@@ -25,6 +25,7 @@ object UI {
         tileInfo = TileInfoPanel(skin)
         tileInfo.debug = true
         tileInfo.isVisible = false
+        tileInfo.width = 200f
         stage.addActor(tileInfo)
     }
 
@@ -33,6 +34,8 @@ object UI {
     }
 
     fun draw() {
+        tileInfo.setPosition(10f, UI.viewport.screenHeight - tileInfo.height - 10)
+
         stage.draw()
     }
 

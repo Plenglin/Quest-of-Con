@@ -5,6 +5,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.scenes.scene2d.ui.Table
+import com.badlogic.gdx.scenes.scene2d.ui.Value
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 
 
@@ -16,6 +17,8 @@ class TileInfoPanel(skin: Skin) : Table(skin) {
 
             val coord = target
             if (coord?.tile != null) {
+                titleLabel.setText("${coord.tile.terrain.name.capitalize()} at ${coord.i}, ${coord.j}")
+
                 val pawn = coord.tile.pawn
                 this.pawn.data = pawn?.getProperties() ?: emptyMap()
 
@@ -27,20 +30,25 @@ class TileInfoPanel(skin: Skin) : Table(skin) {
             building.updateData()
         }
 
+    val titleLabel = Label("", skin)
     val pawn = PropertiesTable(skin)
     val building = PropertiesTable(skin)
 
     init {
-        add(pawn)
+        add(titleLabel).colspan(2)
         row()
-        add(building)
+        add(Label("Unit", skin)).center().pad(10f)
+        add(pawn).top().left().expandX().pad(5f)
+        row()
+        add(Label("Building", skin)).center().pad(10f)
+        add(building).top().left().expandX().pad(5f)
     }
 
     override fun draw(batch: Batch?, parentAlpha: Float) {
-
-        setPosition(0f, UI.viewport.screenHeight - height)
-        setSize(100f, 300f)
+        pad(5f)
         top().left()
+        this.height = 200f
+
         super.draw(batch, parentAlpha)
     }
 
@@ -52,11 +60,20 @@ class PropertiesTable(skin: Skin) : Table(skin) {
 
     fun updateData() {
         clearChildren()
-        data.forEach { k, v ->
-            add(Label(k, skin)).expandX
-            add(Label(v.toString(), skin))
-            row()
+        if (data.size > 0) {
+            data.forEach { k, v ->
+                add(Label(k.capitalize(), skin)).left().prefWidth(999f)
+                add(Label(v.toString(), skin)).right()
+                row()
+            }
+        } else {
+            add(Label("none", skin)).colspan(2).center()
         }
+    }
+
+    override fun draw(batch: Batch?, parentAlpha: Float) {
+        top().left()
+        super.draw(batch, parentAlpha)
     }
 
 }

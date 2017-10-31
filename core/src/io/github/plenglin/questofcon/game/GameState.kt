@@ -4,8 +4,8 @@ import com.badlogic.gdx.graphics.Color
 import io.github.plenglin.questofcon.game.building.BuildingCreator
 import io.github.plenglin.questofcon.game.building.BuildingFactoryCreator
 import io.github.plenglin.questofcon.game.grid.World
-import io.github.plenglin.questofcon.game.unit.PawnCreator
-import io.github.plenglin.questofcon.game.unit.SimplePawnCreator
+import io.github.plenglin.questofcon.game.pawn.PawnCreator
+import io.github.plenglin.questofcon.game.pawn.SimplePawnCreator
 
 /**
  *

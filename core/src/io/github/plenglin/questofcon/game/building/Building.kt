@@ -19,7 +19,7 @@ abstract class Building(val name: String, var team: Team, var pos: WorldCoords, 
     open fun onTurnEnd() = Unit
 
     open fun getProperties(): Map<String, Any> {
-        return mapOf("hp" to health)
+        return mapOf("hp" to "$health/$maxHealth", "team" to team.name)
     }
 
 }

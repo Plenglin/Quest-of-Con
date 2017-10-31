@@ -1,4 +1,4 @@
-package io.github.plenglin.questofcon.game.unit
+package io.github.plenglin.questofcon.game.pawn
 
 import com.badlogic.gdx.graphics.Color
 import io.github.plenglin.questofcon.game.grid.WorldCoords
@@ -26,7 +26,7 @@ abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val 
     abstract fun onAttack(coords: WorldCoords): Boolean
 
     open fun getProperties(): Map<String, Any> {
-        return mapOf("hp" to health, "ap" to actionPoints)
+        return mapOf("team" to team.name, "health" to "$health/$maxHealth", "actions" to "$apRemaining/$actionPoints")
     }
 
 }
@@ -61,7 +61,7 @@ class SimplePawnCreator(val name: String, val maxHealth: Int, val attack: Int, v
 
         override fun getProperties(): Map<String, Any> {
             val props = super.getProperties().toMutableMap()
-            props["atk"] = attack
+            props["attack"] = attack
             if (range > 1) {
                 props["range"] = range
             }

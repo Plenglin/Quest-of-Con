@@ -1,7 +1,7 @@
 package io.github.plenglin.questofcon.game.grid
 
 import io.github.plenglin.questofcon.game.building.Building
-import io.github.plenglin.questofcon.game.unit.Pawn
+import io.github.plenglin.questofcon.game.pawn.Pawn
 
 /**
  *
