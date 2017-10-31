@@ -43,7 +43,7 @@ class WorldRenderer(val world: World) {
 
             // Draw things on tiles
             shape.set(ShapeRenderer.ShapeType.Filled)
-            for (i in 0 until height) {
+            for (i in (height - 1) downTo 0) {
                 val x = i.toFloat()
 
                 // Draw buildings

@@ -15,15 +15,17 @@ object UI {
 
     val stage: Stage = Stage()
 
-    lateinit var pawnInfo: PawnInfoPanel
+    lateinit var tileInfo: TileInfoPanel
 
     fun generateUI() {
         stage.viewport = viewport
 
         stage.clear()
 
-        pawnInfo = PawnInfoPanel(skin)
-        stage.addActor(pawnInfo)
+        tileInfo = TileInfoPanel(skin)
+        tileInfo.debug = true
+        tileInfo.isVisible = false
+        stage.addActor(tileInfo)
     }
 
     fun update(delta: Float) {
@@ -36,6 +38,7 @@ object UI {
 
     fun dispose() {
         stage.dispose()
+        skin.dispose()
     }
 
 }

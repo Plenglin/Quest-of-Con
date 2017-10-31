@@ -10,6 +10,7 @@ import io.github.plenglin.questofcon.game.GameState
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 import io.github.plenglin.questofcon.render.WorldRenderer
+import io.github.plenglin.questofcon.ui.GridSelection
 import io.github.plenglin.questofcon.ui.UI
 import io.github.plenglin.questofcon.ui.MapMovement
 import ktx.app.KtxScreen
@@ -25,6 +26,7 @@ object GameScreen : KtxScreen {
     lateinit var worldRenderer: WorldRenderer
 
     lateinit var mapMovement: MapMovement
+    lateinit var gridSelection: GridSelection
 
     lateinit var gameState: GameState
 
@@ -33,9 +35,10 @@ object GameScreen : KtxScreen {
         gameState = GameState()
 
         mapMovement = MapMovement(gridCam)
+        gridSelection = GridSelection(gridCam, gameState.world)
 
         worldRenderer = WorldRenderer(gameState.world)
-        Gdx.input.inputProcessor = InputMultiplexer(UI.stage, mapMovement)
+        Gdx.input.inputProcessor = InputMultiplexer(UI.stage, gridSelection, mapMovement)
 
         gridCam.zoom = 1/32f
         gridCam.position.set(0f, 0f, 0f)
@@ -70,6 +73,7 @@ object GameScreen : KtxScreen {
 
     override fun resize(width: Int, height: Int) {
         gridCam.setToOrtho(false, width.toFloat(), height.toFloat())
+        UI.viewport.update(width, height, true)
     }
 
 }

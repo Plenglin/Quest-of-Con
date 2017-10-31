@@ -3,7 +3,10 @@ package io.github.plenglin.questofcon.ui
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.math.Vector3
 import io.github.plenglin.questofcon.QuestOfCon
+import io.github.plenglin.questofcon.game.grid.World
+import io.github.plenglin.questofcon.game.grid.WorldCoords
 
 
 class MapMovement(val cam: OrthographicCamera) : InputProcessor {
@@ -94,7 +97,44 @@ class MapMovement(val cam: OrthographicCamera) : InputProcessor {
 
 }
 
-class UnitSpawning(val cam: OrthographicCamera) : InputProcessor {
+class GridSelection(val cam: OrthographicCamera, val world: World) : InputProcessor {
+
+    var selection: WorldCoords? = null
+        private set(value) {
+            println(value)
+            field = value
+            if (value == null) {
+                UI.tileInfo.isVisible = false
+            } else {
+                UI.tileInfo.isVisible = true
+                UI.tileInfo.target = value
+            }
+        }
+
+    override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        val gridPos = cam.unproject(Vector3(screenX.toFloat(), screenY.toFloat(), 0f))
+        val i = gridPos.x.toInt()
+        val j = gridPos.y.toInt()
+        when (pointer) {
+            Input.Buttons.LEFT -> {
+                val grid = WorldCoords(world, i, j)
+                if (grid.exists) {
+                    selection = grid
+                }
+            }
+        }
+        return false
+    }
+
+    override fun keyDown(keycode: Int): Boolean {
+        when (keycode) {
+            Input.Keys.ESCAPE -> {
+                selection = null
+                return true
+            }
+        }
+        return false
+    }
 
     override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         return false
@@ -106,16 +146,8 @@ class UnitSpawning(val cam: OrthographicCamera) : InputProcessor {
 
     override fun scrolled(amount: Int) = false
 
-    override fun keyUp(keycode: Int): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun keyUp(keycode: Int) = false
 
     override fun touchDragged(screenX: Int, screenY: Int, pointer: Int) = false
-
-    override fun keyDown(keycode: Int): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int) = false
 
 }

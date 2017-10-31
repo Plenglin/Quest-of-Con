@@ -34,6 +34,8 @@ data class WorldCoords(val world: World, val i: Int, val j: Int) {
 
     val tile: Tile? = world[i, j]
 
+    val exists: Boolean = world[i, j] != null
+
     /**
      * Perform a floodfill starting from this point.
      * @param radius how far from here to floodfill
