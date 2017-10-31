@@ -1,5 +1,6 @@
 package io.github.plenglin.questofcon.screen
 
+import com.badlogic.gdx.Game
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.graphics.Color
@@ -53,6 +54,7 @@ object GameScreen : KtxScreen {
 
         GameData.spawnableUnits[0].createPawnAt(teamA, WorldCoords(gameState.world, 5, 5))
         val pawnb = GameData.spawnableUnits[0].createPawnAt(teamB, WorldCoords(gameState.world, 6, 5))
+        GameData.spawnableBuildings[0].createBuildingAt(teamA, WorldCoords(gameState.world, 7, 5))
 
         UI.generateUI()
 
@@ -68,6 +70,9 @@ object GameScreen : KtxScreen {
                             val actions = mutableListOf<Selectable>()
                             if (selection.tile!!.pawn != null) {
                                 actions.addAll(RadialMenus.pawnMenu)
+                            }
+                            if (selection.tile.building != null) {
+                                actions.addAll(selection.tile.building!!.getActions())
                             }
                             println(actions)
                             selectables = actions

@@ -1,8 +1,12 @@
 package io.github.plenglin.questofcon.game.building
 
 import com.badlogic.gdx.graphics.Color
+import io.github.plenglin.questofcon.game.GameData
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
+import io.github.plenglin.questofcon.ui.Selectable
+import io.github.plenglin.questofcon.ui.UI
+import io.github.plenglin.questofcon.ui.UnitSpawningDialog
 
 interface BuildingCreator {
 
@@ -17,6 +21,10 @@ abstract class Building(val name: String, var team: Team, var pos: WorldCoords, 
     open fun onTurnBegin() = Unit
 
     open fun onTurnEnd() = Unit
+
+    open fun getActions(): List<Selectable> {
+        return listOf()
+    }
 
     open fun getProperties(): Map<String, Any> {
         return mapOf("hp" to "$health/$maxHealth", "team" to team.name)
@@ -33,6 +41,16 @@ class BuildingFactoryCreator : BuildingCreator {
     }
 
     class BuildingFactory(team: Team, pos: WorldCoords) : Building("factory", team, pos, 10, Color.GRAY) {
+
+        override fun getActions(): List<Selectable> {
+            return listOf(
+                    object : Selectable("Make") {
+                        override fun onSelected(x: Float, y: Float) {
+                            UI.stage.addActor(UnitSpawningDialog(GameData.spawnableUnits, UI.skin))
+                        }
+                    }
+            )
+        }
 
     }
 }

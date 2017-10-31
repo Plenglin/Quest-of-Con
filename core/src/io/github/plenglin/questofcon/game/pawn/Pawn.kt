@@ -5,9 +5,9 @@ import io.github.plenglin.questofcon.game.grid.WorldCoords
 import io.github.plenglin.questofcon.game.Team
 
 
-interface PawnCreator {
+abstract class PawnCreator(val name: String, val cost: Int) {
 
-    fun createPawnAt(team: Team, worldCoords: WorldCoords): Pawn
+    abstract fun createPawnAt(team: Team, worldCoords: WorldCoords): Pawn
 
 }
 
@@ -54,7 +54,8 @@ abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val 
 }
 
 
-class SimplePawnCreator(val name: String, val maxHealth: Int, val attack: Int, val color: Color, val actionPoints: Int = 2, val range: Int = 1) : PawnCreator {
+class SimplePawnCreator(name: String, cost: Int, val maxHealth: Int, val attack: Int, val color: Color, val actionPoints: Int = 2, val range: Int = 1) :
+        PawnCreator(name, cost) {
 
     override fun createPawnAt(team: Team, worldCoords: WorldCoords): Pawn {
         val pawn = SimplePawn(team, worldCoords)

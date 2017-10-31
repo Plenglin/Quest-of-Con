@@ -9,6 +9,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.Align
 import io.github.plenglin.questofcon.game.grid.WorldCoords
+import io.github.plenglin.questofcon.game.pawn.PawnCreator
+import ktx.scene2d.label
+import ktx.scene2d.table
 
 
 class TileInfoPanel(skin: Skin) : Table(skin) {
@@ -153,17 +156,42 @@ abstract class Selectable(val title: String) {
 
 }
 
-class ConfirmationDialog(title: String, skin: Skin, onConfirm: () -> Unit) : Dialog(title, skin) {
+class ConfirmationDialog(title: String, skin: Skin, val onConfirm: () -> Unit) : Dialog(title, skin) {
 
     init {
         text("Are you sure?")
-        button("OK", onConfirm)
-        button("Cancel", { remove() })
+        button("OK", 1)
+        button("Cancel", 2)
         setPosition((UI.viewport.screenWidth / 2).toFloat(), (UI.viewport.screenHeight / 2).toFloat(), Align.center)
     }
 
     override fun result(obj: Any?) {
-        val code = (obj as () -> Unit)()
+        when (obj) {
+            1 -> onConfirm()
+            2 -> remove()
+        }
     }
 
+}
+
+class UnitSpawningDialog(val units: List<PawnCreator>, skin: Skin) : Dialog("Spawn", skin) {
+
+    init {/*
+        table {
+            label("Type")
+            label("Cost")
+            units.forEach {
+                label(it.name)
+                label("$$it.cost")
+                button("Spawn", it)
+                row()
+            }
+        }*/
+    }
+
+    override fun result(btn: Any?) {
+        val pawn = btn as PawnCreator
+        println("Spawn ${pawn.name}")
+        remove()
+    }
 }
