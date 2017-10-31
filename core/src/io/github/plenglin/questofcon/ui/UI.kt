@@ -27,23 +27,7 @@ object UI {
         tileInfo.width = 200f
         stage.addActor(tileInfo)
 
-        radialMenu = RadialMenu(skin, 100f, 50f,
-                object : Selectable("Move") {
-                    override fun onSelected() {
-                        println("mov")
-                    }
-                },
-                object : Selectable("Attack") {
-                    override fun onSelected() {
-                        println("atk")
-                    }
-                },
-                object : Selectable("Build") {
-                    override fun onSelected() {
-                        println("bld")
-                    }
-                }
-        )
+        radialMenu = RadialMenu(skin, 100f, 50f)
         stage.addActor(radialMenu)
     }
 

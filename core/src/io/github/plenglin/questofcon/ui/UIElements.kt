@@ -78,15 +78,16 @@ class PropertiesTable(skin: Skin) : Table(skin) {
 
 }
 
-class RadialMenu(skin: Skin, val radiusX: Float, val radiusY: Float, vararg selectables: Selectable) : Group() {
+class RadialMenu(val skin: Skin, val radiusX: Float, val radiusY: Float) : Group() {
 
     var active = false
-    var selectables = selectables.toList()
+    var selectables = listOf<Selectable>()
 
     private var selected: RadialMenuItem? = null
     private val items = mutableListOf<RadialMenuItem>()
 
-    init {
+    fun updateUI() {
+        clearChildren()
         setScale(1f)
         for (i in 0 until selectables.size) {
             val sel = selectables[i]
