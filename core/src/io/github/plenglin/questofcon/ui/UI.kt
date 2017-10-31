@@ -5,6 +5,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.utils.viewport.ScreenViewport
 import com.badlogic.gdx.utils.viewport.Viewport
+import ktx.scene2d.Scene2DSkin
 
 
 object UI {
@@ -20,6 +21,8 @@ object UI {
 
     fun generateUI() {
         stage.clear()
+
+        Scene2DSkin.defaultSkin = skin
 
         tileInfo = TileInfoPanel(skin)
         tileInfo.debug = true

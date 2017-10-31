@@ -43,13 +43,13 @@ class BuildingFactoryCreator : BuildingCreator {
     class BuildingFactory(team: Team, pos: WorldCoords) : Building("factory", team, pos, 10, Color.GRAY) {
 
         override fun getActions(): List<Selectable> {
-            return listOf(
+            return if (pos.tile!!.pawn == null) listOf(
                     object : Selectable("Make") {
                         override fun onSelected(x: Float, y: Float) {
-                            UI.stage.addActor(UnitSpawningDialog(GameData.spawnableUnits, UI.skin))
+                            UI.stage.addActor(UnitSpawningDialog(GameData.spawnableUnits, UI.skin, pos, team))
                         }
                     }
-            )
+            ) else emptyList()
         }
 
     }

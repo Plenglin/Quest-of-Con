@@ -9,8 +9,9 @@ import io.github.plenglin.questofcon.game.pawn.SimplePawnCreator
 
 object GameData {
     val spawnableUnits = listOf<PawnCreator>(
-            SimplePawnCreator("footman", 10, 3, 2, Color.MAROON),
-            SimplePawnCreator("spearman", 10, 5, 2, Color.LIGHT_GRAY)
+            SimplePawnCreator("grunt", 10, 3, 2, Color.MAROON),
+            SimplePawnCreator("pike mech", 20, 5, 2, Color.LIGHT_GRAY),
+            SimplePawnCreator("laser mech", 15, 3, 2, range = 2, color = Color.LIGHT_GRAY)
     )
 
     val spawnableBuildings = listOf<BuildingCreator>(

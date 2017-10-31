@@ -1,10 +1,13 @@
 package io.github.plenglin.questofcon.ui
 
 import com.badlogic.gdx.graphics.g2d.Batch
+import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.Group
 import com.badlogic.gdx.scenes.scene2d.ui.*
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.Align
+import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 import io.github.plenglin.questofcon.game.pawn.PawnCreator
 
@@ -34,7 +37,6 @@ class TileInfoPanel(skin: Skin) : Table(skin) {
     override fun draw(batch: Batch?, parentAlpha: Float) {
         pad(5f)
         top().left()
-        this.height = 200f
 
         super.draw(batch, parentAlpha)
     }
@@ -53,6 +55,7 @@ class TileInfoPanel(skin: Skin) : Table(skin) {
 
         pawn.updateData()
         building.updateData()
+        pack()
     }
 
 }
@@ -65,7 +68,7 @@ class PropertiesTable(skin: Skin) : Table(skin) {
         clearChildren()
         if (data.size > 0) {
             data.forEach { k, v ->
-                add(Label(k.capitalize(), skin)).left().prefWidth(999f)
+                add(Label(k.capitalize(), skin)).left().prefWidth(100f)
                 add(Label(v.toString(), skin)).right()
                 row()
             }
@@ -92,7 +95,6 @@ class RadialMenu(val skin: Skin, var radiusX: Float, var radiusY: Float) : Group
     fun updateUI() {
 
         clearChildren()
-        setScale(1f)
         for (i in 0 until selectables.size) {
             val sel = selectables[i]
 
@@ -156,36 +158,44 @@ class ConfirmationDialog(title: String, skin: Skin, val onConfirm: () -> Unit) :
         text("Are you sure?")
         button("OK", 1)
         button("Cancel", 2)
-        setPosition((UI.viewport.screenWidth / 2).toFloat(), (UI.viewport.screenHeight / 2).toFloat(), Align.center)
+        setPosition((UI.viewport.screenWidth / 2).toFloat(), (UI.viewport.screenHeight / 2).toFloat())
     }
 
     override fun result(obj: Any?) {
         when (obj) {
             1 -> onConfirm()
-            2 -> remove()
         }
     }
 
 }
 
-class UnitSpawningDialog(val units: List<PawnCreator>, skin: Skin) : Dialog("Spawn", skin) {
+class UnitSpawningDialog(val units: List<PawnCreator>, skin: Skin, val worldCoords: WorldCoords, val team: Team) : Dialog("Spawn", skin) {
 
-    init {/*
-        table {
-            label("Type")
-            label("Cost")
+    init {
+        contentTable.apply {
+            add(Label("Type", skin))
+            add(Label("Cost", skin))
+            add(Label("Spawn", skin))
+            row()
             units.forEach {
-                label(it.name)
-                label("$$it.cost")
-                button("Spawn", it)
+                add(Label(it.name.capitalize(), skin))
+                add(Label("$${it.cost}", skin))
+                add(TextButton("Spawn", skin).apply {
+                    addListener(object : ChangeListener() {
+                        override fun changed(event: ChangeEvent?, actor: Actor?) {
+                            println("spawning ${it.name}")
+                            val pawn = it.createPawnAt(team, worldCoords)
+                            pawn.apRemaining = 0
+                            this@UnitSpawningDialog.hide()
+                        }
+                    })
+                })
                 row()
             }
-        }*/
+        }
+        button("Cancel")
+        pack()
+        setPosition((UI.viewport.screenWidth / 2).toFloat(), (UI.viewport.screenHeight / 2).toFloat())
     }
 
-    override fun result(btn: Any?) {
-        val pawn = btn as PawnCreator
-        println("Spawn ${pawn.name}")
-        remove()
-    }
 }
