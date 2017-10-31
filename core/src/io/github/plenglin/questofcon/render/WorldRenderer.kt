@@ -3,13 +3,14 @@ package io.github.plenglin.questofcon.render
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import io.github.plenglin.questofcon.game.grid.World
+import ktx.app.color
 
 
 class WorldRenderer(val world: World) {
 
     val shape: ShapeRenderer = ShapeRenderer()
 
-    fun render(drawGrid: Boolean = false) {
+    fun render(selI: Int, selJ: Int, drawSelected: Boolean = false, drawGrid: Boolean = false) {
 
         shape.setAutoShapeType(true)
         shape.begin()
@@ -41,8 +42,16 @@ class WorldRenderer(val world: World) {
                 }
             }
 
-            // Draw things on tiles
+            // Emphasize the selected tile
+            if (drawSelected) {
+                shape.set(ShapeRenderer.ShapeType.Line)
+                shape.color = Color.WHITE
+                shape.rect(selI.toFloat(), selJ.toFloat(), 1f, 1f)
+            }
+
             shape.set(ShapeRenderer.ShapeType.Filled)
+
+            // Draw things on tiles
             for (i in (height - 1) downTo 0) {
                 val x = i.toFloat()
 

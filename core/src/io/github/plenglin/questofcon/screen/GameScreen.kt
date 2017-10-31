@@ -60,7 +60,13 @@ object GameScreen : KtxScreen {
         Gdx.gl20.glClearColor(0f, 0f, 0f ,1f)
 
         worldRenderer.shape.projectionMatrix = gridCam.combined
-        worldRenderer.render(true)
+
+        val selection = gridSelection.selection
+        if (selection == null) {
+            worldRenderer.render(0, 0, false, true)
+        } else {
+            worldRenderer.render(selection.i, selection.j, true, true)
+        }
 
         UI.draw()
 
