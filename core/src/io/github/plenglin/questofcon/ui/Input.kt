@@ -156,7 +156,7 @@ class GridSelection(val cam: OrthographicCamera, val world: World) : InputProces
             Input.Buttons.LEFT -> {
                 val grid = WorldCoords(world, i, j)
                 selection = grid
-                selectionListeners.forEach { it(selection, i, j) }
+                selectionListeners.forEach { it(selection, screenX, screenY) }
             }
         }
         return false

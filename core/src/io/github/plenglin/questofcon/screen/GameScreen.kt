@@ -76,6 +76,7 @@ object GameScreen : KtxScreen {
                             active = true
                             updateUI()
                             setPosition(screenX.toFloat(), (Gdx.graphics.height - screenY).toFloat())
+                            println("$x, $y")
                         }
                     } else {
                         println("hiding radial menu")
