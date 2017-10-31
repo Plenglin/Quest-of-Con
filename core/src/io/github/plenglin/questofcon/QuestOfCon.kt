@@ -7,5 +7,9 @@ import ktx.app.KtxGame
 /**
  *
  */
-class Main : KtxGame<Screen>(GameScreen) {
+object QuestOfCon : KtxGame<Screen>(GameScreen) {
+
+    val zoomRate = 1.5f
+    val camSpeed = 7f
+
 }
