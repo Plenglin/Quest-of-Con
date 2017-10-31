@@ -1,5 +1,6 @@
 package io.github.plenglin.questofcon.ui
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.graphics.OrthographicCamera
@@ -122,6 +123,16 @@ class GridSelection(val cam: OrthographicCamera, val world: World) : InputProces
         when (pointer) {
             Input.Buttons.LEFT -> {
                 val grid = WorldCoords(world, i, j)
+                // Detected double click
+                if (selection != null && selection == grid) {
+                    println("showing radial menu")
+                    UI.radialMenu.setPosition(screenX.toFloat(), (Gdx.graphics.height - screenY).toFloat())
+                    UI.radialMenu.isVisible = true
+                    UI.radialMenu.active = true
+                } else {
+                    UI.radialMenu.isVisible = false
+                    UI.radialMenu.active = false
+                }
                 selection = grid
             }
         }
@@ -132,6 +143,8 @@ class GridSelection(val cam: OrthographicCamera, val world: World) : InputProces
         when (keycode) {
             Input.Keys.ESCAPE -> {
                 selection = null
+                UI.radialMenu.isVisible = false
+                UI.radialMenu.active = false
                 return true
             }
         }

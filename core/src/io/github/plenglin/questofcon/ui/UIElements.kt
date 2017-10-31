@@ -1,11 +1,11 @@
 package io.github.plenglin.questofcon.ui
 
 import com.badlogic.gdx.graphics.g2d.Batch
-import com.badlogic.gdx.scenes.scene2d.Actor
+import com.badlogic.gdx.scenes.scene2d.Group
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.scenes.scene2d.ui.Table
-import com.badlogic.gdx.scenes.scene2d.ui.Value
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 
 
@@ -78,6 +78,64 @@ class PropertiesTable(skin: Skin) : Table(skin) {
 
 }
 
-class RadialMenu : Actor() {
+class RadialMenu(skin: Skin, val radiusX: Float, val radiusY: Float, vararg selectables: Selectable) : Group() {
+
+    var active = false
+    var selectables = selectables.toList()
+
+    private var selected: RadialMenuItem? = null
+    private val items = mutableListOf<RadialMenuItem>()
+
+    init {
+        setScale(1f)
+        for (i in 0 until selectables.size) {
+            val sel = selectables[i]
+
+            val label = Label(sel.title, skin)
+
+            val angle = i.toFloat() / selectables.size * 2 * Math.PI
+
+            val listener = ClickListener()
+
+            //label.setSize(100f, 100f)
+            label.setPosition(
+                    radiusX * Math.sin(angle).toFloat() - label.width / 2,
+                    radiusY * Math.cos(angle).toFloat() - label.height / 2)
+
+            println(radiusX * Math.sin(angle).toFloat() - label.width / 2)
+
+            label.addListener(listener)
+            label.isVisible = true
+            label.debug = true
+            addActor(label)
+            items.add(RadialMenuItem(label, sel, listener))
+        }
+    }
+
+    override fun act(delta: Float) {
+        if (active) {
+            selected = null
+            items.forEach {
+                if (it.clickListener.isOver) {
+                    selected = it
+                }
+            }
+            if (selected != null) {
+                println("selected $selected")
+                this.selected!!.selectable.onSelected()
+                this.active = false
+                this.isVisible = false
+            }
+        }
+        super.act(delta)
+    }
+
+}
+
+private data class RadialMenuItem(val label: Label, val selectable: Selectable, val clickListener: ClickListener)
+
+abstract class Selectable(val title: String) {
+
+    abstract fun onSelected()
 
 }

@@ -13,13 +13,12 @@ object UI {
 
     val viewport: Viewport = ScreenViewport()
 
-    val stage: Stage = Stage()
+    val stage: Stage = Stage(viewport)
 
     lateinit var tileInfo: TileInfoPanel
+    lateinit var radialMenu: RadialMenu
 
     fun generateUI() {
-        stage.viewport = viewport
-
         stage.clear()
 
         tileInfo = TileInfoPanel(skin)
@@ -27,6 +26,25 @@ object UI {
         tileInfo.isVisible = false
         tileInfo.width = 200f
         stage.addActor(tileInfo)
+
+        radialMenu = RadialMenu(skin, 100f, 50f,
+                object : Selectable("Move") {
+                    override fun onSelected() {
+                        println("mov")
+                    }
+                },
+                object : Selectable("Attack") {
+                    override fun onSelected() {
+                        println("atk")
+                    }
+                },
+                object : Selectable("Build") {
+                    override fun onSelected() {
+                        println("bld")
+                    }
+                }
+        )
+        stage.addActor(radialMenu)
     }
 
     fun update(delta: Float) {
