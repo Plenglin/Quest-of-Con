@@ -78,7 +78,7 @@ class PropertiesTable(skin: Skin) : Table(skin) {
 
 }
 
-class RadialMenu(val skin: Skin, val radiusX: Float, val radiusY: Float) : Group() {
+class RadialMenu(val skin: Skin, var radiusX: Float, var radiusY: Float) : Group() {
 
     var active = false
     var selectables = listOf<Selectable>()
@@ -123,7 +123,7 @@ class RadialMenu(val skin: Skin, val radiusX: Float, val radiusY: Float) : Group
             }
             if (selected != null) {
                 println("selected $selected")
-                this.selected!!.selectable.onSelected()
+                this.selected!!.selectable.onSelected(this.x, this.y)
                 this.active = false
                 this.isVisible = false
             }
@@ -137,6 +137,13 @@ private data class RadialMenuItem(val label: Label, val selectable: Selectable, 
 
 abstract class Selectable(val title: String) {
 
-    abstract fun onSelected()
+    /**
+     * Called when this selectable is selected. Parameters are at the center of the radial menu.
+     */
+    abstract fun onSelected(x: Float, y: Float)
+
+    override fun toString(): String {
+        return title
+    }
 
 }

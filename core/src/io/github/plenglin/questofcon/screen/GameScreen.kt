@@ -6,13 +6,14 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import io.github.plenglin.questofcon.QuestOfCon
+import io.github.plenglin.questofcon.game.GameData
 import io.github.plenglin.questofcon.game.GameState
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
+import io.github.plenglin.questofcon.render.SelectionSet
 import io.github.plenglin.questofcon.render.WorldRenderer
-import io.github.plenglin.questofcon.ui.GridSelection
-import io.github.plenglin.questofcon.ui.UI
-import io.github.plenglin.questofcon.ui.MapMovement
+import io.github.plenglin.questofcon.ui.*
 import ktx.app.KtxScreen
 
 /**
@@ -29,6 +30,9 @@ object GameScreen : KtxScreen {
     lateinit var gridSelection: GridSelection
 
     lateinit var gameState: GameState
+
+    var pawnMovementData: PawnMovement? = null
+    var uiState = UIState.NONE
 
     val teamA = Team("escargot", Color.BLUE)
     val teamB = Team("parfait", Color.WHITE)
@@ -47,7 +51,45 @@ object GameScreen : KtxScreen {
         gridCam.zoom = 1/32f
         gridCam.position.set(0f, 0f, 0f)
 
+        GameData.spawnableUnits[0].createPawnAt(teamA, WorldCoords(gameState.world, 5, 5))
+
         UI.generateUI()
+
+        var previous: WorldCoords? = null
+        gridSelection.selectionListeners.add({ selection, screenX, screenY ->
+
+            when (uiState) {
+                UIState.NONE -> {
+                    // Detected double click
+                    if (selection != null && selection == previous) {
+                        println("showing radial menu")
+                        UI.radialMenu.apply {
+                            val actions = mutableListOf<Selectable>()
+                            if (selection.tile!!.pawn != null) {
+                                actions.addAll(RadialMenus.pawnMenu)
+                            }
+                            println(actions)
+                            selectables = actions
+                            radiusX = 50f
+                            radiusY = 25f
+                            isVisible = true
+                            active = true
+                            updateUI()
+                            setPosition(screenX.toFloat(), (Gdx.graphics.height - screenY).toFloat())
+                        }
+                    } else {
+                        println("hiding radial menu")
+                        UI.radialMenu.isVisible = false
+                        UI.radialMenu.active = false
+                    }
+                }
+                UIState.MOVING_PAWN -> {
+
+                }
+            }
+
+            previous = gridSelection.selection
+        })
     }
 
     override fun render(delta: Float) {
@@ -62,11 +104,14 @@ object GameScreen : KtxScreen {
         worldRenderer.shape.projectionMatrix = gridCam.combined
 
         val selection = gridSelection.selection
-        if (selection == null) {
-            worldRenderer.render(0, 0, false, true)
-        } else {
-            worldRenderer.render(selection.i, selection.j, true, true)
+        val sets = mutableListOf<SelectionSet>()
+        if (selection != null) {
+            sets.add(SelectionSet(setOf(selection), QuestOfCon.selectionColor))
         }
+        if (uiState == UIState.MOVING_PAWN) {
+            sets.add(SelectionSet(pawnMovementData!!.squares, QuestOfCon.movementColor))
+        }
+        worldRenderer.render(true, *sets.toTypedArray())
 
         UI.draw()
 
@@ -82,4 +127,8 @@ object GameScreen : KtxScreen {
         UI.viewport.update(width, height, true)
     }
 
+}
+
+enum class UIState {
+    NONE, MOVING_PAWN
 }

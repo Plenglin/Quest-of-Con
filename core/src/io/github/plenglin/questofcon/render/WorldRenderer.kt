@@ -3,6 +3,7 @@ package io.github.plenglin.questofcon.render
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import io.github.plenglin.questofcon.game.grid.World
+import io.github.plenglin.questofcon.game.grid.WorldCoords
 import ktx.app.color
 
 
@@ -10,7 +11,7 @@ class WorldRenderer(val world: World) {
 
     val shape: ShapeRenderer = ShapeRenderer()
 
-    fun render(selI: Int, selJ: Int, drawSelected: Boolean = false, drawGrid: Boolean = false) {
+    fun render(drawGrid: Boolean = true, vararg paints: SelectionSet) {
 
         shape.setAutoShapeType(true)
         shape.begin()
@@ -42,14 +43,15 @@ class WorldRenderer(val world: World) {
                 }
             }
 
-            // Emphasize the selected tile
-            if (drawSelected) {
-                shape.set(ShapeRenderer.ShapeType.Line)
-                shape.color = Color.WHITE
-                shape.rect(selI.toFloat(), selJ.toFloat(), 1f, 1f)
+            // Fill in the selection sets
+            shape.set(ShapeRenderer.ShapeType.Filled)
+            for (s in paints) {
+                s.coords.forEach {
+                    shape.color = s.color
+                    shape.rect(it.i.toFloat(), it.j.toFloat(), 1f, 1f)
+                }
             }
 
-            shape.set(ShapeRenderer.ShapeType.Filled)
 
             // Draw things on tiles
             for (i in (height - 1) downTo 0) {
@@ -98,3 +100,5 @@ class WorldRenderer(val world: World) {
     }
 
 }
+
+data class SelectionSet(val coords: Set<WorldCoords>, val color: Color)

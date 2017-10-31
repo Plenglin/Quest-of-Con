@@ -1,13 +1,17 @@
 package io.github.plenglin.questofcon.ui
 
+import com.badlogic.gdx.Game
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.math.Vector3
 import io.github.plenglin.questofcon.QuestOfCon
+import io.github.plenglin.questofcon.game.GameState
 import io.github.plenglin.questofcon.game.grid.World
 import io.github.plenglin.questofcon.game.grid.WorldCoords
+import io.github.plenglin.questofcon.screen.GameScreen
+import io.github.plenglin.questofcon.screen.UIState
 
 
 class MapMovement(val cam: OrthographicCamera) : InputProcessor {
@@ -87,18 +91,47 @@ class MapMovement(val cam: OrthographicCamera) : InputProcessor {
     }
 
     override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean = false
-
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean = false
-
     override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int) = false
-
     override fun mouseMoved(screenX: Int, screenY: Int) = false
-
     override fun keyTyped(character: Char) = false
 
 }
 
+object RadialMenus {
+    val emptyMenu = listOf<Selectable>(
+            object : Selectable("Build") {
+                override fun onSelected(x: Float, y: Float) {
+                    println("showing build menu")
+                }
+            }
+    )
+
+    val pawnMenu = listOf<Selectable>(
+            object : Selectable("Move") {
+                override fun onSelected(x: Float, y: Float) {
+                    println("showing pawn movement menu")
+                    val pawn = GameScreen.gridSelection.selection!!.tile!!.pawn!!
+                    GameScreen.uiState = UIState.MOVING_PAWN
+                    GameScreen.pawnMovementData = PawnMovement(pawn)
+                }
+            },
+            object : Selectable("Attack") {
+                override fun onSelected(x: Float, y: Float) {
+                    println("showing attack menu")
+                }
+            },
+            object : Selectable("Disband") {
+                override fun onSelected(x: Float, y: Float) {
+                    println("disbanding pawn")
+                }
+            }
+    )
+}
+
 class GridSelection(val cam: OrthographicCamera, val world: World) : InputProcessor {
+
+    val selectionListeners = mutableListOf<(WorldCoords?, Int, Int) -> Unit>()
 
     var selection: WorldCoords? = null
         private set(value) {
@@ -113,7 +146,6 @@ class GridSelection(val cam: OrthographicCamera, val world: World) : InputProces
             }
 
             UI.tileInfo.isVisible = (field != null)
-            println(field)
         }
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
@@ -123,17 +155,8 @@ class GridSelection(val cam: OrthographicCamera, val world: World) : InputProces
         when (pointer) {
             Input.Buttons.LEFT -> {
                 val grid = WorldCoords(world, i, j)
-                // Detected double click
-                if (selection != null && selection == grid) {
-                    println("showing radial menu")
-                    UI.radialMenu.setPosition(screenX.toFloat(), (Gdx.graphics.height - screenY).toFloat())
-                    UI.radialMenu.isVisible = true
-                    UI.radialMenu.active = true
-                } else {
-                    UI.radialMenu.isVisible = false
-                    UI.radialMenu.active = false
-                }
                 selection = grid
+                selectionListeners.forEach { it(selection, i, j) }
             }
         }
         return false
@@ -151,18 +174,11 @@ class GridSelection(val cam: OrthographicCamera, val world: World) : InputProces
         return false
     }
 
-    override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        return false
-    }
-
+    override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int) = false
     override fun mouseMoved(screenX: Int, screenY: Int) = false
-
     override fun keyTyped(character: Char) = false
-
     override fun scrolled(amount: Int) = false
-
     override fun keyUp(keycode: Int) = false
-
     override fun touchDragged(screenX: Int, screenY: Int, pointer: Int) = false
 
 }
