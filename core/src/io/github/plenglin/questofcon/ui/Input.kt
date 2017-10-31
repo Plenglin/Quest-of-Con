@@ -124,6 +124,9 @@ object RadialMenus {
             object : Selectable("Disband") {
                 override fun onSelected(x: Float, y: Float) {
                     println("disbanding pawn")
+                    UI.stage.addActor(ConfirmationDialog("Disband Pawn", UI.skin, {
+                        GameScreen.gridSelection.selection!!.tile!!.pawn!!.health = 0
+                    }))
                 }
             }
     )

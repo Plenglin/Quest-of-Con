@@ -2,10 +2,12 @@ package io.github.plenglin.questofcon.ui
 
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.scenes.scene2d.Group
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
+import com.badlogic.gdx.utils.Align
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 
 
@@ -147,6 +149,21 @@ abstract class Selectable(val title: String) {
 
     override fun toString(): String {
         return title
+    }
+
+}
+
+class ConfirmationDialog(title: String, skin: Skin, onConfirm: () -> Unit) : Dialog(title, skin) {
+
+    init {
+        text("Are you sure?")
+        button("OK", onConfirm)
+        button("Cancel", { remove() })
+        setPosition((UI.viewport.screenWidth / 2).toFloat(), (UI.viewport.screenHeight / 2).toFloat(), Align.center)
+    }
+
+    override fun result(obj: Any?) {
+        val code = (obj as () -> Unit)()
     }
 
 }
