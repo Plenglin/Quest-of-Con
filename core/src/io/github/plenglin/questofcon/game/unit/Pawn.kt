@@ -1,15 +1,17 @@
 package io.github.plenglin.questofcon.game.unit
 
+import com.badlogic.gdx.graphics.Color
 import io.github.plenglin.questofcon.game.grid.WorldCoords
+import io.github.plenglin.questofcon.game.Team
 
 
 interface PawnCreator {
 
-    fun createPawnAt(worldCoords: WorldCoords): Pawn
+    fun createPawnAt(team: Team, worldCoords: WorldCoords): Pawn
 
 }
 
-abstract class Pawn(val name: String, var pos: WorldCoords, val maxHealth: Int, val actionPoints: Int) {
+abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val maxHealth: Int, val actionPoints: Int, val color: Color) {
 
     var health: Int = maxHealth
     var apRemaining: Int = actionPoints
@@ -24,16 +26,16 @@ abstract class Pawn(val name: String, var pos: WorldCoords, val maxHealth: Int, 
     abstract fun onAttack(coords: WorldCoords): Boolean
 
     open fun getProperties(): Map<String, Any> {
-        return mapOf("hp" to maxHealth, "ap" to actionPoints)
+        return mapOf("hp" to health, "ap" to actionPoints)
     }
 
 }
 
 
-class SimplePawnCreator(val name: String, val maxHealth: Int, val attack: Int, val actionPoints: Int = 2, val range: Int = 1) : PawnCreator {
+class SimplePawnCreator(val name: String, val maxHealth: Int, val attack: Int, val color: Color, val actionPoints: Int = 2, val range: Int = 1) : PawnCreator {
 
-    override fun createPawnAt(worldCoords: WorldCoords): Pawn {
-        val pawn = SimplePawn(worldCoords)
+    override fun createPawnAt(team: Team, worldCoords: WorldCoords): Pawn {
+        val pawn = SimplePawn(team, worldCoords)
         worldCoords.tile!!.pawn = pawn
         return pawn
     }
@@ -41,7 +43,7 @@ class SimplePawnCreator(val name: String, val maxHealth: Int, val attack: Int, v
     /**
      * A simple pawn that can be melee or ranged.
      */
-    inner class SimplePawn(pos: WorldCoords) : Pawn(name, pos, maxHealth, actionPoints) {
+    inner class SimplePawn(team: Team, pos: WorldCoords) : Pawn(name, team, pos, maxHealth, actionPoints, color) {
 
         override fun getAttackableSquares(): Set<WorldCoords> {
             return pos.floodfill(range)

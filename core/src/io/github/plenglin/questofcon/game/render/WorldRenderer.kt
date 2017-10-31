@@ -10,22 +10,24 @@ class WorldRenderer(val world: World) {
     val shape: ShapeRenderer = ShapeRenderer()
 
     fun render(drawGrid: Boolean = false) {
-        shape.begin(ShapeRenderer.ShapeType.Filled)
+
+        shape.setAutoShapeType(true)
+        shape.begin()
 
         world.apply {
             // Draw the terrain
+            shape.set(ShapeRenderer.ShapeType.Filled)
             grid.forEachIndexed { i, col ->
                 col.forEachIndexed { j, tile ->
                     shape.color = tile.terrain.color
                     shape.rect(i.toFloat(), j.toFloat(), 1f, 1f)
                 }
             }
-            shape.end()
 
             // Draw the grid if necessary
             if (drawGrid) {
                 shape.color = Color(0f, 0.5f, 1f, 0.5f)
-                shape.begin(ShapeRenderer.ShapeType.Line)
+                shape.set(ShapeRenderer.ShapeType.Line)
                 // Columns
                 for (i in 0..width) {
                     val x = i.toFloat()
@@ -37,9 +39,52 @@ class WorldRenderer(val world: World) {
                     val y = j.toFloat()
                     shape.line(0f, y, width.toFloat(), y)
                 }
-                shape.end()
             }
+
+            // Draw things on tiles
+            shape.set(ShapeRenderer.ShapeType.Filled)
+            for (i in 0 until height) {
+                val x = i.toFloat()
+
+                // Draw buildings
+                for (j in 0 until width) {
+                    val building = this[i, j]!!.building
+                    if (building != null) {
+                        val y = j.toFloat()
+
+                        // Team outline
+                        shape.color = building.team.color
+                        shape.rect(x + 0.2f, y + 0.2f, 0.6f, 1f)
+
+                        // Type infill
+                        shape.color = building.color
+                        shape.rect(x + 0.25f, y + 0.25f, 0.5f, 0.9f)
+
+                    }
+                }
+
+                // Draw pawns
+                for (j in 0 until width) {
+                    val pawn = this[i, j]!!.pawn
+
+                    if (pawn != null) {
+                        val y = j.toFloat()
+
+                        // Team outline
+                        shape.color = pawn.team.color
+                        shape.circle(x + 0.5f, y + 0.5f, 0.35f, 16)
+
+                        // Type infill
+                        shape.color = pawn.color
+                        shape.circle(x + 0.5f, y + 0.5f, 0.3f, 16)
+                    }
+                }
+
+            }
+
         }
+
+        shape.end()
 
     }
 

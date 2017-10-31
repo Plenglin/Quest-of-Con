@@ -2,13 +2,17 @@ package io.github.plenglin.questofcon.screen
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputMultiplexer
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import io.github.plenglin.questofcon.game.GameState
+import io.github.plenglin.questofcon.game.Team
+import io.github.plenglin.questofcon.game.grid.WorldCoords
 import io.github.plenglin.questofcon.game.render.WorldRenderer
 import io.github.plenglin.questofcon.game.ui.UI
 import io.github.plenglin.questofcon.game.ui.MapMovement
+import io.github.plenglin.questofcon.game.unit.SimplePawnCreator
 import ktx.app.KtxScreen
 
 /**
@@ -36,6 +40,10 @@ object GameScreen : KtxScreen {
 
         gridCam.zoom = 1/32f
         gridCam.position.set(0f, 0f, 0f)
+
+        val team = Team("bob", Color.RED)
+        gameState.spawnableUnits[0].createPawnAt(team, WorldCoords(gameState.world, 5, 5))
+        gameState.spawnableBuildings[0].createBuildingAt(team, WorldCoords(gameState.world, 5, 5))
 
         UI.generateUI()
     }
