@@ -96,20 +96,20 @@ class MapMovement(val cam: OrthographicCamera) : InputProcessor {
             }
 
             Input.Keys.W, Input.Keys.UP -> {
-                vy = 1
+                vy += 1
                 return true
             }
             Input.Keys.S, Input.Keys.DOWN -> {
-                vy = -1
+                vy += -1
                 return true
             }
 
             Input.Keys.A, Input.Keys.LEFT -> {
-                vx = -1
+                vx += -1
                 return true
             }
             Input.Keys.D, Input.Keys.RIGHT -> {
-                vx = 1
+                vx += 1
                 return true
             }
         }
@@ -123,18 +123,22 @@ class MapMovement(val cam: OrthographicCamera) : InputProcessor {
                 return false
             }
 
-            Input.Keys.W, Input.Keys.S, Input.Keys.UP, Input.Keys.DOWN -> {
-                if (vy != 0) {
-                    vy = 0
-                    return true
-                }
+            Input.Keys.W, Input.Keys.UP -> {
+                vy -= 1
+                return true
+            }
+            Input.Keys.S, Input.Keys.DOWN -> {
+                vy -= -1
+                return true
             }
 
-            Input.Keys.A, Input.Keys.D, Input.Keys.LEFT, Input.Keys.RIGHT -> {
-                if (vx != 0) {
-                    vx = 0
-                    return true
-                }
+            Input.Keys.A, Input.Keys.LEFT -> {
+                vx -= -1
+                return true
+            }
+            Input.Keys.D, Input.Keys.RIGHT -> {
+                vx -= 1
+                return true
             }
         }
         return false
