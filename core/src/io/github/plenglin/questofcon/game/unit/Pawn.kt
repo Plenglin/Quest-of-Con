@@ -9,29 +9,63 @@ interface PawnCreator {
 
 }
 
-abstract class Pawn(var pos: WorldCoords, val maxHealth: Int, val actionPoints: Int) {
+abstract class Pawn(val name: String, var pos: WorldCoords, val maxHealth: Int, val actionPoints: Int) {
 
     var health: Int = maxHealth
     var apRemaining: Int = actionPoints
 
     abstract fun getAttackableSquares(): Set<WorldCoords>
 
-    abstract fun onAttack(coords: WorldCoords)
+    /**
+     * Try to attack a square.
+     * @param coords the square to attack
+     * @return whether it was successful or not.
+     */
+    abstract fun onAttack(coords: WorldCoords): Boolean
 
-    fun getProperties(): Map<String, Any> {
-        return mapOf("HP" to maxHealth, "AP" to actionPoints)
+    open fun getProperties(): Map<String, Any> {
+        return mapOf("hp" to maxHealth, "ap" to actionPoints)
     }
 
 }
 
-class SimplePawn(pos: WorldCoords, maxHealth: Int, actionPoints: Int, val attack: Int, val range: Int = 1) : Pawn(pos, maxHealth, actionPoints) {
 
-    override fun getAttackableSquares(): Set<WorldCoords> {
-        return pos.floodfill(range)
+class SimplePawnCreator(val name: String, val maxHealth: Int, val attack: Int, val actionPoints: Int = 2, val range: Int = 1) : PawnCreator {
+
+    override fun createPawnAt(worldCoords: WorldCoords): Pawn {
+        val pawn = SimplePawn(worldCoords)
+        worldCoords.tile!!.pawn = pawn
+        return pawn
     }
 
-    override fun onAttack(coords: WorldCoords) {
-        //if (coords.tile)
+    /**
+     * A simple pawn that can be melee or ranged.
+     */
+    inner class SimplePawn(pos: WorldCoords) : Pawn(name, pos, maxHealth, actionPoints) {
+
+        override fun getAttackableSquares(): Set<WorldCoords> {
+            return pos.floodfill(range)
+        }
+
+        override fun onAttack(coords: WorldCoords): Boolean {
+            val inRange = Math.abs(coords.i - this.pos.i) + Math.abs(coords.j - this.pos.j) <= range
+            val tile = coords.tile
+            if (inRange && tile != null) {
+                return tile.doDamage(attack)
+            } else {
+                return false
+            }
+        }
+
+        override fun getProperties(): Map<String, Any> {
+            val props = super.getProperties().toMutableMap()
+            props["atk"] = attack
+            if (range > 1) {
+                props["range"] = range
+            }
+            return props
+        }
+
     }
 
 }
