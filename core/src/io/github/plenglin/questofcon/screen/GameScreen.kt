@@ -5,11 +5,11 @@ import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
-import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.viewport.ScreenViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 import io.github.plenglin.questofcon.game.Game
+import io.github.plenglin.questofcon.game.render.WorldRenderer
 import ktx.app.KtxScreen
 
 /**
@@ -20,6 +20,7 @@ object GameScreen : KtxScreen {
     val gridCam = OrthographicCamera()
     lateinit var batch: SpriteBatch
     lateinit var shape: ShapeRenderer
+    lateinit var worldRenderer: WorldRenderer
 
     lateinit var uiStage: Stage
     val uiViewport: Viewport = ScreenViewport()
@@ -32,6 +33,8 @@ object GameScreen : KtxScreen {
         uiStage.viewport = uiViewport
         shape = ShapeRenderer()
         game = Game()
+
+        worldRenderer = WorldRenderer(game.world)
     }
 
     override fun render(delta: Float) {
@@ -42,9 +45,9 @@ object GameScreen : KtxScreen {
         gridCam.zoom = 1/32f
         gridCam.position.set(0f, 0f, 0f)
         gridCam.update()
-        shape.projectionMatrix = gridCam.combined
 
-        game.world.draw(shape)
+        worldRenderer.shape.projectionMatrix = gridCam.combined
+        worldRenderer.render(true)
 
     }
 
