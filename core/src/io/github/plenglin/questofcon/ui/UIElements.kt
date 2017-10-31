@@ -5,19 +5,32 @@ import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.scenes.scene2d.ui.Table
-import com.badlogic.gdx.utils.Align
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 
 
 class TileInfoPanel(skin: Skin) : Table(skin) {
 
     var target: WorldCoords? = null
+        set(value) {
+            field = value
+
+            val coord = target
+            if (coord?.tile != null) {
+                val pawn = coord.tile.pawn
+                this.pawn.data = pawn?.getProperties() ?: emptyMap()
+
+                val building = coord.tile.building
+                this.building.data = building?.getProperties() ?: emptyMap()
+            }
+
+            pawn.updateData()
+            building.updateData()
+        }
 
     val pawn = PropertiesTable(skin)
     val building = PropertiesTable(skin)
 
     init {
-
         add(pawn)
         row()
         add(building)
@@ -28,19 +41,6 @@ class TileInfoPanel(skin: Skin) : Table(skin) {
         setPosition(0f, UI.viewport.screenHeight - height)
         setSize(100f, 300f)
         top().left()
-        val coord = target
-        if (coord?.tile != null) {
-            val pawn = coord.tile.pawn
-            if (pawn != null) {
-                this.pawn.data = pawn.getProperties()
-            }
-
-            val building = coord.tile.building
-            if (building != null) {
-                this.building.data = building.getProperties()
-            }
-        }
-
         super.draw(batch, parentAlpha)
     }
 
@@ -50,15 +50,13 @@ class PropertiesTable(skin: Skin) : Table(skin) {
 
     var data: Map<String, Any> = mapOf()
 
-    override fun draw(batch: Batch?, parentAlpha: Float) {
+    fun updateData() {
         clearChildren()
         data.forEach { k, v ->
-            add(Label(k, skin))
+            add(Label(k, skin)).expandX
             add(Label(v.toString(), skin))
             row()
         }
-
-        super.draw(batch, parentAlpha)
     }
 
 }

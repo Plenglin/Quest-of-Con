@@ -101,14 +101,18 @@ class GridSelection(val cam: OrthographicCamera, val world: World) : InputProces
 
     var selection: WorldCoords? = null
         private set(value) {
-            println(value)
-            field = value
-            if (value == null) {
-                UI.tileInfo.isVisible = false
+            if (value != null) {
+                field = if (value.exists) value else null
             } else {
-                UI.tileInfo.isVisible = true
-                UI.tileInfo.target = value
+                field = null
             }
+
+            if (field != null) {
+                UI.tileInfo.target = field
+            }
+
+            UI.tileInfo.isVisible = (field != null)
+            println(field)
         }
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
@@ -118,9 +122,7 @@ class GridSelection(val cam: OrthographicCamera, val world: World) : InputProces
         when (pointer) {
             Input.Buttons.LEFT -> {
                 val grid = WorldCoords(world, i, j)
-                if (grid.exists) {
-                    selection = grid
-                }
+                selection = grid
             }
         }
         return false
