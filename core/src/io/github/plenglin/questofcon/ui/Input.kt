@@ -1,4 +1,4 @@
-package io.github.plenglin.questofcon.game.ui
+package io.github.plenglin.questofcon.ui
 
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputProcessor

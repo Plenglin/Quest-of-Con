@@ -1,4 +1,4 @@
-package io.github.plenglin.questofcon.game.ui
+package io.github.plenglin.questofcon.ui
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.scenes.scene2d.Stage
@@ -9,7 +9,7 @@ import com.badlogic.gdx.utils.viewport.Viewport
 
 object UI {
 
-    val skin = Skin(Gdx.files.internal("skin/default/skin/uiskin.json"))
+    val skin = Skin(Gdx.files.internal("skin/default/skin/uiskin.skin"))
 
     val viewport: Viewport = ScreenViewport()
 

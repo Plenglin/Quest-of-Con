@@ -1,4 +1,4 @@
-package io.github.plenglin.questofcon.game.render
+package io.github.plenglin.questofcon.render
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer

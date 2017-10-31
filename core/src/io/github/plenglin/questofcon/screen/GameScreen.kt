@@ -9,10 +9,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import io.github.plenglin.questofcon.game.GameState
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
-import io.github.plenglin.questofcon.game.render.WorldRenderer
-import io.github.plenglin.questofcon.game.ui.UI
-import io.github.plenglin.questofcon.game.ui.MapMovement
-import io.github.plenglin.questofcon.game.unit.SimplePawnCreator
+import io.github.plenglin.questofcon.render.WorldRenderer
+import io.github.plenglin.questofcon.ui.UI
+import io.github.plenglin.questofcon.ui.MapMovement
 import ktx.app.KtxScreen
 
 /**
