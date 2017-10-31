@@ -30,9 +30,13 @@ object GameScreen : KtxScreen {
 
     lateinit var gameState: GameState
 
+    val teamA = Team("escargot", Color.BLUE)
+    val teamB = Team("parfait", Color.WHITE)
+    val teamC = Team("la baguette", Color.RED)
+
     override fun show() {
         batch = SpriteBatch()
-        gameState = GameState()
+        gameState = GameState(listOf(teamA, teamB, teamC))
 
         mapMovement = MapMovement(gridCam)
         gridSelection = GridSelection(gridCam, gameState.world)
@@ -42,10 +46,6 @@ object GameScreen : KtxScreen {
 
         gridCam.zoom = 1/32f
         gridCam.position.set(0f, 0f, 0f)
-
-        val team = Team("bob", Color.RED)
-        gameState.spawnableUnits[0].createPawnAt(team, WorldCoords(gameState.world, 5, 5))
-        gameState.spawnableBuildings[0].createBuildingAt(team, WorldCoords(gameState.world, 5, 5))
 
         UI.generateUI()
     }

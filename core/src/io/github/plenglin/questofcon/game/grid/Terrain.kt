@@ -9,12 +9,12 @@ enum class Movement {
 /**
  *
  */
-open class Terrain(val name: String, val color: Color, val movement: Movement)
+open class Terrain(val name: String, val color: Color, val passable: Boolean, val buildable: Boolean)
 
 object Terrains {
 
-    val grass = Terrain("grassland", Color.GREEN, Movement.NORMAL)
-    val hills = Terrain("hills", Color.BROWN, Movement.SLOWED)
-    val mountains = Terrain("mountains", Color.BLACK, Movement.IMPASSABLE)
+    val grass = Terrain("grassland", Color.GREEN, true, true)
+    val marsh = Terrain("hills", Color.BROWN, true, false)
+    val mountains = Terrain("mountains", Color.BLACK, false, false)
 
 }

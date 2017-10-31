@@ -16,6 +16,10 @@ abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val 
     var health: Int = maxHealth
     var apRemaining: Int = actionPoints
 
+    fun getMovableSquares(): Set<WorldCoords> {
+        return this.pos.floodfill(actionPoints, { it.tile!!.terrain.passable })
+    }
+
     abstract fun getAttackableSquares(): Set<WorldCoords>
 
     /**
