@@ -2,16 +2,11 @@ package io.github.plenglin.questofcon.ui
 
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.scenes.scene2d.Group
-import com.badlogic.gdx.scenes.scene2d.ui.Dialog
-import com.badlogic.gdx.scenes.scene2d.ui.Label
-import com.badlogic.gdx.scenes.scene2d.ui.Skin
-import com.badlogic.gdx.scenes.scene2d.ui.Table
+import com.badlogic.gdx.scenes.scene2d.ui.*
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.Align
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 import io.github.plenglin.questofcon.game.pawn.PawnCreator
-import ktx.scene2d.label
-import ktx.scene2d.table
 
 
 class TileInfoPanel(skin: Skin) : Table(skin) {
@@ -95,29 +90,28 @@ class RadialMenu(val skin: Skin, var radiusX: Float, var radiusY: Float) : Group
     private val items = mutableListOf<RadialMenuItem>()
 
     fun updateUI() {
+
         clearChildren()
         setScale(1f)
         for (i in 0 until selectables.size) {
             val sel = selectables[i]
 
-            val label = Label(sel.title, skin)
-
             val angle = i.toFloat() / selectables.size * 2 * Math.PI
 
+            val button = TextButton(sel.title, skin, "radial-menu-item")
+            //button.pad(-5f)
             val listener = ClickListener()
+            button.setPosition(
+                    radiusX * Math.sin(angle).toFloat() - button.width / 2,
+                    radiusY * Math.cos(angle).toFloat() - button.height / 2)
 
-            //label.setSize(100f, 100f)
-            label.setPosition(
-                    radiusX * Math.sin(angle).toFloat() - label.width / 2,
-                    radiusY * Math.cos(angle).toFloat() - label.height / 2)
+            println(radiusX * Math.sin(angle).toFloat() - button.width / 2)
 
-            println(radiusX * Math.sin(angle).toFloat() - label.width / 2)
-
-            label.addListener(listener)
-            label.isVisible = true
-            label.debug = true
-            addActor(label)
-            items.add(RadialMenuItem(label, sel, listener))
+            button.addListener(listener)
+            button.isVisible = true
+            button.debug = true
+            addActor(button)
+            items.add(RadialMenuItem(button, sel, listener))
         }
     }
 
@@ -125,7 +119,7 @@ class RadialMenu(val skin: Skin, var radiusX: Float, var radiusY: Float) : Group
         if (active) {
             selected = null
             items.forEach {
-                if (it.clickListener.isOver) {
+                if (it.clickListener.isPressed) {
                     selected = it
                 }
             }
@@ -141,7 +135,7 @@ class RadialMenu(val skin: Skin, var radiusX: Float, var radiusY: Float) : Group
 
 }
 
-private data class RadialMenuItem(val label: Label, val selectable: Selectable, val clickListener: ClickListener)
+private data class RadialMenuItem(val label: TextButton, val selectable: Selectable, val clickListener: ClickListener)
 
 abstract class Selectable(val title: String) {
 
