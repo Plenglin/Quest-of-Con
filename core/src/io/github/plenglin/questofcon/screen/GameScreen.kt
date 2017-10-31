@@ -85,7 +85,11 @@ object GameScreen : KtxScreen {
                     }
                 }
                 UIState.MOVING_PAWN -> {
-
+                    val pawnData = pawnMovementData!!
+                    if (selection != null && pawnData.squares.contains(selection)) {
+                        pawnData.pawn.moveTo(selection)
+                        uiState = UIState.NONE
+                    }
                 }
             }
 

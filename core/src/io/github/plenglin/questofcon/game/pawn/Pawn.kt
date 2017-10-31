@@ -17,7 +17,7 @@ abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val 
     var apRemaining: Int = actionPoints
 
     fun getMovableSquares(): Set<WorldCoords> {
-        return this.pos.floodfill(actionPoints, { it.tile!!.terrain.passable })
+        return this.pos.floodfill(apRemaining, { it.tile!!.terrain.passable })
     }
 
     abstract fun getAttackableSquares(): Set<WorldCoords>
@@ -28,6 +28,13 @@ abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val 
      * @return whether it was successful or not.
      */
     abstract fun onAttack(coords: WorldCoords): Boolean
+
+    fun moveTo(coords: WorldCoords) {
+        apRemaining -= Math.abs(coords.i - pos.i) + Math.abs(coords.j - pos.j)
+        pos.tile!!.pawn = null  // clear old tile
+        coords.tile!!.pawn = this  // set new tile to this
+        pos = coords  // set this pawn's reference
+    }
 
     open fun getProperties(): Map<String, Any> {
         return mapOf("team" to team.name, "health" to "$health/$maxHealth", "actions" to "$apRemaining/$actionPoints")
