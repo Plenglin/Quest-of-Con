@@ -1,25 +1,29 @@
 package io.github.plenglin.questofcon.game.ui
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.scenes.scene2d.Stage
-import com.badlogic.gdx.scenes.scene2d.ui.Label
-import com.badlogic.gdx.scenes.scene2d.ui.Table
+import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.utils.viewport.ScreenViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 
 
 object UI {
 
+    val skin = Skin(Gdx.files.internal("skin/default/skin/uiskin.json"))
+
     val viewport: Viewport = ScreenViewport()
 
     val stage: Stage = Stage()
 
-    lateinit var unitInfoPanel: Table
+    lateinit var pawnInfo: PawnInfoPanel
 
     fun generateUI() {
         stage.viewport = viewport
 
         stage.clear()
 
+        pawnInfo = PawnInfoPanel(skin)
+        stage.addActor(pawnInfo)
     }
 
     fun update(delta: Float) {
