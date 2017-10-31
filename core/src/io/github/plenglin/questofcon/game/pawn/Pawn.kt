@@ -14,10 +14,17 @@ interface PawnCreator {
 abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val maxHealth: Int, val actionPoints: Int, val color: Color) {
 
     var health: Int = maxHealth
+        set(value) {
+            field = value
+            if (health <= 0) {
+                println("$this died")
+                pos.tile!!.pawn = null
+            }
+        }
     var apRemaining: Int = actionPoints
 
     fun getMovableSquares(): Set<WorldCoords> {
-        return this.pos.floodfill(apRemaining, { it.tile!!.terrain.passable })
+        return this.pos.floodfill(apRemaining, { it.tile!!.terrain.passable && it.tile.pawn == null })
     }
 
     abstract fun getAttackableSquares(): Set<WorldCoords>
@@ -37,7 +44,11 @@ abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val 
     }
 
     open fun getProperties(): Map<String, Any> {
-        return mapOf("team" to team.name, "health" to "$health/$maxHealth", "actions" to "$apRemaining/$actionPoints")
+        return mapOf("type" to name, "team" to team.name, "health" to "$health/$maxHealth", "actions" to "$apRemaining/$actionPoints")
+    }
+
+    fun attack(coords: WorldCoords) {
+        onAttack(coords)
     }
 
 }
@@ -57,13 +68,13 @@ class SimplePawnCreator(val name: String, val maxHealth: Int, val attack: Int, v
     inner class SimplePawn(team: Team, pos: WorldCoords) : Pawn(name, team, pos, maxHealth, actionPoints, color) {
 
         override fun getAttackableSquares(): Set<WorldCoords> {
-            return pos.floodfill(range)
+            return pos.floodfill(range).minus(this.pos)
         }
 
         override fun onAttack(coords: WorldCoords): Boolean {
-            val inRange = Math.abs(coords.i - this.pos.i) + Math.abs(coords.j - this.pos.j) <= range
+            //val inRange = Math.abs(coords.i - this.pos.i) + Math.abs(coords.j - this.pos.j) <= range
             val tile = coords.tile
-            if (inRange && tile != null) {
+            if (tile != null && tile.getTeam() != this.team) {
                 return tile.doDamage(attack)
             } else {
                 return false

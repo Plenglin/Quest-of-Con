@@ -17,6 +17,7 @@ object QuestOfCon : KtxGame<Screen>(GameScreen) {
     val camSpeed = 7f
 
     val selectionColor = Color(0.5f, 0.75f, 0f, 0.5f)
-    val movementColor: Color = Color(1f, 0f, 0f, 0.5f)
+    val movementColor: Color = Color(0f, 0f, 1f, 0.5f)
+    val attackColor: Color = Color(1f, 0f, 0f, 0.5f)
 
 }

@@ -31,7 +31,7 @@ object GameScreen : KtxScreen {
 
     lateinit var gameState: GameState
 
-    var pawnMovementData: PawnMovement? = null
+    var pawnActionData: PawnAction? = null
     var uiState = UIState.NONE
 
     val teamA = Team("escargot", Color.BLUE)
@@ -52,6 +52,7 @@ object GameScreen : KtxScreen {
         gridCam.position.set(0f, 0f, 0f)
 
         GameData.spawnableUnits[0].createPawnAt(teamA, WorldCoords(gameState.world, 5, 5))
+        val pawnb = GameData.spawnableUnits[0].createPawnAt(teamB, WorldCoords(gameState.world, 6, 5))
 
         UI.generateUI()
 
@@ -85,10 +86,18 @@ object GameScreen : KtxScreen {
                     }
                 }
                 UIState.MOVING_PAWN -> {
-                    val pawnData = pawnMovementData!!
+                    val pawnData = pawnActionData!!
                     if (selection != null && pawnData.squares.contains(selection)) {
                         pawnData.pawn.moveTo(selection)
                         uiState = UIState.NONE
+                    }
+                }
+                UIState.ATTACKING_PAWN -> {
+                    val pawnData = pawnActionData!!
+                    if (selection != null && pawnData.squares.contains(selection)) {
+                        pawnData.pawn.attack(selection)
+                        uiState = UIState.NONE
+                        UI.tileInfo.updateData()
                     }
                 }
             }
@@ -113,8 +122,11 @@ object GameScreen : KtxScreen {
         if (selection != null) {
             sets.add(SelectionSet(setOf(selection), QuestOfCon.selectionColor))
         }
-        if (uiState == UIState.MOVING_PAWN) {
-            sets.add(SelectionSet(pawnMovementData!!.squares, QuestOfCon.movementColor))
+        when (uiState) {
+            UIState.MOVING_PAWN -> {
+                sets.add(SelectionSet(pawnActionData!!.squares, QuestOfCon.movementColor))
+            }
+            UIState.ATTACKING_PAWN -> sets.add(SelectionSet(pawnActionData!!.squares, QuestOfCon.attackColor))
         }
         worldRenderer.render(true, *sets.toTypedArray())
 
@@ -135,5 +147,5 @@ object GameScreen : KtxScreen {
 }
 
 enum class UIState {
-    NONE, MOVING_PAWN
+    NONE, MOVING_PAWN, ATTACKING_PAWN
 }

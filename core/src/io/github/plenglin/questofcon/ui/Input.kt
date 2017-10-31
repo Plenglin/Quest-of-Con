@@ -1,13 +1,10 @@
 package io.github.plenglin.questofcon.ui
 
-import com.badlogic.gdx.Game
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.math.Vector3
 import io.github.plenglin.questofcon.QuestOfCon
-import io.github.plenglin.questofcon.game.GameState
 import io.github.plenglin.questofcon.game.grid.World
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 import io.github.plenglin.questofcon.screen.GameScreen
@@ -113,12 +110,15 @@ object RadialMenus {
                     println("showing pawn movement menu")
                     val pawn = GameScreen.gridSelection.selection!!.tile!!.pawn!!
                     GameScreen.uiState = UIState.MOVING_PAWN
-                    GameScreen.pawnMovementData = PawnMovement(pawn)
+                    GameScreen.pawnActionData = PawnAction(pawn, pawn.getMovableSquares())
                 }
             },
             object : Selectable("Attack") {
                 override fun onSelected(x: Float, y: Float) {
                     println("showing attack menu")
+                    val pawn = GameScreen.gridSelection.selection!!.tile!!.pawn!!
+                    GameScreen.uiState = UIState.ATTACKING_PAWN
+                    GameScreen.pawnActionData = PawnAction(pawn, pawn.getAttackableSquares())
                 }
             },
             object : Selectable("Disband") {

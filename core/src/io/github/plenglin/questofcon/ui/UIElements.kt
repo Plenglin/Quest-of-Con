@@ -14,20 +14,7 @@ class TileInfoPanel(skin: Skin) : Table(skin) {
     var target: WorldCoords? = null
         set(value) {
             field = value
-
-            val coord = target
-            if (coord?.tile != null) {
-                titleLabel.setText("${coord.tile.terrain.name.capitalize()} at ${coord.i}, ${coord.j}")
-
-                val pawn = coord.tile.pawn
-                this.pawn.data = pawn?.getProperties() ?: emptyMap()
-
-                val building = coord.tile.building
-                this.building.data = building?.getProperties() ?: emptyMap()
-            }
-
-            pawn.updateData()
-            building.updateData()
+            updateData()
         }
 
     val titleLabel = Label("", skin)
@@ -50,6 +37,22 @@ class TileInfoPanel(skin: Skin) : Table(skin) {
         this.height = 200f
 
         super.draw(batch, parentAlpha)
+    }
+
+    fun updateData() {
+        val coord = target
+        if (coord?.tile != null) {
+            titleLabel.setText("${coord.tile.terrain.name.capitalize()} at ${coord.i}, ${coord.j}")
+
+            val pawn = coord.tile.pawn
+            this.pawn.data = pawn?.getProperties() ?: emptyMap()
+
+            val building = coord.tile.building
+            this.building.data = building?.getProperties() ?: emptyMap()
+        }
+
+        pawn.updateData()
+        building.updateData()
     }
 
 }

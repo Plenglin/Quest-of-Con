@@ -1,5 +1,6 @@
 package io.github.plenglin.questofcon.game.grid
 
+import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.building.Building
 import io.github.plenglin.questofcon.game.pawn.Pawn
 
@@ -11,6 +12,10 @@ class Tile(var terrain: Terrain) {
     var pawn: Pawn? = null
     var building: Building? = null
 
+    fun getTeam(): Team? {
+        return pawn?.team ?: building?.team
+    }
+
     fun doDamage(hp: Int): Boolean {
         val bldg = building
         if (bldg != null) {
@@ -18,9 +23,9 @@ class Tile(var terrain: Terrain) {
             return true
         }
 
-        val p = pawn
-        if (p != null) {
-            p.health -= hp
+        if (pawn != null) {
+            println(pawn!!.team.name)
+            pawn!!.health -= hp
             return true
         }
         return false
