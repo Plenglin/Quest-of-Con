@@ -81,9 +81,10 @@ class MapMovement(val cam: OrthographicCamera) : InputProcessor {
 
     override fun scrolled(amount: Int): Boolean {
         when (amount) {
-            1 -> cam.zoom *= QuestOfCon.zoomRate
-            -1 -> cam.zoom /= QuestOfCon.zoomRate
+            1 -> cam.zoom = cam.zoom * QuestOfCon.zoomRate
+            -1 -> cam.zoom = cam.zoom / QuestOfCon.zoomRate
         }
+        cam.zoom = minOf(maxOf(cam.zoom, QuestOfCon.minZoom), QuestOfCon.maxZoom)
         return true
     }
 
