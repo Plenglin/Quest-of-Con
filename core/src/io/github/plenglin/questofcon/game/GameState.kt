@@ -7,7 +7,7 @@ import io.github.plenglin.questofcon.game.unit.SimplePawnCreator
 /**
  *
  */
-class Game {
+class GameState {
 
     val world = World(16, 16)
 
