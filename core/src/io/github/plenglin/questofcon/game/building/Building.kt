@@ -18,14 +18,27 @@ abstract class Building(val name: String, var team: Team, var pos: WorldCoords, 
 
     var enabled = true
 
-    var health = 0
+    var health = maxHealth
+        set(value) {
+            field = value
+            if (health <= 0) {
+                println("$this died")
+                pos.tile!!.building = null
+            }
+        }
 
     open fun onTurnBegin() = Unit
 
     open fun onTurnEnd() = Unit
 
     open fun getActions(): List<Selectable> {
-        return listOf()
+        return listOf(
+                object : Selectable("Demolish") {
+                    override fun onSelected(x: Float, y: Float) {
+                        health = 0
+                    }
+                }
+        )
     }
 
     open fun getProperties(): Map<String, Any> {
@@ -45,7 +58,7 @@ class BuildingFactoryCreator : BuildingCreator("factory", 20) {
     class BuildingFactory(team: Team, pos: WorldCoords) : Building("factory", team, pos, 10, Color.GRAY) {
 
         override fun getActions(): List<Selectable> {
-            return if (pos.tile!!.pawn == null) listOf(
+            return super.getActions() + if (pos.tile!!.pawn == null) listOf(
                     object : Selectable("Make") {
                         override fun onSelected(x: Float, y: Float) {
                             UI.stage.addActor(UnitSpawningDialog(GameData.spawnableUnits, UI.skin, pos, team))
