@@ -221,15 +221,19 @@ class BuildingSpawningDialog(val team: Team, skin: Skin, val worldCoords: WorldC
             add(Label("Cost", skin))
             add(Label("Build", skin))
             row()
-            buildings.forEach {
-                add(Label(it.name.capitalize(), skin))
-                add(Label("$${it.cost}", skin))
+            buildings.forEach { bldg ->
+                add(Label(bldg.name.capitalize(), skin))
+                add(Label("$${bldg.cost}", skin))
                 add(TextButton("Build", skin).apply {
+                    isDisabled = bldg.cost > team.money
+
                     addListener(object : ChangeListener() {
                         override fun changed(event: ChangeEvent?, actor: Actor?) {
-                            println("spawning ${it.name}")
-                            val building = it.createBuildingAt(team, worldCoords)
+                            println("spawning ${bldg.name}")
+                            team.money -= bldg.cost
+                            val building = bldg.createBuildingAt(team, worldCoords)
                             building.enabled = false
+                            UI.updateData()
                             this@BuildingSpawningDialog.hide()
                         }
                     })
