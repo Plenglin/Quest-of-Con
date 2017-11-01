@@ -35,14 +35,11 @@ abstract class Building(val name: String, var team: Team, var pos: WorldCoords, 
     open fun onTurnEnd() = Unit
 
     open fun getActions(): List<Selectable> {
-        return listOf(
-                object : Selectable("Demolish") {
-                    override fun onSelected(x: Float, y: Float) {
-                        ConfirmationDialog("Demolish", UI.skin, {
-                            health = 0
-                        }).show(UI.stage)
-                    }
-                }
+        return listOf(Selectable("Demolish", { x, y ->
+                ConfirmationDialog("Demolish", UI.skin, {
+                    health = 0
+                }).show(UI.stage)
+            })
         )
     }
 

@@ -96,39 +96,26 @@ class MapMovement(val cam: OrthographicCamera) : InputProcessor {
 }
 
 object RadialMenus {
-    val emptyMenu = listOf<Selectable>(
-            object : Selectable("Build") {
-                override fun onSelected(x: Float, y: Float) {
-                    println("showing build menu")
-                }
-            }
-    )
-
     val pawnMenu = listOf<Selectable>(
-            object : Selectable("Move") {
-                override fun onSelected(x: Float, y: Float) {
-                    println("showing pawn movement menu")
-                    val pawn = GameScreen.gridSelection.selection!!.tile!!.pawn!!
-                    GameScreen.uiState = UIState.MOVING_PAWN
-                    GameScreen.pawnActionData = PawnAction(pawn, pawn.getMovableSquares())
-                }
-            },
-            object : Selectable("Attack") {
-                override fun onSelected(x: Float, y: Float) {
+            Selectable("Move", { x, y ->
+                println("showing pawn movement menu")
+                val pawn = GameScreen.gridSelection.selection!!.tile!!.pawn!!
+                GameScreen.uiState = UIState.MOVING_PAWN
+                GameScreen.pawnActionData = PawnAction(pawn, pawn.getMovableSquares())
+            }),
+            Selectable("Attack", { x, y ->
                     println("showing attack menu")
                     val pawn = GameScreen.gridSelection.selection!!.tile!!.pawn!!
                     GameScreen.uiState = UIState.ATTACKING_PAWN
                     GameScreen.pawnActionData = PawnAction(pawn, pawn.getAttackableSquares())
-                }
-            },
-            object : Selectable("Disband") {
-                override fun onSelected(x: Float, y: Float) {
-                    println("disbanding pawn")
-                    UI.stage.addActor(ConfirmationDialog("Disband Pawn", UI.skin, {
-                        GameScreen.gridSelection.selection!!.tile!!.pawn!!.health = 0
-                    }))
-                }
-            }
+            }),
+            Selectable("Disband", { x, y ->
+                println("disbanding pawn")
+                UI.stage.addActor(ConfirmationDialog("Disband Pawn", UI.skin, {
+                    GameScreen.gridSelection.selection!!.tile!!.pawn!!.health = 0
+                }))
+            })
+
     )
 }
 

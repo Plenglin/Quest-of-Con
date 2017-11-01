@@ -14,11 +14,9 @@ class BuildingFactory(team: Team, pos: WorldCoords) : Building("factory", team, 
 
     override fun getActions(): List<Selectable> {
         return super.getActions() + if (pos.tile!!.pawn == null) listOf(
-                object : Selectable("Make") {
-                    override fun onSelected(x: Float, y: Float) {
-                        UI.stage.addActor(UnitSpawningDialog(GameData.spawnableUnits, UI.skin, pos, team))
-                    }
-                }
+            Selectable("Make", { x, y ->
+                UI.stage.addActor(UnitSpawningDialog(GameData.spawnableUnits, UI.skin, pos, team))
+            })
         ) else emptyList()
     }
 

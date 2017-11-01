@@ -11,6 +11,7 @@ import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 import io.github.plenglin.questofcon.game.pawn.PawnCreator
 import io.github.plenglin.questofcon.screen.GameScreen
+import io.github.plenglin.questofcon.ui.Selectable
 
 
 class TileInfoPanel(skin: Skin) : Table(skin) {
@@ -140,17 +141,10 @@ class RadialMenu(val skin: Skin, var radiusX: Float, var radiusY: Float) : Group
 
 private data class RadialMenuItem(val label: TextButton, val selectable: Selectable, val clickListener: ClickListener)
 
-abstract class Selectable(val title: String) {
-
-    /**
-     * Called when this selectable is selected. Parameters are at the center of the radial menu.
-     */
-    abstract fun onSelected(x: Float, y: Float)
-
+data class Selectable(val title: String, val onSelected: (x: Float, y: Float) -> Unit) {
     override fun toString(): String {
-        return title
+        return "Selectable($title)"
     }
-
 }
 
 class ConfirmationDialog(title: String, skin: Skin, val onConfirm: () -> Unit) : Dialog(title, skin) {
@@ -241,17 +235,6 @@ class BuildingSpawningDialog(val team: Team, skin: Skin, val worldCoords: WorldC
         button("Cancel")
         pack()
         setPosition((UI.viewport.screenWidth / 2).toFloat(), (UI.viewport.screenHeight / 2).toFloat())
-    }
-
-    companion object : Selectable("Build") {
-        override fun onSelected(x: Float, y: Float) {
-            BuildingSpawningDialog(
-                    GameScreen.gameState.getCurrentTeam(),
-                    UI.skin,
-                    GameScreen.gridSelection.selection!!
-            ).show(UI.stage)
-        }
-
     }
 
 }

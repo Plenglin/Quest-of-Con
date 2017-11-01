@@ -77,7 +77,13 @@ object GameScreen : KtxScreen {
                                 actions.addAll(selection.tile.building!!.getActions())
                             }
                             if (selection.tile.canBuildOn(currentTeam)) {
-                                actions.add(BuildingSpawningDialog)
+                                actions.add(Selectable("Build", { x, y ->
+                                    BuildingSpawningDialog(
+                                            GameScreen.gameState.getCurrentTeam(),
+                                            UI.skin,
+                                            GameScreen.gridSelection.selection!!
+                                    ).show(UI.stage)
+                                }))
                             }
                             println(actions)
                             selectables = actions
