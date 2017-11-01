@@ -8,13 +8,15 @@ import io.github.plenglin.questofcon.ui.Selectable
 import io.github.plenglin.questofcon.ui.UI
 import io.github.plenglin.questofcon.ui.UnitSpawningDialog
 
-interface BuildingCreator {
+abstract class BuildingCreator(val name: String, val cost: Int) {
 
-    fun createBuildingAt(team: Team, worldCoords: WorldCoords): Building?
+    abstract fun createBuildingAt(team: Team, worldCoords: WorldCoords): Building
 
 }
 
 abstract class Building(val name: String, var team: Team, var pos: WorldCoords, val maxHealth: Int, val color: Color) {
+
+    var enabled = true
 
     var health = 0
 
@@ -32,9 +34,9 @@ abstract class Building(val name: String, var team: Team, var pos: WorldCoords, 
 
 }
 
-class BuildingFactoryCreator : BuildingCreator {
+class BuildingFactoryCreator : BuildingCreator("factory", 20) {
 
-    override fun createBuildingAt(team: Team, worldCoords: WorldCoords): Building? {
+    override fun createBuildingAt(team: Team, worldCoords: WorldCoords): Building {
         val building = BuildingFactory(team, worldCoords)
         worldCoords.tile!!.building = building
         return building

@@ -16,7 +16,11 @@ class Team(val name: String, val color: Color) {
     fun startTurn() {
         money += QuestOfCon.BASE_ECO
         getOwnedTiles().forEach {
-            it.tile!!.building?.onTurnBegin()
+            val building = it.tile!!.building
+            if (building != null) {
+                building.enabled = true
+                building.onTurnBegin()
+            }
             val pawn = it.tile.pawn
             if (pawn != null) {
                 pawn.apRemaining = pawn.actionPoints
@@ -24,10 +28,14 @@ class Team(val name: String, val color: Color) {
         }
     }
 
-    fun endTurn(gameState: GameState) {
+    fun endTurn() {
         getOwnedTiles().forEach {
             it.tile!!.building?.onTurnEnd()
         }
+    }
+
+    override fun toString(): String {
+        return "Team($name)"
     }
 
 }

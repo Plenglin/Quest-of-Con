@@ -9,10 +9,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.*
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable
+import io.github.plenglin.questofcon.game.GameData
 import io.github.plenglin.questofcon.game.GameState
 import io.github.plenglin.questofcon.game.Team
+import io.github.plenglin.questofcon.game.building.BuildingCreator
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 import io.github.plenglin.questofcon.game.pawn.PawnCreator
+import io.github.plenglin.questofcon.screen.GameScreen
 import ktx.scene2d.*
 
 
@@ -200,6 +203,44 @@ class UnitSpawningDialog(val units: List<PawnCreator>, skin: Skin, val worldCoor
         button("Cancel")
         pack()
         setPosition((UI.viewport.screenWidth / 2).toFloat(), (UI.viewport.screenHeight / 2).toFloat())
+    }
+
+}
+
+class BuildingSpawningDialog(val units: List<BuildingCreator>, skin: Skin, val worldCoords: WorldCoords, val team: Team) : Dialog("Spawn", skin) {
+
+    init {
+        contentTable.apply {
+            add(Label("Type", skin))
+            add(Label("Cost", skin))
+            add(Label("Build", skin))
+            row()
+            units.forEach {
+                add(Label(it.name.capitalize(), skin))
+                add(Label("$${it.cost}", skin))
+                add(TextButton("Build", skin).apply {
+                    addListener(object : ChangeListener() {
+                        override fun changed(event: ChangeEvent?, actor: Actor?) {
+                            println("spawning ${it.name}")
+                            val building = it.createBuildingAt(team, worldCoords)
+                            building.enabled = false
+                            this@BuildingSpawningDialog.hide()
+                        }
+                    })
+                })
+                row()
+            }
+        }
+        button("Cancel")
+        pack()
+        setPosition((UI.viewport.screenWidth / 2).toFloat(), (UI.viewport.screenHeight / 2).toFloat())
+    }
+
+    companion object : Selectable("Build") {
+        override fun onSelected(x: Float, y: Float) {
+            BuildingSpawningDialog(GameData.spawnableBuildings, UI.skin, GameScreen.gridSelection.selection!!, GameScreen.gameState.getCurrentTeam()).show(UI.stage)
+        }
+
     }
 
 }

@@ -16,6 +16,10 @@ class Tile(var terrain: Terrain) {
         return pawn?.team ?: building?.team
     }
 
+    fun canBuildOn(team: Team): Boolean {
+        return building == null && pawn?.let { it.team == team } ?: true
+    }
+
     fun doDamage(hp: Int): Boolean {
         val bldg = building
         if (bldg != null) {

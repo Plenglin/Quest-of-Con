@@ -68,11 +68,20 @@ object GameScreen : KtxScreen {
                         println("showing radial menu")
                         UI.radialMenu.apply {
                             val actions = mutableListOf<Selectable>()
-                            if (selection.tile!!.pawn != null) {
+                            val currentTeam = gameState.getCurrentTeam()
+
+                            val pawn = selection.tile!!.pawn
+                            if (pawn != null && pawn.team == currentTeam) {
                                 actions.addAll(RadialMenus.pawnMenu)
                             }
-                            if (selection.tile.building != null) {
+
+                            val building = selection.tile.building
+                            println("building enabled: ${building?.enabled}")
+                            if (building != null && building.team == currentTeam && building.enabled) {
                                 actions.addAll(selection.tile.building!!.getActions())
+                            }
+                            if (selection.tile.canBuildOn(currentTeam)) {
+                                actions.add(BuildingSpawningDialog)
                             }
                             println(actions)
                             selectables = actions
