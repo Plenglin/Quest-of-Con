@@ -22,17 +22,19 @@ class Tile(var terrain: Terrain) {
 
     fun doDamage(hp: Int): Boolean {
         val bldg = building
+        var output = false
+
         if (bldg != null) {
             bldg.health -= hp
-            return true
+            output = true
         }
 
         if (pawn != null) {
             println(pawn!!.team.name)
             pawn!!.health -= hp
-            return true
+            output = true
         }
-        return false
+        return output
     }
 
 }
