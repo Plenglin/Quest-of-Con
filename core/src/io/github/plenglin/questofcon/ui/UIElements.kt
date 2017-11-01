@@ -10,6 +10,7 @@ import io.github.plenglin.questofcon.game.GameData
 import io.github.plenglin.questofcon.game.GameState
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.building.BuildingCreator
+import io.github.plenglin.questofcon.game.building.buildings.BuildingHQ
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 import io.github.plenglin.questofcon.game.pawn.PawnCreator
 import io.github.plenglin.questofcon.screen.GameScreen
@@ -210,15 +211,17 @@ class UnitSpawningDialog(val units: List<PawnCreator>, skin: Skin, val worldCoor
 
 }
 
-class BuildingSpawningDialog(val units: List<BuildingCreator>, skin: Skin, val worldCoords: WorldCoords, val team: Team) : Dialog("Spawn", skin) {
+class BuildingSpawningDialog(val team: Team, skin: Skin, val worldCoords: WorldCoords) : Dialog("Spawn", skin) {
 
     init {
+        val buildings = team.getBuildable()
+        println(buildings)
         contentTable.apply {
             add(Label("Type", skin))
             add(Label("Cost", skin))
             add(Label("Build", skin))
             row()
-            units.forEach {
+            buildings.forEach {
                 add(Label(it.name.capitalize(), skin))
                 add(Label("$${it.cost}", skin))
                 add(TextButton("Build", skin).apply {
@@ -241,7 +244,11 @@ class BuildingSpawningDialog(val units: List<BuildingCreator>, skin: Skin, val w
 
     companion object : Selectable("Build") {
         override fun onSelected(x: Float, y: Float) {
-            BuildingSpawningDialog(GameData.spawnableBuildings, UI.skin, GameScreen.gridSelection.selection!!, GameScreen.gameState.getCurrentTeam()).show(UI.stage)
+            BuildingSpawningDialog(
+                    GameScreen.gameState.getCurrentTeam(),
+                    UI.skin,
+                    GameScreen.gridSelection.selection!!
+            ).show(UI.stage)
         }
 
     }

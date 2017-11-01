@@ -2,18 +2,25 @@ package io.github.plenglin.questofcon.game
 
 import com.badlogic.gdx.graphics.Color
 import io.github.plenglin.questofcon.QuestOfCon
+import io.github.plenglin.questofcon.game.building.BuildingCreator
+import io.github.plenglin.questofcon.game.building.buildings.BuildingHQ
 import io.github.plenglin.questofcon.game.grid.World
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 
 
 class Team(val name: String, val color: Color) {
 
-    var money: Int = 10
+    var money: Int = 50
+    var hasBuiltHQ = false
     lateinit var world: World
+
+    fun getBuildable(): List<BuildingCreator> {
+        return if (hasBuiltHQ) GameData.spawnableBuildings else listOf(BuildingHQ)
+    }
 
     fun getOwnedTiles(): List<WorldCoords> = world.filter { it.tile!!.getTeam() == this }.toList()
 
-    fun getMoneyPerTurn(): Int = 10 + getOwnedTiles().sumBy { it.tile!!.building?.getMoneyPerTurn() ?: 0 }
+    fun getMoneyPerTurn(): Int = getOwnedTiles().sumBy { it.tile!!.building?.getMoneyPerTurn() ?: 0 }
 
     fun startTurn() {
         money += getMoneyPerTurn()

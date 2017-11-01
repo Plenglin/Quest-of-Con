@@ -52,10 +52,6 @@ object GameScreen : KtxScreen {
         gridCam.zoom = 1/32f
         gridCam.position.set(0f, 0f, 0f)
 
-        GameData.spawnableUnits[0].createPawnAt(teamA, WorldCoords(gameState.world, 5, 5))
-        val pawnb = GameData.spawnableUnits[0].createPawnAt(teamB, WorldCoords(gameState.world, 6, 5))
-        GameData.spawnableBuildings[0].createBuildingAt(teamA, WorldCoords(gameState.world, 7, 5))
-
         UI.generateUI()
 
         var previous: WorldCoords? = null
