@@ -71,7 +71,7 @@ object GameScreen : KtxScreen {
                             val currentTeam = gameState.getCurrentTeam()
 
                             val pawn = selection.tile!!.pawn
-                            if (pawn != null && pawn.team == currentTeam) {
+                            if (pawn != null && pawn.team == currentTeam && pawn.apRemaining > 0) {
                                 actions.addAll(RadialMenus.pawnMenu)
                             }
 
