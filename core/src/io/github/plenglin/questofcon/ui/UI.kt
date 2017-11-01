@@ -5,7 +5,10 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.utils.viewport.ScreenViewport
 import com.badlogic.gdx.utils.viewport.Viewport
-import ktx.scene2d.Scene2DSkin
+import io.github.plenglin.questofcon.game.GameState
+import io.github.plenglin.questofcon.screen.GameScreen
+import ktx.scene2d.*
+import org.w3c.dom.events.UIEvent
 
 
 object UI {
@@ -16,6 +19,7 @@ object UI {
 
     val stage: Stage = Stage(viewport)
 
+    lateinit var gameState: GameStateInfoController
     lateinit var tileInfo: TileInfoPanel
     lateinit var radialMenu: RadialMenu
 
@@ -32,6 +36,10 @@ object UI {
 
         radialMenu = RadialMenu(skin, 100f, 50f)
         stage.addActor(radialMenu)
+
+        gameState = GameStateInfoController(GameScreen.gameState)
+        stage.addActor(gameState.window)
+        gameState.updateData()
     }
 
     fun update(delta: Float) {
@@ -40,6 +48,7 @@ object UI {
 
     fun draw() {
         tileInfo.setPosition(10f, UI.viewport.screenHeight - tileInfo.height - 10)
+        gameState.window.setPosition(Gdx.graphics.width - gameState.window.width, 0f)
 
         stage.draw()
     }

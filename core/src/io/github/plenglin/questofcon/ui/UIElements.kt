@@ -1,15 +1,19 @@
 package io.github.plenglin.questofcon.ui
 
+import com.badlogic.gdx.graphics.Pixmap
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.Group
 import com.badlogic.gdx.scenes.scene2d.ui.*
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
-import com.badlogic.gdx.utils.Align
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable
+import io.github.plenglin.questofcon.game.GameState
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 import io.github.plenglin.questofcon.game.pawn.PawnCreator
+import ktx.scene2d.*
 
 
 class TileInfoPanel(skin: Skin) : Table(skin) {
@@ -196,6 +200,41 @@ class UnitSpawningDialog(val units: List<PawnCreator>, skin: Skin, val worldCoor
         button("Cancel")
         pack()
         setPosition((UI.viewport.screenWidth / 2).toFloat(), (UI.viewport.screenHeight / 2).toFloat())
+    }
+
+}
+
+class GameStateInfoController(val gameState: GameState) {
+
+    lateinit var currentTeamLabel: Label
+    val window: KWindow
+
+    init {
+        window = window("Game Info") {
+            table {
+                currentTeamLabel = label("")
+                textButton("Next Turn").addListener(
+                        object : ChangeListener() {
+                            override fun changed(event: ChangeEvent?, actor: Actor?) {
+                                gameState.nextTurn()
+                                updateData()
+                            }
+                        }
+                )
+                //pack()
+            }
+            //pack()
+        }
+    }
+
+    fun updateData() {
+        val team = gameState.getCurrentTeam()
+        currentTeamLabel.setText("${team.name}'s turn")
+        val background = Pixmap(currentTeamLabel.width.toInt(), currentTeamLabel.height.toInt(), Pixmap.Format.RGBA8888)
+        background.setColor(team.color)
+        background.fill()
+        currentTeamLabel.style.background = Image(Texture(background)).drawable
+        background.dispose()
     }
 
 }

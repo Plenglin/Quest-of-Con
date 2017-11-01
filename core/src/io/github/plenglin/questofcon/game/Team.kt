@@ -8,12 +8,13 @@ import io.github.plenglin.questofcon.game.grid.WorldCoords
 
 class Team(val name: String, val color: Color) {
 
-    var money: Int = QuestOfCon.STARTING_MONEY
+    var money: Int = 10
     lateinit var world: World
 
     fun getOwnedTiles(): List<WorldCoords> = world.filter { it.tile!!.getTeam() == this }.toList()
 
-    fun startTurn(gameState: GameState) {
+    fun startTurn() {
+        money += QuestOfCon.BASE_ECO
         getOwnedTiles().forEach {
             it.tile!!.building?.onTurnBegin()
             val pawn = it.tile.pawn

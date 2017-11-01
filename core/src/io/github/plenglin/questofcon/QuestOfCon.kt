@@ -20,6 +20,6 @@ object QuestOfCon : KtxGame<Screen>(GameScreen) {
     val movementColor: Color = Color(0f, 0f, 1f, 0.5f)
     val attackColor: Color = Color(1f, 0f, 0f, 0.5f)
     val STARTING_MONEY: Int = 50
-    val BASE_ECO = 10
+    val BASE_ECO: Int = 10
 
 }
