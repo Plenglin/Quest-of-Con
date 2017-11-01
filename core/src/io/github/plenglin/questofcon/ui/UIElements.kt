@@ -1,14 +1,11 @@
 package io.github.plenglin.questofcon.ui
 
-import com.badlogic.gdx.graphics.Pixmap
-import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.Group
 import com.badlogic.gdx.scenes.scene2d.ui.*
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 import io.github.plenglin.questofcon.game.GameData
 import io.github.plenglin.questofcon.game.GameState
 import io.github.plenglin.questofcon.game.Team
@@ -16,7 +13,6 @@ import io.github.plenglin.questofcon.game.building.BuildingCreator
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 import io.github.plenglin.questofcon.game.pawn.PawnCreator
 import io.github.plenglin.questofcon.screen.GameScreen
-import ktx.scene2d.*
 
 
 class TileInfoPanel(skin: Skin) : Table(skin) {
@@ -166,6 +162,7 @@ class ConfirmationDialog(title: String, skin: Skin, val onConfirm: () -> Unit) :
         button("OK", 1)
         button("Cancel", 2)
         setPosition((UI.viewport.screenWidth / 2).toFloat(), (UI.viewport.screenHeight / 2).toFloat())
+        pack()
     }
 
     override fun result(obj: Any?) {
@@ -184,18 +181,24 @@ class UnitSpawningDialog(val units: List<PawnCreator>, skin: Skin, val worldCoor
             add(Label("Cost", skin))
             add(Label("Spawn", skin))
             row()
-            units.forEach {
-                add(Label(it.name.capitalize(), skin))
-                add(Label("$${it.cost}", skin))
+            units.forEach { pawn ->
+                add(Label(pawn.name.capitalize(), skin))
+                add(Label("$${pawn.cost}", skin))
                 add(TextButton("Spawn", skin).apply {
+
+                    this.isDisabled = pawn.cost > team.money
+
                     addListener(object : ChangeListener() {
                         override fun changed(event: ChangeEvent?, actor: Actor?) {
-                            println("spawning ${it.name}")
-                            val pawn = it.createPawnAt(team, worldCoords)
-                            pawn.apRemaining = 0
+                            println("spawning ${pawn.name}")
+                            team.money -= pawn.cost
+                            val newPawn = pawn.createPawnAt(team, worldCoords)
+                            newPawn.apRemaining = 0
+                            UI.updateData()
                             this@UnitSpawningDialog.hide()
                         }
                     })
+
                 })
                 row()
             }
@@ -245,37 +248,46 @@ class BuildingSpawningDialog(val units: List<BuildingCreator>, skin: Skin, val w
 
 }
 
-class GameStateInfoController(val gameState: GameState) {
+class GameStateInfoController(val gameState: GameState, skin: Skin) : Window("Status", skin) {
 
-    lateinit var currentTeamLabel: Label
-    val window: KWindow
+    val currentTeamLabel: Label
+    val moneyLabel: Label
+    val ecoLabel: Label
 
     init {
-        window = window("Game Info") {
-            table {
-                currentTeamLabel = label("")
-                textButton("Next Turn").addListener(
-                        object : ChangeListener() {
-                            override fun changed(event: ChangeEvent?, actor: Actor?) {
-                                gameState.nextTurn()
-                                updateData()
-                            }
+        currentTeamLabel = Label("", skin)
+        moneyLabel = Label("", skin)
+        ecoLabel = Label("", skin)
+
+        add(currentTeamLabel)
+        add(TextButton("Next Turn", skin).apply {
+            addListener(
+                    object : ChangeListener() {
+                        override fun changed(event: ChangeEvent?, actor: Actor?) {
+                            gameState.nextTurn()
+                            updateData()
                         }
-                )
-                //pack()
-            }
-            //pack()
-        }
+                    }
+            )
+        })
+        row()
+        add(moneyLabel)
+        add(ecoLabel)
+        pack()
     }
 
     fun updateData() {
         val team = gameState.getCurrentTeam()
         currentTeamLabel.setText("${team.name}'s turn")
+        moneyLabel.setText("$${team.money}")
+        ecoLabel.setText("+$${team.getMoneyPerTurn()}")
+        pack()
+        /*
         val background = Pixmap(currentTeamLabel.width.toInt(), currentTeamLabel.height.toInt(), Pixmap.Format.RGBA8888)
         background.setColor(team.color)
         background.fill()
         currentTeamLabel.style.background = Image(Texture(background)).drawable
-        background.dispose()
+        background.dispose()*/
     }
 
 }

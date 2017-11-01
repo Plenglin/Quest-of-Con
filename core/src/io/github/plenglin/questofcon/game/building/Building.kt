@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color
 import io.github.plenglin.questofcon.game.GameData
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
+import io.github.plenglin.questofcon.ui.ConfirmationDialog
 import io.github.plenglin.questofcon.ui.Selectable
 import io.github.plenglin.questofcon.ui.UI
 import io.github.plenglin.questofcon.ui.UnitSpawningDialog
@@ -27,6 +28,8 @@ abstract class Building(val name: String, var team: Team, var pos: WorldCoords, 
             }
         }
 
+    open fun getMoneyPerTurn() = 0
+
     open fun onTurnBegin() = Unit
 
     open fun onTurnEnd() = Unit
@@ -35,7 +38,9 @@ abstract class Building(val name: String, var team: Team, var pos: WorldCoords, 
         return listOf(
                 object : Selectable("Demolish") {
                     override fun onSelected(x: Float, y: Float) {
-                        health = 0
+                        ConfirmationDialog("Demolish", UI.skin, {
+                            health = 0
+                        }).show(UI.stage)
                     }
                 }
         )

@@ -13,8 +13,10 @@ class Team(val name: String, val color: Color) {
 
     fun getOwnedTiles(): List<WorldCoords> = world.filter { it.tile!!.getTeam() == this }.toList()
 
+    fun getMoneyPerTurn(): Int = 10 + getOwnedTiles().sumBy { it.tile!!.building?.getMoneyPerTurn() ?: 0 }
+
     fun startTurn() {
-        money += QuestOfCon.BASE_ECO
+        money += getMoneyPerTurn()
         getOwnedTiles().forEach {
             val building = it.tile!!.building
             if (building != null) {

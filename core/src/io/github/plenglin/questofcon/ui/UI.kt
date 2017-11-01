@@ -37,9 +37,14 @@ object UI {
         radialMenu = RadialMenu(skin, 100f, 50f)
         stage.addActor(radialMenu)
 
-        gameState = GameStateInfoController(GameScreen.gameState)
-        stage.addActor(gameState.window)
+        gameState = GameStateInfoController(GameScreen.gameState, skin)
+        stage.addActor(gameState)
         gameState.updateData()
+    }
+
+    fun updateData() {
+        gameState.updateData()
+        tileInfo.updateData()
     }
 
     fun update(delta: Float) {
@@ -48,7 +53,7 @@ object UI {
 
     fun draw() {
         tileInfo.setPosition(10f, UI.viewport.screenHeight - tileInfo.height - 10)
-        gameState.window.setPosition(Gdx.graphics.width - gameState.window.width, 0f)
+        gameState.setPosition(Gdx.graphics.width - gameState.width, 0f)
 
         stage.draw()
     }

@@ -141,6 +141,7 @@ object GameScreen : KtxScreen {
                 sets.add(SelectionSet(pawnActionData!!.squares, QuestOfCon.movementColor))
             }
             UIState.ATTACKING_PAWN -> sets.add(SelectionSet(pawnActionData!!.squares, QuestOfCon.attackColor))
+            UIState.NONE -> {}
         }
         worldRenderer.render(true, *sets.toTypedArray())
 
