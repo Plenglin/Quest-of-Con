@@ -3,7 +3,14 @@ package io.github.plenglin.questofcon.game.grid
 /**
  *
  */
-class World(val width: Int, val height: Int) {
+class World(val width: Int, val height: Int) : Sequence<WorldCoords> {
+    override fun iterator(): Iterator<WorldCoords> {
+        return grid.mapIndexed { i, arr ->
+            arr.mapIndexed { j, tile ->
+                WorldCoords(this@World, i, j)
+            }
+        }.flatten().iterator()
+    }
 
     val grid = Array(width, {
         Array(height, { Tile(Terrains.grass) })

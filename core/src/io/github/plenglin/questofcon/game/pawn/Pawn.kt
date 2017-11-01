@@ -49,6 +49,7 @@ abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val 
 
     fun attack(coords: WorldCoords) {
         onAttack(coords)
+        apRemaining -= 1
     }
 
 }
