@@ -55,7 +55,7 @@ abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val 
 }
 
 
-class SimplePawnCreator(name: String, cost: Int, val maxHealth: Int, val attack: Int, val color: Color, val actionPoints: Int = 2, val range: Int = 1) :
+class SimplePawnCreator(name: String, cost: Int, val maxHealth: Int, val attack: Int, val color: Color, val actionPoints: Int = 3, val range: Int = 1) :
         PawnCreator(name, cost) {
 
     override fun createPawnAt(team: Team, worldCoords: WorldCoords): Pawn {
