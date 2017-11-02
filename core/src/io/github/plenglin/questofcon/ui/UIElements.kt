@@ -10,8 +10,6 @@ import io.github.plenglin.questofcon.game.GameState
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 import io.github.plenglin.questofcon.game.pawn.PawnCreator
-import io.github.plenglin.questofcon.screen.GameScreen
-import io.github.plenglin.questofcon.ui.Selectable
 
 
 class TileInfoPanel(skin: Skin) : Table(skin) {
@@ -89,52 +87,48 @@ class PropertiesTable(skin: Skin) : Table(skin) {
 class RadialMenu(val skin: Skin, var radiusX: Float, var radiusY: Float) : Group() {
 
     var active = false
-    var selectables = listOf<Selectable>()
-
-    private var selected: RadialMenuItem? = null
-    private val items = mutableListOf<RadialMenuItem>()
+    var items = listOf<Selectable>()
+    var deadzoneX = 0f
+    var deadzoneY = 0f
 
     fun updateUI() {
+        println(items)
 
         clearChildren()
-        for (i in 0 until selectables.size) {
-            val sel = selectables[i]
+        for (i in 0 until items.size) {
+            val sel = items[i]
 
-            val angle = i.toFloat() / selectables.size * 2 * Math.PI
+            val angle = i.toFloat() / items.size * 2 * Math.PI
 
-            val button = TextButton(sel.title, skin, "radial-menu-item")
+            val button = Label(sel.title, skin, "radial-menu-item")
             //button.pad(-5f)
-            val listener = ClickListener()
             button.setPosition(
                     radiusX * Math.sin(angle).toFloat() - button.width / 2,
                     radiusY * Math.cos(angle).toFloat() - button.height / 2)
 
             println(radiusX * Math.sin(angle).toFloat() - button.width / 2)
 
-            button.addListener(listener)
             button.isVisible = true
             button.debug = true
             addActor(button)
-            items.add(RadialMenuItem(button, sel, listener))
         }
     }
 
-    override fun act(delta: Float) {
-        if (active) {
-            selected = null
-            items.forEach {
-                if (it.clickListener.isPressed) {
-                    selected = it
-                }
-            }
-            if (selected != null) {
-                println("selected $selected")
-                this.selected!!.selectable.onSelected(this.x, this.y)
-                this.active = false
-                this.isVisible = false
+    fun getSelected(xOff: Double, yOff: Double): Selectable? {
+        if (xOff * xOff / deadzoneX / deadzoneX + yOff * yOff / deadzoneY / deadzoneY < 1) {  // In deadzone ellipse?
+            return null
+        }
+        println("$xOff, $yOff, ${Math.toDegrees(Math.atan2(yOff, xOff))}")
+        val bearing = (450 - Math.toDegrees(Math.atan2(yOff, xOff))) % 360
+        println("bearing $bearing")
+        for (i in items.indices) {
+            val rot = 360 * (i + 0.5) / items.size
+            println("$i: is $rot")
+            if (bearing <= rot) {
+                return items[i]
             }
         }
-        super.act(delta)
+        return items[0]
     }
 
 }

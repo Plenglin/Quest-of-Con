@@ -1,6 +1,5 @@
 package io.github.plenglin.questofcon.screen
 
-import com.badlogic.gdx.Game
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.graphics.Color
@@ -43,11 +42,12 @@ object GameScreen : KtxScreen {
         batch = SpriteBatch()
         gameState = GameState(listOf(teamA, teamB, teamC))
 
+        GameData.spawnableBuildings[0].createBuildingAt(teamA, WorldCoords(gameState.world, 5, 5))
+
         mapMovement = MapMovement(gridCam)
         gridSelection = GridSelection(gridCam, gameState.world)
 
         worldRenderer = WorldRenderer(gameState.world)
-        Gdx.input.inputProcessor = InputMultiplexer(UI.stage, gridSelection, mapMovement)
 
         gridCam.zoom = 1/32f
         gridCam.position.set(0f, 0f, 0f)
@@ -86,7 +86,7 @@ object GameScreen : KtxScreen {
                                 }))
                             }
                             println(actions)
-                            selectables = actions
+                            items = actions
                             radiusX = 50f
                             radiusY = 25f
                             isVisible = true
@@ -120,6 +120,7 @@ object GameScreen : KtxScreen {
 
             previous = gridSelection.selection
         })
+        Gdx.input.inputProcessor = InputMultiplexer(UI.stage, RadialMenuInputManager, gridSelection, mapMovement)
     }
 
     override fun render(delta: Float) {

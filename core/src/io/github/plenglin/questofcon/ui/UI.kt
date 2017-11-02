@@ -35,6 +35,8 @@ object UI {
         stage.addActor(tileInfo)
 
         radialMenu = RadialMenu(skin, 100f, 50f)
+        radialMenu.deadzoneX = 30f
+        radialMenu.deadzoneY = 15f
         stage.addActor(radialMenu)
 
         gameState = GameStateInfoController(GameScreen.gameState, skin)

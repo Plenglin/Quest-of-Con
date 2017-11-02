@@ -1,5 +1,6 @@
 package io.github.plenglin.questofcon.ui
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.graphics.OrthographicCamera
@@ -9,6 +10,7 @@ import io.github.plenglin.questofcon.game.grid.World
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 import io.github.plenglin.questofcon.screen.GameScreen
 import io.github.plenglin.questofcon.screen.UIState
+import ktx.app.KtxInputAdapter
 
 
 class MapMovement(val cam: OrthographicCamera) : InputProcessor {
@@ -170,5 +172,75 @@ class GridSelection(val cam: OrthographicCamera, val world: World) : InputProces
     override fun scrolled(amount: Int) = false
     override fun keyUp(keycode: Int) = false
     override fun touchDragged(screenX: Int, screenY: Int, pointer: Int) = false
+
+}
+
+object RadialMenuInputManager : KtxInputAdapter {
+
+    private val radialMenu = UI.radialMenu
+
+    override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        when (button) {
+            Input.Buttons.RIGHT -> {
+                radialMenu.items = getSelectables()
+                radialMenu.setPosition(screenX.toFloat(), UI.viewport.screenHeight - screenY.toFloat())
+                radialMenu.updateUI()
+                radialMenu.active = true
+                radialMenu.isVisible = true
+                return true
+            }
+        }
+        return false
+    }
+
+    override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
+
+        return false
+    }
+
+    override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        val sx = screenX.toFloat()
+        val sy = UI.viewport.screenHeight - screenY.toFloat()
+        if (radialMenu.active) {
+            when (button) {
+                Input.Buttons.RIGHT -> {
+                    val selected = radialMenu.getSelected((sx - radialMenu.x).toDouble(), (sy - radialMenu.y).toDouble())
+                    selected?.onSelected?.invoke(screenX.toFloat(), screenY.toFloat())
+                    println(selected)
+                    radialMenu.active = false
+                    radialMenu.isVisible = false
+                    return true
+                }
+            }
+        }
+        return false
+    }
+
+    private fun getSelectables(): List<Selectable> {
+        val selection = GameScreen.gridSelection.selection!!
+        val actions = mutableListOf<Selectable>()
+        val currentTeam = GameScreen.gameState.getCurrentTeam()
+
+        val pawn = selection.tile!!.pawn
+        if (pawn != null && pawn.team == currentTeam && pawn.apRemaining > 0) {
+            actions.addAll(RadialMenus.pawnMenu)
+        }
+
+        val building = selection.tile.building
+        println("building enabled: ${building?.enabled}")
+        if (building != null && building.team == currentTeam && building.enabled) {
+            actions.addAll(selection.tile.building!!.getActions())
+        }
+        if (selection.tile.canBuildOn(currentTeam)) {
+            actions.add(Selectable("Build", { x, y ->
+                BuildingSpawningDialog(
+                        GameScreen.gameState.getCurrentTeam(),
+                        UI.skin,
+                        GameScreen.gridSelection.selection!!
+                ).show(UI.stage)
+            }))
+        }
+        return actions
+    }
 
 }
