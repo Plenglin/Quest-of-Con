@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Vector3
 import io.github.plenglin.questofcon.QuestOfCon
 import io.github.plenglin.questofcon.game.grid.World
 import io.github.plenglin.questofcon.game.grid.WorldCoords
+import io.github.plenglin.questofcon.render.ShadeSet
 import io.github.plenglin.questofcon.screen.GameScreen
 import io.github.plenglin.questofcon.screen.UIState
 import ktx.app.KtxInputAdapter
@@ -97,10 +98,16 @@ object GridSelectionInputManager : KtxInputAdapter {
     val world: World = GameScreen.gameState.world
     val selectionListeners = mutableListOf<(WorldCoords?, Int, Int) -> Unit>()
 
+    var selectedShadeSet: ShadeSet? = null
+    var hoveringShadeSet: ShadeSet? = null
+
     var selection: WorldCoords? = null
         private set(value) {
-            if (value != null) {
-                field = if (value.exists) value else null
+            GameScreen.shadeSets.remove(selectedShadeSet)
+            if (value != null && value.exists) {
+                field = value
+                selectedShadeSet = ShadeSet(setOf(value), QuestOfCon.selectionColor)
+                GameScreen.shadeSets.add(selectedShadeSet!!)
             } else {
                 field = null
             }
@@ -112,13 +119,27 @@ object GridSelectionInputManager : KtxInputAdapter {
             UI.tileInfo.isVisible = (field != null)
         }
 
+    var hovering: WorldCoords? = null
+        private set(value) {
+            GameScreen.shadeSets.remove(hoveringShadeSet)
+            if (value != null && value.exists) {
+                field = value
+                hoveringShadeSet = ShadeSet(setOf(value), QuestOfCon.hoveringColor)
+                GameScreen.shadeSets.add(hoveringShadeSet!!)
+            } else {
+                field = null
+            }
+        }
+
+    override fun mouseMoved(screenX: Int, screenY: Int): Boolean {
+        hovering = getGridPos(screenX, screenY)
+        return false
+    }
+
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        val gridPos = cam.unproject(Vector3(screenX.toFloat(), screenY.toFloat(), 0f))
-        val i = gridPos.x.toInt()
-        val j = gridPos.y.toInt()
         when (pointer) {
             Input.Buttons.LEFT -> {
-                val grid = WorldCoords(world, i, j)
+                val grid = getGridPos(screenX, screenY)
                 selection = grid
                 selectionListeners.forEach { it(selection, screenX, screenY) }
             }
@@ -136,6 +157,13 @@ object GridSelectionInputManager : KtxInputAdapter {
             }
         }
         return false
+    }
+
+    fun getGridPos(screenX: Int, screenY: Int): WorldCoords {
+        val gridPos = cam.unproject(Vector3(screenX.toFloat(), screenY.toFloat(), 0f))
+        val i = gridPos.x.toInt()
+        val j = gridPos.y.toInt()
+        return WorldCoords(world, i, j)
     }
 
 }
@@ -199,7 +227,7 @@ object RadialMenuInputManager : KtxInputAdapter {
     }
 
     private fun getSelectables(): List<Selectable> {
-        val selection = GridSelectionInputManager.selection!!
+        val selection = GridSelectionInputManager.hovering!!
         val actions = mutableListOf<Selectable>()
         val currentTeam = GameScreen.gameState.getCurrentTeam()
 
@@ -218,7 +246,7 @@ object RadialMenuInputManager : KtxInputAdapter {
                 BuildingSpawningDialog(
                         GameScreen.gameState.getCurrentTeam(),
                         UI.skin,
-                        GridSelectionInputManager.selection!!
+                        GridSelectionInputManager.hovering!!
                 ).show(UI.stage)
             }))
         }

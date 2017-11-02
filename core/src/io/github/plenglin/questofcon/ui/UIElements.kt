@@ -115,7 +115,7 @@ class RadialMenu(val skin: Skin, var radiusX: Float, var radiusY: Float) : Group
     }
 
     fun getSelected(xOff: Double, yOff: Double): Selectable? {
-        if (xOff * xOff / deadzoneX / deadzoneX + yOff * yOff / deadzoneY / deadzoneY < 1) {  // In deadzone ellipse?
+        if (items.isEmpty() || xOff * xOff / deadzoneX / deadzoneX + yOff * yOff / deadzoneY / deadzoneY < 1) {  // In deadzone ellipse?
             return null
         }
         println("$xOff, $yOff, ${Math.toDegrees(Math.atan2(yOff, xOff))}")
@@ -269,7 +269,7 @@ class GameStateInfoController(val gameState: GameState, skin: Skin) : Window("St
         pack()
         /*
         val background = Pixmap(currentTeamLabel.width.toInt(), currentTeamLabel.height.toInt(), Pixmap.Format.RGBA8888)
-        background.setColor(team.color)
+        background.setColor(team.shading)
         background.fill()
         currentTeamLabel.style.background = Image(Texture(background)).drawable
         background.dispose()*/

@@ -11,7 +11,7 @@ import io.github.plenglin.questofcon.game.GameData
 import io.github.plenglin.questofcon.game.GameState
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
-import io.github.plenglin.questofcon.render.SelectionSet
+import io.github.plenglin.questofcon.render.ShadeSet
 import io.github.plenglin.questofcon.render.WorldRenderer
 import io.github.plenglin.questofcon.ui.*
 import ktx.app.KtxScreen
@@ -27,6 +27,8 @@ object GameScreen : KtxScreen {
     lateinit var worldRenderer: WorldRenderer
 
     lateinit var gameState: GameState
+
+    val shadeSets = mutableListOf<ShadeSet>()
 
     var pawnActionData: PawnAction? = null
     var uiState = UIState.NONE
@@ -129,19 +131,15 @@ object GameScreen : KtxScreen {
 
         worldRenderer.shape.projectionMatrix = gridCam.combined
 
-        val selection = GridSelectionInputManager.selection
-        val sets = mutableListOf<SelectionSet>()
-        if (selection != null) {
-            sets.add(SelectionSet(setOf(selection), QuestOfCon.selectionColor))
-        }
+        /*
         when (uiState) {
             UIState.MOVING_PAWN -> {
-                sets.add(SelectionSet(pawnActionData!!.squares, QuestOfCon.movementColor))
+                shadeSets.add(ShadeSet(pawnActionData!!.squares, QuestOfCon.movementColor))
             }
-            UIState.ATTACKING_PAWN -> sets.add(SelectionSet(pawnActionData!!.squares, QuestOfCon.attackColor))
+            UIState.ATTACKING_PAWN -> shadeSets.add(ShadeSet(pawnActionData!!.squares, QuestOfCon.attackColor))
             UIState.NONE -> {}
-        }
-        worldRenderer.render(true, *sets.toTypedArray())
+        }*/
+        worldRenderer.render(true, *shadeSets.toTypedArray())
 
         UI.draw()
 

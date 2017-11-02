@@ -4,14 +4,13 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import io.github.plenglin.questofcon.game.grid.World
 import io.github.plenglin.questofcon.game.grid.WorldCoords
-import ktx.app.color
 
 
 class WorldRenderer(val world: World) {
 
     val shape: ShapeRenderer = ShapeRenderer()
 
-    fun render(drawGrid: Boolean = true, vararg paints: SelectionSet) {
+    fun render(drawGrid: Boolean = true, vararg paints: ShadeSet) {
 
         shape.setAutoShapeType(true)
         shape.begin()
@@ -47,7 +46,7 @@ class WorldRenderer(val world: World) {
             shape.set(ShapeRenderer.ShapeType.Filled)
             for (s in paints) {
                 s.coords.forEach {
-                    shape.color = s.color
+                    shape.color = s.shading
                     shape.rect(it.i.toFloat(), it.j.toFloat(), 1f, 1f)
                 }
             }
@@ -101,4 +100,4 @@ class WorldRenderer(val world: World) {
 
 }
 
-data class SelectionSet(val coords: Set<WorldCoords>, val color: Color)
+data class ShadeSet(val coords: Set<WorldCoords>, val shading: Color)
