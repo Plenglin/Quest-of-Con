@@ -1,6 +1,5 @@
 package io.github.plenglin.questofcon.ui
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.graphics.OrthographicCamera
@@ -13,7 +12,7 @@ import io.github.plenglin.questofcon.screen.UIState
 import ktx.app.KtxInputAdapter
 
 
-object MapMovement : InputProcessor {
+object MapControlInputManager : KtxInputAdapter {
 
     val cam: OrthographicCamera = GameScreen.gridCam
     var vx: Int = 0
@@ -90,39 +89,9 @@ object MapMovement : InputProcessor {
         cam.translate(vx * mult * QuestOfCon.camSpeed * delta, vy * mult * QuestOfCon.camSpeed * delta)
     }
 
-    override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean = false
-    override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean = false
-    override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int) = false
-    override fun mouseMoved(screenX: Int, screenY: Int) = false
-    override fun keyTyped(character: Char) = false
-
 }
 
-object RadialMenus {
-    val pawnMenu = listOf<Selectable>(
-            Selectable("Move", { x, y ->
-                println("showing pawn movement menu")
-                val pawn = GridSelection.selection!!.tile!!.pawn!!
-                GameScreen.uiState = UIState.MOVING_PAWN
-                GameScreen.pawnActionData = PawnAction(pawn, pawn.getMovableSquares())
-            }),
-            Selectable("Attack", { x, y ->
-                    println("showing attack menu")
-                    val pawn = GridSelection.selection!!.tile!!.pawn!!
-                    GameScreen.uiState = UIState.ATTACKING_PAWN
-                    GameScreen.pawnActionData = PawnAction(pawn, pawn.getAttackableSquares())
-            }),
-            Selectable("Disband", { x, y ->
-                println("disbanding pawn")
-                UI.stage.addActor(ConfirmationDialog("Disband Pawn", UI.skin, {
-                    GridSelection.selection!!.tile!!.pawn!!.health = 0
-                }))
-            })
-
-    )
-}
-
-object GridSelection : InputProcessor {
+object GridSelectionInputManager : KtxInputAdapter {
 
     val cam: OrthographicCamera = GameScreen.gridCam
     val world: World = GameScreen.gameState.world
@@ -169,16 +138,31 @@ object GridSelection : InputProcessor {
         return false
     }
 
-    override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int) = false
-    override fun mouseMoved(screenX: Int, screenY: Int) = false
-    override fun keyTyped(character: Char) = false
-    override fun scrolled(amount: Int) = false
-    override fun keyUp(keycode: Int) = false
-    override fun touchDragged(screenX: Int, screenY: Int, pointer: Int) = false
-
 }
 
 object RadialMenuInputManager : KtxInputAdapter {
+
+    val pawnMenu = listOf<Selectable>(
+            Selectable("Move", { x, y ->
+                println("showing pawn movement menu")
+                val pawn = GridSelectionInputManager.selection!!.tile!!.pawn!!
+                GameScreen.uiState = UIState.MOVING_PAWN
+                GameScreen.pawnActionData = PawnAction(pawn, pawn.getMovableSquares())
+            }),
+            Selectable("Attack", { x, y ->
+                println("showing attack menu")
+                val pawn = GridSelectionInputManager.selection!!.tile!!.pawn!!
+                GameScreen.uiState = UIState.ATTACKING_PAWN
+                GameScreen.pawnActionData = PawnAction(pawn, pawn.getAttackableSquares())
+            }),
+            Selectable("Disband", { x, y ->
+                println("disbanding pawn")
+                UI.stage.addActor(ConfirmationDialog("Disband Pawn", UI.skin, {
+                    GridSelectionInputManager.selection!!.tile!!.pawn!!.health = 0
+                }))
+            })
+
+    )
 
     private val radialMenu = UI.radialMenu
 
@@ -193,11 +177,6 @@ object RadialMenuInputManager : KtxInputAdapter {
                 return true
             }
         }
-        return false
-    }
-
-    override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
-
         return false
     }
 
@@ -220,13 +199,13 @@ object RadialMenuInputManager : KtxInputAdapter {
     }
 
     private fun getSelectables(): List<Selectable> {
-        val selection = GridSelection.selection!!
+        val selection = GridSelectionInputManager.selection!!
         val actions = mutableListOf<Selectable>()
         val currentTeam = GameScreen.gameState.getCurrentTeam()
 
         val pawn = selection.tile!!.pawn
         if (pawn != null && pawn.team == currentTeam && pawn.apRemaining > 0) {
-            actions.addAll(RadialMenus.pawnMenu)
+            actions.addAll(pawnMenu)
         }
 
         val building = selection.tile.building
@@ -239,7 +218,7 @@ object RadialMenuInputManager : KtxInputAdapter {
                 BuildingSpawningDialog(
                         GameScreen.gameState.getCurrentTeam(),
                         UI.skin,
-                        GridSelection.selection!!
+                        GridSelectionInputManager.selection!!
                 ).show(UI.stage)
             }))
         }

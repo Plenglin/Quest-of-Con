@@ -115,13 +115,13 @@ object GameScreen : KtxScreen {
 
             previous = gridSelection.selection
         })*/
-        Gdx.input.inputProcessor = InputMultiplexer(UI.stage, RadialMenuInputManager, GridSelection, MapMovement)
+        Gdx.input.inputProcessor = InputMultiplexer(UI.stage, RadialMenuInputManager, GridSelectionInputManager, MapControlInputManager)
     }
 
     override fun render(delta: Float) {
 
         UI.update(delta)
-        MapMovement.update(delta)
+        MapControlInputManager.update(delta)
         gridCam.update()
 
         Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
@@ -129,7 +129,7 @@ object GameScreen : KtxScreen {
 
         worldRenderer.shape.projectionMatrix = gridCam.combined
 
-        val selection = GridSelection.selection
+        val selection = GridSelectionInputManager.selection
         val sets = mutableListOf<SelectionSet>()
         if (selection != null) {
             sets.add(SelectionSet(setOf(selection), QuestOfCon.selectionColor))
