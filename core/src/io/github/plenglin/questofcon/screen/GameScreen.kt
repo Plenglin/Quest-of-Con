@@ -43,7 +43,7 @@ object GameScreen : KtxScreen {
         batch = SpriteBatch()
         gameState = GameState(listOf(teamA, teamB, teamC))
 
-        GameData.spawnableBuildings[0].createBuildingAt(teamA, WorldCoords(gameState.world, 5, 5))
+        //GameData.spawnableBuildings[0].createBuildingAt(teamA, WorldCoords(gameState.world, 5, 5))
 
         worldRenderer = WorldRenderer(gameState.world)
 

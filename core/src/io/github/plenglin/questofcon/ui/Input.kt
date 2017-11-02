@@ -229,7 +229,7 @@ object RadialMenuInputManager : KtxInputAdapter {
 
     private fun getSelectables(): List<Selectable> {
         val currentTeam = GameScreen.gameState.getCurrentTeam()
-        val selection = GridSelectionInputManager.hovering!!
+        val selection = GridSelectionInputManager.hovering ?: return emptyList()
 
         if (currentTeam.hasBuiltHQ) {
             val actions = mutableListOf<Selectable>()
@@ -255,9 +255,11 @@ object RadialMenuInputManager : KtxInputAdapter {
             }
             return actions
         } else {
-            return listOf(Selectable("Build HQ", {
-                BuildingHQ.createBuildingAt(currentTeam, selection)
-            }))
+            return if (selection.tile?.canBuildOn(currentTeam) == true)
+                listOf(Selectable("Build HQ", {
+                    BuildingHQ.createBuildingAt(currentTeam, selection)
+                }))
+            else emptyList()
         }
     }
 
@@ -299,7 +301,7 @@ object PawnActionInputManager : KtxInputAdapter {
 
     override fun keyDown(keycode: Int): Boolean {
         val pawn = GridSelectionInputManager.selection?.tile?.pawn ?: return false
-        if (pawn.apRemaining <= 0) {
+        if (pawn.team != GameScreen.gameState.getCurrentTeam() && pawn.apRemaining <= 0) {
             return false
         }
         this.pawn = pawn
