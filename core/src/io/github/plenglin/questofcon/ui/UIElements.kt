@@ -162,7 +162,6 @@ class UnitSpawningDialog(val units: List<PawnCreator>, skin: Skin, val worldCoor
         contentTable.apply {
             add(Label("Type", skin))
             add(Label("Cost", skin))
-            add(Label("Spawn", skin))
             row()
             units.forEach { pawn ->
                 add(Label(pawn.name.capitalize(), skin))
@@ -201,7 +200,6 @@ class BuildingSpawningDialog(val team: Team, skin: Skin, val worldCoords: WorldC
         contentTable.apply {
             add(Label("Type", skin))
             add(Label("Cost", skin))
-            add(Label("Build", skin))
             row()
             buildings.forEach { bldg ->
                 add(Label(bldg.name.capitalize(), skin))
