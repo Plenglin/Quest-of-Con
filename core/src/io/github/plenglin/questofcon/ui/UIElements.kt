@@ -5,12 +5,10 @@ import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.Group
 import com.badlogic.gdx.scenes.scene2d.ui.*
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import io.github.plenglin.questofcon.game.GameState
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 import io.github.plenglin.questofcon.game.pawn.PawnCreator
-import io.github.plenglin.questofcon.screen.GameScreen
 
 
 class TileInfoPanel(skin: Skin) : Table(skin) {
@@ -33,10 +31,10 @@ class TileInfoPanel(skin: Skin) : Table(skin) {
         row()
         add(Label("Building", skin)).center().pad(10f)
         add(building).top().left().expandX().pad(5f)
+        pad(5f)
     }
 
     override fun draw(batch: Batch?, parentAlpha: Float) {
-        pad(5f)
         top().left()
 
         super.draw(batch, parentAlpha)
@@ -67,7 +65,7 @@ class PropertiesTable(skin: Skin) : Table(skin) {
 
     fun updateData() {
         clearChildren()
-        if (data.size > 0) {
+        if (data.isNotEmpty()) {
             data.forEach { k, v ->
                 add(Label(k.capitalize(), skin)).left().prefWidth(100f)
                 add(Label(v.toString(), skin)).right()
@@ -88,69 +86,56 @@ class PropertiesTable(skin: Skin) : Table(skin) {
 class RadialMenu(val skin: Skin, var radiusX: Float, var radiusY: Float) : Group() {
 
     var active = false
-    var selectables = listOf<Selectable>()
-
-    private var selected: RadialMenuItem? = null
-    private val items = mutableListOf<RadialMenuItem>()
+    var items = listOf<Selectable>()
+    var deadzoneX = 0f
+    var deadzoneY = 0f
 
     fun updateUI() {
+        println(items)
 
         clearChildren()
-        for (i in 0 until selectables.size) {
-            val sel = selectables[i]
+        for (i in 0 until items.size) {
+            val sel = items[i]
 
-            val angle = i.toFloat() / selectables.size * 2 * Math.PI
+            val angle = i.toFloat() / items.size * 2 * Math.PI
 
-            val button = TextButton(sel.title, skin, "radial-menu-item")
+            val button = Label(sel.title, skin, "radial-menu-item")
             //button.pad(-5f)
-            val listener = ClickListener()
             button.setPosition(
                     radiusX * Math.sin(angle).toFloat() - button.width / 2,
                     radiusY * Math.cos(angle).toFloat() - button.height / 2)
 
             println(radiusX * Math.sin(angle).toFloat() - button.width / 2)
 
-            button.addListener(listener)
             button.isVisible = true
             button.debug = true
             addActor(button)
-            items.add(RadialMenuItem(button, sel, listener))
         }
     }
 
-    override fun act(delta: Float) {
-        if (active) {
-            selected = null
-            items.forEach {
-                if (it.clickListener.isPressed) {
-                    selected = it
-                }
-            }
-            if (selected != null) {
-                println("selected $selected")
-                this.selected!!.selectable.onSelected(this.x, this.y)
-                this.active = false
-                this.isVisible = false
+    fun getSelected(xOff: Double, yOff: Double): Selectable? {
+        if (items.isEmpty() || xOff * xOff / deadzoneX / deadzoneX + yOff * yOff / deadzoneY / deadzoneY < 1) {  // In deadzone ellipse?
+            return null
+        }
+        println("$xOff, $yOff, ${Math.toDegrees(Math.atan2(yOff, xOff))}")
+        val bearing = (450 - Math.toDegrees(Math.atan2(yOff, xOff))) % 360
+        println("bearing $bearing")
+        for (i in items.indices) {
+            val rot = 360 * (i + 0.5) / items.size
+            println("$i: is $rot")
+            if (bearing <= rot) {
+                return items[i]
             }
         }
-        super.act(delta)
+        return items[0]
     }
 
 }
 
-private data class RadialMenuItem(val label: TextButton, val selectable: Selectable, val clickListener: ClickListener)
-
-abstract class Selectable(val title: String) {
-
-    /**
-     * Called when this selectable is selected. Parameters are at the center of the radial menu.
-     */
-    abstract fun onSelected(x: Float, y: Float)
-
+data class Selectable(val title: String, val onSelected: () -> Unit) {
     override fun toString(): String {
-        return title
+        return "Selectable($title)"
     }
-
 }
 
 class ConfirmationDialog(title: String, skin: Skin, val onConfirm: () -> Unit) : Dialog(title, skin) {
@@ -243,17 +228,6 @@ class BuildingSpawningDialog(val team: Team, skin: Skin, val worldCoords: WorldC
         setPosition((UI.viewport.screenWidth / 2).toFloat(), (UI.viewport.screenHeight / 2).toFloat())
     }
 
-    companion object : Selectable("Build") {
-        override fun onSelected(x: Float, y: Float) {
-            BuildingSpawningDialog(
-                    GameScreen.gameState.getCurrentTeam(),
-                    UI.skin,
-                    GameScreen.gridSelection.selection!!
-            ).show(UI.stage)
-        }
-
-    }
-
 }
 
 class GameStateInfoController(val gameState: GameState, skin: Skin) : Window("Status", skin) {
@@ -290,12 +264,6 @@ class GameStateInfoController(val gameState: GameState, skin: Skin) : Window("St
         moneyLabel.setText("$${team.money}")
         ecoLabel.setText("+$${team.getMoneyPerTurn()}")
         pack()
-        /*
-        val background = Pixmap(currentTeamLabel.width.toInt(), currentTeamLabel.height.toInt(), Pixmap.Format.RGBA8888)
-        background.setColor(team.color)
-        background.fill()
-        currentTeamLabel.style.background = Image(Texture(background)).drawable
-        background.dispose()*/
     }
 
 }

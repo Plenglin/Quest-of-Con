@@ -18,7 +18,6 @@
   },
   com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle: {
     default: { down: default-round-down, up: default-round, font: default-font, fontColor: white },
-    radial-menu-item: { down: radial-item-bg, up: radial-item-bg, font: default-font, fontColor: white },
     toggle: { down: default-round-down, up: default-round, checked: default-round-down, font: default-font, fontColor: white, downFontColor: red }
   },
   com.badlogic.gdx.scenes.scene2d.ui.ScrollPane$ScrollPaneStyle: {
@@ -49,6 +48,7 @@
   },
   com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle: {
     default: { font: default-font, fontColor: white }
+    radial-menu-item: { background: radial-item-bg, font: default-font, fontColor: white },
   },
   com.badlogic.gdx.scenes.scene2d.ui.TextField$TextFieldStyle: {
     default: { selection: selection, background: textfield, font: default-font, fontColor: white, cursor: cursor }

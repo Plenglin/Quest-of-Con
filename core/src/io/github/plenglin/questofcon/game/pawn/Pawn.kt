@@ -30,8 +30,8 @@ abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val 
     abstract fun getAttackableSquares(): Set<WorldCoords>
 
     /**
-     * Try to attack a square.
-     * @param coords the square to attack
+     * Try to attemptAttack a square.
+     * @param coords the square to attemptAttack
      * @return whether it was successful or not.
      */
     abstract fun onAttack(coords: WorldCoords): Boolean
@@ -47,9 +47,9 @@ abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val 
         return mapOf("type" to name, "team" to team.name, "health" to "$health/$maxHealth", "actions" to "$apRemaining/$actionPoints")
     }
 
-    fun attack(coords: WorldCoords) {
-        onAttack(coords)
+    fun attemptAttack(coords: WorldCoords): Boolean {
         apRemaining -= 1
+        return onAttack(coords)
     }
 
 }
