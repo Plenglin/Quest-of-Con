@@ -4,6 +4,7 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.math.Vector3
 import io.github.plenglin.questofcon.QuestOfCon
+import io.github.plenglin.questofcon.game.building.buildings.BuildingHQ
 import io.github.plenglin.questofcon.game.grid.World
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 import io.github.plenglin.questofcon.game.pawn.Pawn
@@ -227,30 +228,37 @@ object RadialMenuInputManager : KtxInputAdapter {
     }
 
     private fun getSelectables(): List<Selectable> {
-        val selection = GridSelectionInputManager.hovering!!
-        val actions = mutableListOf<Selectable>()
         val currentTeam = GameScreen.gameState.getCurrentTeam()
+        val selection = GridSelectionInputManager.hovering!!
 
-        val pawn = selection.tile!!.pawn
-        if (pawn != null && pawn.team == currentTeam && pawn.apRemaining > 0) {
-            actions.addAll(pawnMenu)
-        }
+        if (currentTeam.hasBuiltHQ) {
+            val actions = mutableListOf<Selectable>()
 
-        val building = selection.tile.building
-        println("building enabled: ${building?.enabled}")
-        if (building != null && building.team == currentTeam && building.enabled) {
-            actions.addAll(selection.tile.building!!.getActions())
-        }
-        if (selection.tile.canBuildOn(currentTeam)) {
-            actions.add(Selectable("Build", {
-                BuildingSpawningDialog(
-                        GameScreen.gameState.getCurrentTeam(),
-                        UI.skin,
-                        GridSelectionInputManager.hovering!!
-                ).show(UI.stage)
+            val pawn = selection.tile!!.pawn
+            if (pawn != null && pawn.team == currentTeam && pawn.apRemaining > 0) {
+                actions.addAll(pawnMenu)
+            }
+
+            val building = selection.tile.building
+            println("building enabled: ${building?.enabled}")
+            if (building != null && building.team == currentTeam && building.enabled) {
+                actions.addAll(selection.tile.building!!.getActions())
+            }
+            if (selection.tile.canBuildOn(currentTeam)) {
+                actions.add(Selectable("Build", {
+                    BuildingSpawningDialog(
+                            GameScreen.gameState.getCurrentTeam(),
+                            UI.skin,
+                            GridSelectionInputManager.hovering!!
+                    ).show(UI.stage)
+                }))
+            }
+            return actions
+        } else {
+            return listOf(Selectable("Build HQ", {
+                BuildingHQ.createBuildingAt(currentTeam, selection)
             }))
         }
-        return actions
     }
 
 }
