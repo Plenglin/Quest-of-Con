@@ -5,10 +5,10 @@ import com.badlogic.gdx.graphics.Color
 import io.github.plenglin.questofcon.screen.GameScreen
 import ktx.app.KtxGame
 
-/**
- *
- */
-object QuestOfCon : KtxGame<Screen>(GameScreen) {
+
+object QuestOfCon : KtxGame<Screen>(GameScreen)
+
+object Constants {
 
     val zoomRate = 1.125f
     val minZoom = 1/64f

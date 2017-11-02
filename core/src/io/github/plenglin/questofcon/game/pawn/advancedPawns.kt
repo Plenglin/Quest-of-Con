@@ -21,7 +21,7 @@ class PawnArtillery(team: Team, pos: WorldCoords) : Pawn("Bertha", team, pos, 3,
     companion object : PawnCreator("Bertha", 50) {
 
         val damage = 15
-        val dmgRadius = 2
+        val dmgRadius = 1
         val maxRange = 5
         val minRange = 3
 
