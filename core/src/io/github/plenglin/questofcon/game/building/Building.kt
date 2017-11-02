@@ -1,8 +1,6 @@
 package io.github.plenglin.questofcon.game.building
 
-import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g2d.Sprite
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 import io.github.plenglin.questofcon.ui.ConfirmationDialog

@@ -354,6 +354,7 @@ object PawnActionInputManager : KtxInputAdapter {
             State.NONE -> return false
             State.ATTACK -> {
                 if (selectionSet.contains(hovering) && pawn.attemptAttack(hovering)) {
+                    UI.tileInfo.updateData()
                     setPawnState(pawn, State.NONE)
                     return true
                 }
