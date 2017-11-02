@@ -29,9 +29,6 @@ object GameScreen : KtxScreen {
 
     val shadeSets = mutableListOf<ShadeSet>()
 
-    var pawnActionData: PawnAction? = null
-    var uiState = UIState.NONE
-
     val teamA = Team("escargot", Color.BLUE)
     val teamB = Team("parfait", Color.WHITE)
     val teamC = Team("le baguette", Color.RED)
@@ -130,14 +127,6 @@ object GameScreen : KtxScreen {
 
         worldRenderer.shape.projectionMatrix = gridCam.combined
 
-        /*
-        when (uiState) {
-            UIState.MOVING_PAWN -> {
-                shadeSets.add(ShadeSet(pawnActionData!!.squares, QuestOfCon.movementColor))
-            }
-            UIState.ATTACKING_PAWN -> shadeSets.add(ShadeSet(pawnActionData!!.squares, QuestOfCon.attackColor))
-            UIState.NONE -> {}
-        }*/
         worldRenderer.render(true, *shadeSets.toTypedArray())
 
         UI.draw()
@@ -154,8 +143,4 @@ object GameScreen : KtxScreen {
         UI.viewport.update(width, height, true)
     }
 
-}
-
-enum class UIState {
-    NONE, MOVING_PAWN, ATTACKING_PAWN
 }

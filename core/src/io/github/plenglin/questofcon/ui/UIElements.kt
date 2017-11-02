@@ -268,13 +268,6 @@ class GameStateInfoController(val gameState: GameState, skin: Skin) : Window("St
         currentTeamLabel.setText("${team.name}'s turn")
         moneyLabel.setText("$${team.money}")
         ecoLabel.setText("+$${team.getMoneyPerTurn()}")
-        pack()
-        /*
-        val background = Pixmap(currentTeamLabel.width.toInt(), currentTeamLabel.height.toInt(), Pixmap.Format.RGBA8888)
-        background.setColor(team.shading)
-        background.fill()
-        currentTeamLabel.style.background = Image(Texture(background)).drawable
-        background.dispose()*/
     }
 
 }

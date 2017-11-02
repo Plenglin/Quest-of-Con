@@ -9,8 +9,8 @@ import io.github.plenglin.questofcon.game.grid.WorldCoords
 import io.github.plenglin.questofcon.game.pawn.Pawn
 import io.github.plenglin.questofcon.render.ShadeSet
 import io.github.plenglin.questofcon.screen.GameScreen
-import io.github.plenglin.questofcon.screen.UIState
 import ktx.app.KtxInputAdapter
+import sun.awt.image.URLImageSource
 
 
 object MapControlInputManager : KtxInputAdapter {
@@ -172,22 +172,22 @@ object RadialMenuInputManager : KtxInputAdapter {
 
     val pawnMenu = listOf<Selectable>(
             Selectable("Move", { x, y ->
-                println("showing pawn movement menu")
-                val pawn = GridSelectionInputManager.selection!!.tile!!.pawn!!
-                GameScreen.uiState = UIState.MOVING_PAWN
-                GameScreen.pawnActionData = PawnAction(pawn, pawn.getMovableSquares())
+                PawnActionInputManager.setPawnState(
+                        GridSelectionInputManager.hovering!!.tile!!.pawn!!,
+                        PawnActionInputManager.State.MOVE
+                )
             }),
             Selectable("Attack", { x, y ->
-                println("showing attack menu")
-                val pawn = GridSelectionInputManager.selection!!.tile!!.pawn!!
-                GameScreen.uiState = UIState.ATTACKING_PAWN
-                GameScreen.pawnActionData = PawnAction(pawn, pawn.getAttackableSquares())
+                PawnActionInputManager.setPawnState(
+                        GridSelectionInputManager.hovering!!.tile!!.pawn!!,
+                        PawnActionInputManager.State.ATTACK
+                )
             }),
             Selectable("Disband", { x, y ->
                 println("disbanding pawn")
-                UI.stage.addActor(ConfirmationDialog("Disband Pawn", UI.skin, {
+                ConfirmationDialog("Disband Pawn", UI.skin, {
                     GridSelectionInputManager.selection!!.tile!!.pawn!!.health = 0
-                }))
+                }).show(UI.stage)
             })
 
     )
@@ -258,14 +258,6 @@ object RadialMenuInputManager : KtxInputAdapter {
 object PawnActionInputManager : KtxInputAdapter {
 
     var state = State.NONE
-        set(value) {
-            shadeSet = when (value) {
-                State.NONE -> null
-                State.MOVE -> ShadeSet(selectionSet, QuestOfCon.movementColor)
-                State.ATTACK -> ShadeSet(selectionSet, QuestOfCon.attackColor)
-            }
-            field = value
-        }
     private lateinit var pawn: Pawn
 
     private var shadeSet: ShadeSet? = null
@@ -276,6 +268,24 @@ object PawnActionInputManager : KtxInputAdapter {
             }
             field = value
         }
+
+    fun setPawnState(pawn: Pawn, state: State) {
+        this.pawn = pawn
+        when (state) {
+            State.MOVE -> {
+                selectionSet = pawn.getMovableSquares()
+                shadeSet = ShadeSet(selectionSet, QuestOfCon.movementColor)
+            }
+            State.ATTACK -> {
+                selectionSet = pawn.getAttackableSquares()
+                shadeSet = ShadeSet(selectionSet, QuestOfCon.attackColor)
+            }
+            else -> {
+                shadeSet = null
+            }
+        }
+        this.state = state
+    }
 
     private lateinit var selectionSet: Set<WorldCoords>
 
@@ -288,23 +298,20 @@ object PawnActionInputManager : KtxInputAdapter {
         when (keycode) {
             Input.Keys.Q -> {  // Attack
                 if (state == State.ATTACK) {
-                    state = State.NONE
+                    setPawnState(pawn, State.NONE)
                     return false
                 }
-                selectionSet = pawn.getAttackableSquares()
-                state = State.ATTACK
+                setPawnState(pawn, State.ATTACK)
             }
             Input.Keys.E -> {  // Move
                 if (state == State.MOVE) {
-                    state = State.NONE
+                    setPawnState(pawn, State.NONE)
                     return false
                 }
-                selectionSet = pawn.getMovableSquares()
-                state = State.MOVE
+                setPawnState(pawn, State.MOVE)
             }
             Input.Keys.ESCAPE -> {  // Stop what you're doing!
-                shadeSet = null
-                state = State.NONE
+                setPawnState(pawn, State.NONE)
                 return false
             }
         }
@@ -321,14 +328,14 @@ object PawnActionInputManager : KtxInputAdapter {
             State.NONE -> return false
             State.ATTACK -> {
                 if (selectionSet.contains(hovering) && pawn.attemptAttack(hovering)) {
-                    state = State.NONE
+                    setPawnState(pawn, State.NONE)
                     return true
                 }
             }
             State.MOVE -> {
                 if (selectionSet.contains(hovering)) {
                     pawn.moveTo(hovering)
-                    state = State.NONE
+                    setPawnState(pawn, State.NONE)
                     return true
                 }
             }
