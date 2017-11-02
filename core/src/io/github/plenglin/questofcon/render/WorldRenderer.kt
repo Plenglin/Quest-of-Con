@@ -117,8 +117,8 @@ data class ShadeSet(
 
         // Draw shading
         shape.color = shading
+        shape.set(ShapeRenderer.ShapeType.Filled)
         if (mode and SHADE > 0) {
-            shape.set(ShapeRenderer.ShapeType.Filled)
             coords.forEach {
                 shape.rect(it.i.toFloat(), it.j.toFloat(), 1f, 1f)
             }
@@ -136,29 +136,31 @@ data class ShadeSet(
                         Line(x + 1, y, x, y + 1),
                         Line(x, y + 1, x + 1, y)
                 )}.flatten().toSet().forEach {
-                it.draw(shape)
+                it.draw(shape, width = 0.07f)
             }
         }
 
         // Draw outlines
         if (mode and OUTLINE > 0) {
-            coords.map { c ->
+            val lines = coords.map { c ->
                 c.surrounding().filter {  // Get all the cells surrounding it that aren't inside the set
                     !coords.contains(it)
-                }.map { surr ->
+                }.map { surr ->  // Get the line dividing the two
                     val dx = surr.i - c.i
                     val dy = surr.j - c.j
-                    when (dx) {
-                        1 -> Line(c.i + 1, c.j, c.i + 1, c.i + 1)
-                        -1 -> Line(c.i, c.j, c.i, c.i + 1)
+                    val output = when (dx) {
+                        +1 -> Line(c.i + 1, c.j, c.i + 1, c.j + 1)
+                        -1 -> Line(c.i, c.j, c.i, c.j + 1)
+                        else -> when (dy) {
+                            +1 -> Line(c.i, c.j + 1, c.i + 1, c.j + 1)
+                            else -> Line(c.i, c.j, c.i + 1, c.j)
+                        }
                     }
-                    when (dy) {
-                        1 -> Line(c.i, c.j, c.i + 1, c.j)
-                        else -> Line(c.i, c.j, c.i, c.j + 1)
-                    }
+                    output
                 }
-            }.flatten().forEach {
-                it.draw(shape)
+            }.flatten()
+            lines.forEach {
+                it.draw(shape, width = 0.1f)
             }
         }
 
@@ -189,8 +191,8 @@ data class Line(val x1: Float, val y1: Float, val x2: Float, val y2: Float) {
         return false
     }
 
-    fun draw(shape: ShapeRenderer) {
-        shape.line(this.x1, this.y1, this.x2, this.y2)
+    fun draw(shape: ShapeRenderer, width: Float = 1f) {
+        shape.rectLine(this.x1, this.y1, this.x2, this.y2, width)
     }
 
     override fun hashCode(): Int {

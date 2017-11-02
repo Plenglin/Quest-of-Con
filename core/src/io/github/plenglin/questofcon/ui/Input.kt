@@ -126,7 +126,7 @@ object GridSelectionInputManager : KtxInputAdapter {
             GameScreen.shadeSets.remove(hoveringShadeSet)
             if (value != null && value.exists) {
                 field = value
-                hoveringShadeSet = ShadeSet(setOf(value), QuestOfCon.hoveringColor)
+                hoveringShadeSet = ShadeSet(setOf(value), mode = ShadeSet.OUTLINE, lines = QuestOfCon.hoveringColor)
                 GameScreen.shadeSets.add(hoveringShadeSet!!)
             } else {
                 field = null
@@ -138,7 +138,7 @@ object GridSelectionInputManager : KtxInputAdapter {
         val pawn = hovering?.tile?.pawn
         GameScreen.shadeSets.remove(attackableShadeSet)
         if (pawn != null) {
-            attackableShadeSet = ShadeSet(pawn.getAttackableSquares(), QuestOfCon.attackColor)
+            attackableShadeSet = ShadeSet(pawn.getAttackableSquares(), mode = ShadeSet.OUTLINE, lines = QuestOfCon.attackColor)
             GameScreen.shadeSets.add(attackableShadeSet!!)
         } else {
             attackableShadeSet = null
