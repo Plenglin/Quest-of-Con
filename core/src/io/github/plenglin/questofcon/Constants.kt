@@ -5,10 +5,10 @@ import com.badlogic.gdx.graphics.Color
 import io.github.plenglin.questofcon.screen.GameScreen
 import ktx.app.KtxGame
 
-/**
- *
- */
-object QuestOfCon : KtxGame<Screen>(GameScreen) {
+
+object QuestOfCon : KtxGame<Screen>(GameScreen)
+
+object Constants {
 
     val zoomRate = 1.125f
     val minZoom = 1/64f
@@ -22,5 +22,6 @@ object QuestOfCon : KtxGame<Screen>(GameScreen) {
     val attackColor: Color = Color(1f, 0f, 0f, 0.5f)
     val STARTING_MONEY: Int = 50
     val BASE_ECO: Int = 10
+    val HQ_HEALTH = 50
 
 }

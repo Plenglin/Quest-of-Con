@@ -1,16 +1,16 @@
 package io.github.plenglin.questofcon.game
 
 import com.badlogic.gdx.graphics.Color
-import io.github.plenglin.questofcon.QuestOfCon
+import io.github.plenglin.questofcon.Constants
 import io.github.plenglin.questofcon.game.building.BuildingCreator
-import io.github.plenglin.questofcon.game.building.buildings.BuildingHQ
+import io.github.plenglin.questofcon.game.building.BuildingHQ
 import io.github.plenglin.questofcon.game.grid.World
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 
 
 class Team(val name: String, val color: Color) {
 
-    var money: Int = 50
+    var money: Int = Constants.STARTING_MONEY
     var hasBuiltHQ = false
     lateinit var world: World
 
@@ -33,6 +33,7 @@ class Team(val name: String, val color: Color) {
             val pawn = it.tile.pawn
             if (pawn != null) {
                 pawn.apRemaining = pawn.actionPoints
+                pawn.attacksRemaining = pawn.maxAttacks
             }
         }
     }

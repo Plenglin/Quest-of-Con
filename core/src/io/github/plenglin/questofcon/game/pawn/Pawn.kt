@@ -13,6 +13,9 @@ abstract class PawnCreator(val name: String, val cost: Int) {
 
 abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val maxHealth: Int, val actionPoints: Int, val color: Color) {
 
+    open val maxAttacks = 1
+    var attacksRemaining = maxAttacks
+
     var health: Int = maxHealth
         set(value) {
             field = value
@@ -44,18 +47,22 @@ abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val 
     }
 
     open fun getProperties(): Map<String, Any> {
-        return mapOf("type" to name, "team" to team.name, "health" to "$health/$maxHealth", "actions" to "$apRemaining/$actionPoints")
+        return mapOf("type" to name, "team" to team.name, "health" to "$health/$maxHealth", "actions" to "$apRemaining/$actionPoints", "attacks" to "$attacksRemaining/$maxAttacks")
     }
 
     fun attemptAttack(coords: WorldCoords): Boolean {
         apRemaining -= 1
-        return onAttack(coords)
+        val result = onAttack(coords)
+        if (!result) {
+            attacksRemaining -= 1
+        }
+        return result
     }
 
 }
 
 
-class SimplePawnCreator(name: String, cost: Int, val maxHealth: Int, val attack: Int, val color: Color, val actionPoints: Int = 3, val range: Int = 1) :
+class SimplePawnCreator(name: String, cost: Int, val maxHealth: Int, val attack: Int, val color: Color, val actionPoints: Int = 3, val range: Int = 1, val maxAttacks: Int = 1) :
         PawnCreator(name, cost) {
 
     override fun createPawnAt(team: Team, worldCoords: WorldCoords): Pawn {
@@ -68,6 +75,8 @@ class SimplePawnCreator(name: String, cost: Int, val maxHealth: Int, val attack:
      * A simple pawn that can be melee or ranged.
      */
     inner class SimplePawn(team: Team, pos: WorldCoords) : Pawn(name, team, pos, maxHealth, actionPoints, color) {
+
+        override val maxAttacks = this@SimplePawnCreator.maxAttacks
 
         override fun getAttackableSquares(): Set<WorldCoords> {
             return pos.floodfill(range).minus(this.pos)

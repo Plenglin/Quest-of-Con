@@ -3,15 +3,14 @@ package io.github.plenglin.questofcon.ui
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.math.Vector3
-import io.github.plenglin.questofcon.QuestOfCon
-import io.github.plenglin.questofcon.game.building.buildings.BuildingHQ
+import io.github.plenglin.questofcon.Constants
+import io.github.plenglin.questofcon.game.building.BuildingHQ
 import io.github.plenglin.questofcon.game.grid.World
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 import io.github.plenglin.questofcon.game.pawn.Pawn
 import io.github.plenglin.questofcon.render.ShadeSet
 import io.github.plenglin.questofcon.screen.GameScreen
 import ktx.app.KtxInputAdapter
-import sun.awt.image.URLImageSource
 
 
 object MapControlInputManager : KtxInputAdapter {
@@ -23,10 +22,10 @@ object MapControlInputManager : KtxInputAdapter {
 
     override fun scrolled(amount: Int): Boolean {
         when (amount) {
-            1 -> cam.zoom = cam.zoom * QuestOfCon.zoomRate
-            -1 -> cam.zoom = cam.zoom / QuestOfCon.zoomRate
+            1 -> cam.zoom = cam.zoom * Constants.zoomRate
+            -1 -> cam.zoom = cam.zoom / Constants.zoomRate
         }
-        cam.zoom = minOf(maxOf(cam.zoom, QuestOfCon.minZoom), QuestOfCon.maxZoom)
+        cam.zoom = minOf(maxOf(cam.zoom, Constants.minZoom), Constants.maxZoom)
         return true
     }
 
@@ -88,7 +87,7 @@ object MapControlInputManager : KtxInputAdapter {
 
     fun update(delta: Float) {
         val mult = if (fast) 2 else 1
-        cam.translate(vx * mult * QuestOfCon.camSpeed * delta, vy * mult * QuestOfCon.camSpeed * delta)
+        cam.translate(vx * mult * Constants.camSpeed * delta, vy * mult * Constants.camSpeed * delta)
     }
 
 }
@@ -108,7 +107,7 @@ object GridSelectionInputManager : KtxInputAdapter {
             GameScreen.shadeSets.remove(selectedShadeSet)
             if (value != null && value.exists) {
                 field = value
-                selectedShadeSet = ShadeSet(setOf(value), QuestOfCon.selectionColor)
+                selectedShadeSet = ShadeSet(setOf(value), Constants.selectionColor)
                 GameScreen.shadeSets.add(selectedShadeSet!!)
             } else {
                 field = null
@@ -126,7 +125,7 @@ object GridSelectionInputManager : KtxInputAdapter {
             GameScreen.shadeSets.remove(hoveringShadeSet)
             if (value != null && value.exists) {
                 field = value
-                hoveringShadeSet = ShadeSet(setOf(value), mode = ShadeSet.OUTLINE, lines = QuestOfCon.hoveringColor)
+                hoveringShadeSet = ShadeSet(setOf(value), mode = ShadeSet.OUTLINE, lines = Constants.hoveringColor)
                 GameScreen.shadeSets.add(hoveringShadeSet!!)
             } else {
                 field = null
@@ -138,7 +137,7 @@ object GridSelectionInputManager : KtxInputAdapter {
         val pawn = hovering?.tile?.pawn
         GameScreen.shadeSets.remove(attackableShadeSet)
         if (pawn != null) {
-            attackableShadeSet = ShadeSet(pawn.getAttackableSquares(), mode = ShadeSet.OUTLINE, lines = QuestOfCon.attackColor)
+            attackableShadeSet = ShadeSet(pawn.getAttackableSquares(), mode = ShadeSet.OUTLINE, lines = Constants.attackColor)
             GameScreen.shadeSets.add(attackableShadeSet!!)
         } else {
             attackableShadeSet = null
@@ -180,27 +179,25 @@ object GridSelectionInputManager : KtxInputAdapter {
 
 object RadialMenuInputManager : KtxInputAdapter {
 
-    val pawnMenu = listOf<Selectable>(
-            Selectable("Move", {
-                PawnActionInputManager.setPawnState(
-                        GridSelectionInputManager.hovering!!.tile!!.pawn!!,
-                        PawnActionInputManager.State.MOVE
-                )
-            }),
-            Selectable("Attack", {
-                PawnActionInputManager.setPawnState(
-                        GridSelectionInputManager.hovering!!.tile!!.pawn!!,
-                        PawnActionInputManager.State.ATTACK
-                )
-            }),
-            Selectable("Disband", {
-                println("disbanding pawn")
-                ConfirmationDialog("Disband Pawn", UI.skin, {
-                    GridSelectionInputManager.selection!!.tile!!.pawn!!.health = 0
-                }).show(UI.stage)
-            })
+    val move = Selectable("Move", {
+        PawnActionInputManager.setPawnState(
+                GridSelectionInputManager.hovering!!.tile!!.pawn!!,
+                PawnActionInputManager.State.MOVE
+        )
+    })
+    val attack = Selectable("Attack", {
+        PawnActionInputManager.setPawnState(
+                GridSelectionInputManager.hovering!!.tile!!.pawn!!,
+                PawnActionInputManager.State.ATTACK
+        )
+    })
+    val disband = Selectable("Disband", {
+        println("disbanding pawn")
+        ConfirmationDialog("Disband Pawn", UI.skin, {
+            GridSelectionInputManager.selection!!.tile!!.pawn!!.health = 0
+        }).show(UI.stage)
+    })
 
-    )
 
     private val radialMenu = UI.radialMenu
 
@@ -244,8 +241,14 @@ object RadialMenuInputManager : KtxInputAdapter {
             val actions = mutableListOf<Selectable>()
 
             val pawn = selection.tile!!.pawn
-            if (pawn != null && pawn.team == currentTeam && pawn.apRemaining > 0) {
-                actions.addAll(pawnMenu)
+            if (pawn != null && pawn.team == currentTeam) {
+                actions.add(disband)
+                if (pawn.apRemaining > 0) {
+                    actions.add(move)
+                    if (pawn.attacksRemaining > 0) {
+                        actions.add(attack)
+                    }
+                }
             }
 
             val building = selection.tile.building
@@ -293,11 +296,11 @@ object PawnActionInputManager : KtxInputAdapter {
         when (state) {
             State.MOVE -> {
                 selectionSet = pawn.getMovableSquares()
-                shadeSet = ShadeSet(selectionSet, QuestOfCon.movementColor)
+                shadeSet = ShadeSet(selectionSet, Constants.movementColor)
             }
             State.ATTACK -> {
                 selectionSet = pawn.getAttackableSquares()
-                shadeSet = ShadeSet(selectionSet, QuestOfCon.attackColor)
+                shadeSet = ShadeSet(selectionSet, Constants.attackColor)
             }
             else -> {
                 shadeSet = null
@@ -320,7 +323,7 @@ object PawnActionInputManager : KtxInputAdapter {
                     setPawnState(pawn, State.NONE)
                     return false
                 }
-                if (pawn.apRemaining > 0) {
+                if (pawn.apRemaining > 0 && pawn.attacksRemaining > 0) {
                     setPawnState(pawn, State.ATTACK)
                 }
             }
@@ -351,6 +354,7 @@ object PawnActionInputManager : KtxInputAdapter {
             State.NONE -> return false
             State.ATTACK -> {
                 if (selectionSet.contains(hovering) && pawn.attemptAttack(hovering)) {
+                    UI.tileInfo.updateData()
                     setPawnState(pawn, State.NONE)
                     return true
                 }

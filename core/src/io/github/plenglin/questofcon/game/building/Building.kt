@@ -1,8 +1,6 @@
 package io.github.plenglin.questofcon.game.building
 
-import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g2d.Sprite
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 import io.github.plenglin.questofcon.ui.ConfirmationDialog
@@ -46,7 +44,12 @@ abstract class Building(val name: String, var team: Team, var pos: WorldCoords, 
     }
 
     open fun getProperties(): Map<String, Any> {
-        return mapOf("hp" to "$health/$maxHealth", "team" to team.name)
+        val map = mutableMapOf("type" to name, "hp" to "$health/$maxHealth", "team" to team.name)
+        val money = getMoneyPerTurn()
+        if (money > 0) {
+            map.put("Income", "$$money")
+        }
+        return map
     }
 
 }
