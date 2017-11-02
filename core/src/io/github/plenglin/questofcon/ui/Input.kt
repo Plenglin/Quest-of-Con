@@ -1,5 +1,6 @@
 package io.github.plenglin.questofcon.ui
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.math.Vector3
@@ -88,6 +89,7 @@ object MapControlInputManager : KtxInputAdapter {
     fun update(delta: Float) {
         val mult = if (fast) 2 else 1
         cam.translate(vx * mult * Constants.camSpeed * delta, vy * mult * Constants.camSpeed * delta)
+        GridSelectionInputManager.mouseMoved(Gdx.input.x, Gdx.input.y)
     }
 
 }
