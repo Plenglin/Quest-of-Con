@@ -311,14 +311,18 @@ object PawnActionInputManager : KtxInputAdapter {
                     setPawnState(pawn, State.NONE)
                     return false
                 }
-                setPawnState(pawn, State.ATTACK)
+                if (pawn.apRemaining > 0) {
+                    setPawnState(pawn, State.ATTACK)
+                }
             }
             Input.Keys.E -> {  // Move
                 if (state == State.MOVE) {
                     setPawnState(pawn, State.NONE)
                     return false
                 }
-                setPawnState(pawn, State.MOVE)
+                if (pawn.apRemaining > 0) {
+                    setPawnState(pawn, State.MOVE)
+                }
             }
             Input.Keys.ESCAPE -> {  // Stop what you're doing!
                 setPawnState(pawn, State.NONE)

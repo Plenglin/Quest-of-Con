@@ -11,6 +11,7 @@ import io.github.plenglin.questofcon.Textures
 import io.github.plenglin.questofcon.game.GameData
 import io.github.plenglin.questofcon.game.GameState
 import io.github.plenglin.questofcon.game.Team
+import io.github.plenglin.questofcon.game.building.buildings.BuildingFactory
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 import io.github.plenglin.questofcon.render.ShadeSet
 import io.github.plenglin.questofcon.render.WorldRenderer
@@ -43,7 +44,8 @@ object GameScreen : KtxScreen {
         batch = SpriteBatch()
         gameState = GameState(listOf(teamA, teamB, teamC))
 
-        //GameData.spawnableBuildings[0].createBuildingAt(teamA, WorldCoords(gameState.world, 5, 5))
+        BuildingFactory.createBuildingAt(teamA, WorldCoords(gameState.world, 5, 5))
+        BuildingFactory.createBuildingAt(teamB, WorldCoords(gameState.world, 7, 5))
 
         worldRenderer = WorldRenderer(gameState.world)
 

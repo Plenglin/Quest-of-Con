@@ -34,7 +34,7 @@ class PawnArtillery(team: Team, pos: WorldCoords) : Pawn("Bertha", team, pos, 3,
     }
 }
 
-class PawnKnight(team: Team, pos: WorldCoords) : Pawn("KangarooBot", team, pos, 5, 2, Color.PINK) {
+class PawnKnight(team: Team, pos: WorldCoords) : Pawn("KangarooBot", team, pos, 5, 1, Color.PINK) {
 
     override fun getAttackableSquares(): Set<WorldCoords> {
         return listOf(
@@ -50,7 +50,14 @@ class PawnKnight(team: Team, pos: WorldCoords) : Pawn("KangarooBot", team, pos, 
     }
 
     override fun onAttack(coords: WorldCoords): Boolean {
-        if (coords.tile!!.pawn != null) {
+        val pawn = coords.tile!!.pawn
+        val building = coords.tile.building
+        if (pawn != null) {
+            if (pawn.team != this.team && pawn.health - damage > 0) {
+                return false
+            }
+        }
+        if (building != null && building.team != this.team) {
             return false
         }
         coords.floodfill(dmgRadius).forEach {
@@ -60,7 +67,7 @@ class PawnKnight(team: Team, pos: WorldCoords) : Pawn("KangarooBot", team, pos, 
         return true
     }
 
-    companion object : PawnCreator("KangarooBot", 50) {
+    companion object : PawnCreator("KangarooBot", 30) {
 
         val distA = 3
         val distB = 2
