@@ -43,14 +43,8 @@ class WorldRenderer(val world: World) {
                 }
             }
 
-            // Fill in the selection sets
-            shape.set(ShapeRenderer.ShapeType.Filled)
-            for (s in paints) {
-                s.coords.forEach {
-                    shape.color = s.shading
-                    shape.rect(it.i.toFloat(), it.j.toFloat(), 1f, 1f)
-                }
-            }
+            // Draw in the selection sets
+            paints.forEach { it.draw(shape) }
 
             shape.end()
 
@@ -113,4 +107,98 @@ class WorldRenderer(val world: World) {
 
 }
 
-data class ShadeSet(val coords: Set<WorldCoords>, val shading: Color)
+data class ShadeSet(
+        val coords: Set<WorldCoords>,
+        val shading: Color = Color.CLEAR,
+        val mode: Int = SHADE,
+        val lines: Color = Color.CLEAR) {
+
+    fun draw(shape: ShapeRenderer) {
+
+        // Draw shading
+        shape.color = shading
+        if (mode and SHADE > 0) {
+            shape.set(ShapeRenderer.ShapeType.Filled)
+            coords.forEach {
+                shape.rect(it.i.toFloat(), it.j.toFloat(), 1f, 1f)
+            }
+        }
+
+        // Draw inner lines
+        shape.color = lines
+        if (mode and INNER_LINES > 0) {
+            coords.map {
+                val x = it.i.toFloat()
+                val y = it.j.toFloat()
+                listOf(
+                        Line(x, y, x + 1, y),
+                        Line(x, y, x, y + 1),
+                        Line(x + 1, y, x, y + 1),
+                        Line(x, y + 1, x + 1, y)
+                )}.flatten().toSet().forEach {
+                it.draw(shape)
+            }
+        }
+
+        // Draw outlines
+        if (mode and OUTLINE > 0) {
+            coords.map { c ->
+                c.surrounding().filter {  // Get all the cells surrounding it that aren't inside the set
+                    !coords.contains(it)
+                }.map { surr ->
+                    val dx = surr.i - c.i
+                    val dy = surr.j - c.j
+                    when (dx) {
+                        1 -> Line(c.i + 1, c.j, c.i + 1, c.i + 1)
+                        -1 -> Line(c.i, c.j, c.i, c.i + 1)
+                    }
+                    when (dy) {
+                        1 -> Line(c.i, c.j, c.i + 1, c.j)
+                        else -> Line(c.i, c.j, c.i, c.j + 1)
+                    }
+                }
+            }.flatten().forEach {
+                it.draw(shape)
+            }
+        }
+
+    }
+
+    companion object {
+        val SHADE = 1
+        val OUTLINE = 1 shl 2
+        val INNER_LINES = 1 shl 3
+    }
+
+}
+
+data class Line(val x1: Float, val y1: Float, val x2: Float, val y2: Float) {
+
+    private fun toList() = listOf(x1, y1, x2, y2)
+    private fun toListReverse() = listOf(x2, y2, x1, y1)
+
+    constructor(x1: Int, y1: Int, x2: Int, y2: Int) : this(x1.toFloat(), y1.toFloat(), x2.toFloat(), y2.toFloat())
+
+    override operator fun equals(other: Any?): Boolean {
+        when (other) {
+            is Line -> {
+                val otherList = other.toList()
+                return (otherList == this.toList()) || (otherList == this.toListReverse())
+            }
+        }
+        return false
+    }
+
+    fun draw(shape: ShapeRenderer) {
+        shape.line(this.x1, this.y1, this.x2, this.y2)
+    }
+
+    override fun hashCode(): Int {
+        var result = x1.hashCode()
+        result = 31 * result + y1.hashCode()
+        result = 31 * result + x2.hashCode()
+        result = 31 * result + y2.hashCode()
+        return result
+    }
+
+}

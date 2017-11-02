@@ -73,6 +73,15 @@ data class WorldCoords(val world: World, val i: Int, val j: Int) {
         return set
     }
 
+    fun surrounding(): List<WorldCoords> {
+        return listOf(
+                WorldCoords(world, i + 1, j),
+                WorldCoords(world, i, j + 1),
+                WorldCoords(world, i - 1, j),
+                WorldCoords(world, i, j - 1)
+        ).filter { it.exists }
+    }
+
 }
 
 fun main(args: Array<String>) {
