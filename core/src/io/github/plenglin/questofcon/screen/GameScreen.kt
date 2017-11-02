@@ -26,9 +26,6 @@ object GameScreen : KtxScreen {
 
     lateinit var worldRenderer: WorldRenderer
 
-    lateinit var mapMovement: MapMovement
-    lateinit var gridSelection: GridSelection
-
     lateinit var gameState: GameState
 
     var pawnActionData: PawnAction? = null
@@ -36,16 +33,13 @@ object GameScreen : KtxScreen {
 
     val teamA = Team("escargot", Color.BLUE)
     val teamB = Team("parfait", Color.WHITE)
-    val teamC = Team("la baguette", Color.RED)
+    val teamC = Team("le baguette", Color.RED)
 
     override fun show() {
         batch = SpriteBatch()
         gameState = GameState(listOf(teamA, teamB, teamC))
 
         GameData.spawnableBuildings[0].createBuildingAt(teamA, WorldCoords(gameState.world, 5, 5))
-
-        mapMovement = MapMovement(gridCam)
-        gridSelection = GridSelection(gridCam, gameState.world)
 
         worldRenderer = WorldRenderer(gameState.world)
 
@@ -55,6 +49,7 @@ object GameScreen : KtxScreen {
         UI.generateUI()
 
         var previous: WorldCoords? = null
+        /*
         gridSelection.selectionListeners.add({ selection, screenX, screenY ->
 
             when (uiState) {
@@ -119,14 +114,14 @@ object GameScreen : KtxScreen {
             }
 
             previous = gridSelection.selection
-        })
-        Gdx.input.inputProcessor = InputMultiplexer(UI.stage, RadialMenuInputManager, gridSelection, mapMovement)
+        })*/
+        Gdx.input.inputProcessor = InputMultiplexer(UI.stage, RadialMenuInputManager, GridSelection, MapMovement)
     }
 
     override fun render(delta: Float) {
 
         UI.update(delta)
-        mapMovement.update(delta)
+        MapMovement.update(delta)
         gridCam.update()
 
         Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
@@ -134,7 +129,7 @@ object GameScreen : KtxScreen {
 
         worldRenderer.shape.projectionMatrix = gridCam.combined
 
-        val selection = gridSelection.selection
+        val selection = GridSelection.selection
         val sets = mutableListOf<SelectionSet>()
         if (selection != null) {
             sets.add(SelectionSet(setOf(selection), QuestOfCon.selectionColor))

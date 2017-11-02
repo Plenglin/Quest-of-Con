@@ -13,8 +13,9 @@ import io.github.plenglin.questofcon.screen.UIState
 import ktx.app.KtxInputAdapter
 
 
-class MapMovement(val cam: OrthographicCamera) : InputProcessor {
+object MapMovement : InputProcessor {
 
+    val cam: OrthographicCamera = GameScreen.gridCam
     var vx: Int = 0
     var vy: Int = 0
     var fast: Boolean = false
@@ -101,28 +102,30 @@ object RadialMenus {
     val pawnMenu = listOf<Selectable>(
             Selectable("Move", { x, y ->
                 println("showing pawn movement menu")
-                val pawn = GameScreen.gridSelection.selection!!.tile!!.pawn!!
+                val pawn = GridSelection.selection!!.tile!!.pawn!!
                 GameScreen.uiState = UIState.MOVING_PAWN
                 GameScreen.pawnActionData = PawnAction(pawn, pawn.getMovableSquares())
             }),
             Selectable("Attack", { x, y ->
                     println("showing attack menu")
-                    val pawn = GameScreen.gridSelection.selection!!.tile!!.pawn!!
+                    val pawn = GridSelection.selection!!.tile!!.pawn!!
                     GameScreen.uiState = UIState.ATTACKING_PAWN
                     GameScreen.pawnActionData = PawnAction(pawn, pawn.getAttackableSquares())
             }),
             Selectable("Disband", { x, y ->
                 println("disbanding pawn")
                 UI.stage.addActor(ConfirmationDialog("Disband Pawn", UI.skin, {
-                    GameScreen.gridSelection.selection!!.tile!!.pawn!!.health = 0
+                    GridSelection.selection!!.tile!!.pawn!!.health = 0
                 }))
             })
 
     )
 }
 
-class GridSelection(val cam: OrthographicCamera, val world: World) : InputProcessor {
+object GridSelection : InputProcessor {
 
+    val cam: OrthographicCamera = GameScreen.gridCam
+    val world: World = GameScreen.gameState.world
     val selectionListeners = mutableListOf<(WorldCoords?, Int, Int) -> Unit>()
 
     var selection: WorldCoords? = null
@@ -217,7 +220,7 @@ object RadialMenuInputManager : KtxInputAdapter {
     }
 
     private fun getSelectables(): List<Selectable> {
-        val selection = GameScreen.gridSelection.selection!!
+        val selection = GridSelection.selection!!
         val actions = mutableListOf<Selectable>()
         val currentTeam = GameScreen.gameState.getCurrentTeam()
 
@@ -236,7 +239,7 @@ object RadialMenuInputManager : KtxInputAdapter {
                 BuildingSpawningDialog(
                         GameScreen.gameState.getCurrentTeam(),
                         UI.skin,
-                        GameScreen.gridSelection.selection!!
+                        GridSelection.selection!!
                 ).show(UI.stage)
             }))
         }
