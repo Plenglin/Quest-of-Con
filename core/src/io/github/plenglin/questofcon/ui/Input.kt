@@ -101,6 +101,7 @@ object GridSelectionInputManager : KtxInputAdapter {
 
     var selectedShadeSet: ShadeSet? = null
     var hoveringShadeSet: ShadeSet? = null
+    var attackableShadeSet: ShadeSet? = null
 
     var selection: WorldCoords? = null
         private set(value) {
@@ -134,6 +135,14 @@ object GridSelectionInputManager : KtxInputAdapter {
 
     override fun mouseMoved(screenX: Int, screenY: Int): Boolean {
         hovering = getGridPos(screenX, screenY)
+        val pawn = hovering?.tile?.pawn
+        GameScreen.shadeSets.remove(attackableShadeSet)
+        if (pawn != null) {
+            attackableShadeSet = ShadeSet(pawn.getAttackableSquares(), QuestOfCon.attackColor)
+            GameScreen.shadeSets.add(attackableShadeSet!!)
+        } else {
+            attackableShadeSet = null
+        }
         return false
     }
 
