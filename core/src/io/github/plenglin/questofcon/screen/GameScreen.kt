@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import io.github.plenglin.questofcon.QuestOfCon
 import io.github.plenglin.questofcon.game.GameData
 import io.github.plenglin.questofcon.game.GameState
 import io.github.plenglin.questofcon.game.Team
@@ -108,7 +107,7 @@ object GameScreen : KtxScreen {
                 UIState.ATTACKING_PAWN -> {
                     val pawnData = pawnActionData!!
                     if (selection != null && pawnData.squares.contains(selection)) {
-                        pawnData.pawn.attack(selection)
+                        pawnData.pawn.attemptAttack(selection)
                         uiState = UIState.NONE
                         UI.tileInfo.updateData()
                     }
@@ -117,7 +116,7 @@ object GameScreen : KtxScreen {
 
             previous = gridSelection.selection
         })*/
-        Gdx.input.inputProcessor = InputMultiplexer(UI.stage, RadialMenuInputManager, GridSelectionInputManager, MapControlInputManager)
+        Gdx.input.inputProcessor = InputMultiplexer(UI.stage, MapControlInputManager, PawnActionInputManager, RadialMenuInputManager, GridSelectionInputManager)
     }
 
     override fun render(delta: Float) {

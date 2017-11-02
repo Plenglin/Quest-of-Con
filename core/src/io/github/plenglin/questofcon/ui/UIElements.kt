@@ -1,5 +1,6 @@
 package io.github.plenglin.questofcon.ui
 
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.Group
@@ -10,6 +11,7 @@ import io.github.plenglin.questofcon.game.GameState
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 import io.github.plenglin.questofcon.game.pawn.PawnCreator
+import ktx.app.KtxInputAdapter
 
 
 class TileInfoPanel(skin: Skin) : Table(skin) {

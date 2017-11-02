@@ -1,12 +1,12 @@
 package io.github.plenglin.questofcon.ui
 
 import com.badlogic.gdx.Input
-import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.math.Vector3
 import io.github.plenglin.questofcon.QuestOfCon
 import io.github.plenglin.questofcon.game.grid.World
 import io.github.plenglin.questofcon.game.grid.WorldCoords
+import io.github.plenglin.questofcon.game.pawn.Pawn
 import io.github.plenglin.questofcon.render.ShadeSet
 import io.github.plenglin.questofcon.screen.GameScreen
 import io.github.plenglin.questofcon.screen.UIState
@@ -251,6 +251,93 @@ object RadialMenuInputManager : KtxInputAdapter {
             }))
         }
         return actions
+    }
+
+}
+
+object PawnActionInputManager : KtxInputAdapter {
+
+    var state = State.NONE
+        set(value) {
+            shadeSet = when (value) {
+                State.NONE -> null
+                State.MOVE -> ShadeSet(selectionSet, QuestOfCon.movementColor)
+                State.ATTACK -> ShadeSet(selectionSet, QuestOfCon.attackColor)
+            }
+            field = value
+        }
+    private lateinit var pawn: Pawn
+
+    private var shadeSet: ShadeSet? = null
+        set(value) {
+            GameScreen.shadeSets.remove(field)
+            if (value != null) {
+                GameScreen.shadeSets.add(value)
+            }
+            field = value
+        }
+
+    private lateinit var selectionSet: Set<WorldCoords>
+
+    override fun keyDown(keycode: Int): Boolean {
+        val pawn = GridSelectionInputManager.selection?.tile?.pawn ?: return false
+        if (pawn.apRemaining <= 0) {
+            return false
+        }
+        this.pawn = pawn
+        when (keycode) {
+            Input.Keys.Q -> {  // Attack
+                if (state == State.ATTACK) {
+                    state = State.NONE
+                    return false
+                }
+                selectionSet = pawn.getAttackableSquares()
+                state = State.ATTACK
+            }
+            Input.Keys.E -> {  // Move
+                if (state == State.MOVE) {
+                    state = State.NONE
+                    return false
+                }
+                selectionSet = pawn.getMovableSquares()
+                state = State.MOVE
+            }
+            Input.Keys.ESCAPE -> {  // Stop what you're doing!
+                shadeSet = null
+                state = State.NONE
+                return false
+            }
+        }
+
+        return true
+    }
+
+    override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        if (button == Input.Buttons.MIDDLE) {
+            return false
+        }
+        val hovering = GridSelectionInputManager.hovering ?: return false
+        when (state) {
+            State.NONE -> return false
+            State.ATTACK -> {
+                if (selectionSet.contains(hovering) && pawn.attemptAttack(hovering)) {
+                    state = State.NONE
+                    return true
+                }
+            }
+            State.MOVE -> {
+                if (selectionSet.contains(hovering)) {
+                    pawn.moveTo(hovering)
+                    state = State.NONE
+                    return true
+                }
+            }
+        }
+        return false
+    }
+
+    enum class State {
+        NONE, MOVE, ATTACK
     }
 
 }
