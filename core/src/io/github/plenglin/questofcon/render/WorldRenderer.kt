@@ -136,7 +136,7 @@ data class ShadeSet(
                         Line(x + 1, y, x, y + 1),
                         Line(x, y + 1, x + 1, y)
                 )}.flatten().toSet().forEach {
-                it.draw(shape, width = 0.07f)
+                it.draw(shape, width = 0.03f)
             }
         }
 
@@ -160,7 +160,7 @@ data class ShadeSet(
                 }
             }.flatten()
             lines.forEach {
-                it.draw(shape, width = 0.1f)
+                it.draw(shape, width = 0.05f)
             }
         }
 
@@ -191,7 +191,7 @@ data class Line(val x1: Float, val y1: Float, val x2: Float, val y2: Float) {
         return false
     }
 
-    fun draw(shape: ShapeRenderer, width: Float = 1f) {
+    fun draw(shape: ShapeRenderer, width: Float = 0f) {
         shape.rectLine(this.x1, this.y1, this.x2, this.y2, width)
     }
 
