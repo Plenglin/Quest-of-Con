@@ -171,19 +171,19 @@ object GridSelectionInputManager : KtxInputAdapter {
 object RadialMenuInputManager : KtxInputAdapter {
 
     val pawnMenu = listOf<Selectable>(
-            Selectable("Move", { x, y ->
+            Selectable("Move", {
                 PawnActionInputManager.setPawnState(
                         GridSelectionInputManager.hovering!!.tile!!.pawn!!,
                         PawnActionInputManager.State.MOVE
                 )
             }),
-            Selectable("Attack", { x, y ->
+            Selectable("Attack", {
                 PawnActionInputManager.setPawnState(
                         GridSelectionInputManager.hovering!!.tile!!.pawn!!,
                         PawnActionInputManager.State.ATTACK
                 )
             }),
-            Selectable("Disband", { x, y ->
+            Selectable("Disband", {
                 println("disbanding pawn")
                 ConfirmationDialog("Disband Pawn", UI.skin, {
                     GridSelectionInputManager.selection!!.tile!!.pawn!!.health = 0
@@ -215,7 +215,7 @@ object RadialMenuInputManager : KtxInputAdapter {
             when (button) {
                 Input.Buttons.RIGHT -> {
                     val selected = radialMenu.getSelected((sx - radialMenu.x).toDouble(), (sy - radialMenu.y).toDouble())
-                    selected?.onSelected?.invoke(screenX.toFloat(), screenY.toFloat())
+                    selected?.onSelected?.invoke()
                     println(selected)
                     radialMenu.active = false
                     radialMenu.isVisible = false
@@ -242,7 +242,7 @@ object RadialMenuInputManager : KtxInputAdapter {
             actions.addAll(selection.tile.building!!.getActions())
         }
         if (selection.tile.canBuildOn(currentTeam)) {
-            actions.add(Selectable("Build", { x, y ->
+            actions.add(Selectable("Build", {
                 BuildingSpawningDialog(
                         GameScreen.gameState.getCurrentTeam(),
                         UI.skin,

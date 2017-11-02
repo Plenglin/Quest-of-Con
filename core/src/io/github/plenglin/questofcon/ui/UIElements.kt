@@ -1,17 +1,14 @@
 package io.github.plenglin.questofcon.ui
 
-import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.Group
 import com.badlogic.gdx.scenes.scene2d.ui.*
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import io.github.plenglin.questofcon.game.GameState
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 import io.github.plenglin.questofcon.game.pawn.PawnCreator
-import ktx.app.KtxInputAdapter
 
 
 class TileInfoPanel(skin: Skin) : Table(skin) {
@@ -34,10 +31,10 @@ class TileInfoPanel(skin: Skin) : Table(skin) {
         row()
         add(Label("Building", skin)).center().pad(10f)
         add(building).top().left().expandX().pad(5f)
+        pad(5f)
     }
 
     override fun draw(batch: Batch?, parentAlpha: Float) {
-        pad(5f)
         top().left()
 
         super.draw(batch, parentAlpha)
@@ -68,7 +65,7 @@ class PropertiesTable(skin: Skin) : Table(skin) {
 
     fun updateData() {
         clearChildren()
-        if (data.size > 0) {
+        if (data.isNotEmpty()) {
             data.forEach { k, v ->
                 add(Label(k.capitalize(), skin)).left().prefWidth(100f)
                 add(Label(v.toString(), skin)).right()
@@ -135,9 +132,7 @@ class RadialMenu(val skin: Skin, var radiusX: Float, var radiusY: Float) : Group
 
 }
 
-private data class RadialMenuItem(val label: TextButton, val selectable: Selectable, val clickListener: ClickListener)
-
-data class Selectable(val title: String, val onSelected: (x: Float, y: Float) -> Unit) {
+data class Selectable(val title: String, val onSelected: () -> Unit) {
     override fun toString(): String {
         return "Selectable($title)"
     }
@@ -268,6 +263,7 @@ class GameStateInfoController(val gameState: GameState, skin: Skin) : Window("St
         currentTeamLabel.setText("${team.name}'s turn")
         moneyLabel.setText("$${team.money}")
         ecoLabel.setText("+$${team.getMoneyPerTurn()}")
+        pack()
     }
 
 }

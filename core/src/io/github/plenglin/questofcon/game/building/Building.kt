@@ -35,7 +35,7 @@ abstract class Building(val name: String, var team: Team, var pos: WorldCoords, 
     open fun onTurnEnd() = Unit
 
     open fun getActions(): List<Selectable> {
-        return listOf(Selectable("Demolish", { x, y ->
+        return listOf(Selectable("Demolish", {
                 ConfirmationDialog("Demolish", UI.skin, {
                     health = 0
                 }).show(UI.stage)

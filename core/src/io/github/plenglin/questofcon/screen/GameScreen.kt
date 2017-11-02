@@ -41,78 +41,11 @@ object GameScreen : KtxScreen {
 
         worldRenderer = WorldRenderer(gameState.world)
 
-        gridCam.zoom = 1/32f
+        gridCam.zoom = 1/48f
         gridCam.position.set(0f, 0f, 0f)
 
         UI.generateUI()
 
-        var previous: WorldCoords? = null
-        /*
-        gridSelection.selectionListeners.add({ selection, screenX, screenY ->
-
-            when (uiState) {
-                UIState.NONE -> {
-                    // Detected double click
-                    if (selection != null && selection == previous) {
-                        println("showing radial menu")
-                        UI.radialMenu.apply {
-                            val actions = mutableListOf<Selectable>()
-                            val currentTeam = gameState.getCurrentTeam()
-
-                            val pawn = selection.tile!!.pawn
-                            if (pawn != null && pawn.team == currentTeam && pawn.apRemaining > 0) {
-                                actions.addAll(RadialMenus.pawnMenu)
-                            }
-
-                            val building = selection.tile.building
-                            println("building enabled: ${building?.enabled}")
-                            if (building != null && building.team == currentTeam && building.enabled) {
-                                actions.addAll(selection.tile.building!!.getActions())
-                            }
-                            if (selection.tile.canBuildOn(currentTeam)) {
-                                actions.add(Selectable("Build", { x, y ->
-                                    BuildingSpawningDialog(
-                                            GameScreen.gameState.getCurrentTeam(),
-                                            UI.skin,
-                                            GameScreen.gridSelection.selection!!
-                                    ).show(UI.stage)
-                                }))
-                            }
-                            println(actions)
-                            items = actions
-                            radiusX = 50f
-                            radiusY = 25f
-                            isVisible = true
-                            active = true
-                            updateUI()
-                            setPosition(screenX.toFloat(), (Gdx.graphics.height - screenY).toFloat())
-                            println("$x, $y")
-                        }
-                    } else {
-                        println("hiding radial menu")
-                        UI.radialMenu.isVisible = false
-                        UI.radialMenu.active = false
-                    }
-                }
-                UIState.MOVING_PAWN -> {
-                    val pawnData = pawnActionData!!
-                    if (selection != null && pawnData.squares.contains(selection)) {
-                        pawnData.pawn.moveTo(selection)
-                        uiState = UIState.NONE
-                    }
-                }
-                UIState.ATTACKING_PAWN -> {
-                    val pawnData = pawnActionData!!
-                    if (selection != null && pawnData.squares.contains(selection)) {
-                        pawnData.pawn.attemptAttack(selection)
-                        uiState = UIState.NONE
-                        UI.tileInfo.updateData()
-                    }
-                }
-            }
-
-            previous = gridSelection.selection
-        })*/
         Gdx.input.inputProcessor = InputMultiplexer(UI.stage, MapControlInputManager, PawnActionInputManager, RadialMenuInputManager, GridSelectionInputManager)
     }
 
