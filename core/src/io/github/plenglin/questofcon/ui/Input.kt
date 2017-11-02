@@ -101,6 +101,7 @@ object GridSelectionInputManager : KtxInputAdapter {
 
     var selectedShadeSet: ShadeSet? = null
     var hoveringShadeSet: ShadeSet? = null
+    var attackableShadeSet: ShadeSet? = null
 
     var selection: WorldCoords? = null
         private set(value) {
@@ -125,7 +126,7 @@ object GridSelectionInputManager : KtxInputAdapter {
             GameScreen.shadeSets.remove(hoveringShadeSet)
             if (value != null && value.exists) {
                 field = value
-                hoveringShadeSet = ShadeSet(setOf(value), QuestOfCon.hoveringColor)
+                hoveringShadeSet = ShadeSet(setOf(value), mode = ShadeSet.OUTLINE, lines = QuestOfCon.hoveringColor)
                 GameScreen.shadeSets.add(hoveringShadeSet!!)
             } else {
                 field = null
@@ -134,6 +135,14 @@ object GridSelectionInputManager : KtxInputAdapter {
 
     override fun mouseMoved(screenX: Int, screenY: Int): Boolean {
         hovering = getGridPos(screenX, screenY)
+        val pawn = hovering?.tile?.pawn
+        GameScreen.shadeSets.remove(attackableShadeSet)
+        if (pawn != null) {
+            attackableShadeSet = ShadeSet(pawn.getAttackableSquares(), mode = ShadeSet.OUTLINE, lines = QuestOfCon.attackColor)
+            GameScreen.shadeSets.add(attackableShadeSet!!)
+        } else {
+            attackableShadeSet = null
+        }
         return false
     }
 
@@ -229,7 +238,7 @@ object RadialMenuInputManager : KtxInputAdapter {
 
     private fun getSelectables(): List<Selectable> {
         val currentTeam = GameScreen.gameState.getCurrentTeam()
-        val selection = GridSelectionInputManager.hovering!!
+        val selection = GridSelectionInputManager.hovering ?: return emptyList()
 
         if (currentTeam.hasBuiltHQ) {
             val actions = mutableListOf<Selectable>()
@@ -255,9 +264,11 @@ object RadialMenuInputManager : KtxInputAdapter {
             }
             return actions
         } else {
-            return listOf(Selectable("Build HQ", {
-                BuildingHQ.createBuildingAt(currentTeam, selection)
-            }))
+            return if (selection.tile?.canBuildOn(currentTeam) == true)
+                listOf(Selectable("Build HQ", {
+                    BuildingHQ.createBuildingAt(currentTeam, selection)
+                }))
+            else emptyList()
         }
     }
 
@@ -299,7 +310,7 @@ object PawnActionInputManager : KtxInputAdapter {
 
     override fun keyDown(keycode: Int): Boolean {
         val pawn = GridSelectionInputManager.selection?.tile?.pawn ?: return false
-        if (pawn.apRemaining <= 0) {
+        if (pawn.team != GameScreen.gameState.getCurrentTeam() && pawn.apRemaining <= 0) {
             return false
         }
         this.pawn = pawn
@@ -309,14 +320,18 @@ object PawnActionInputManager : KtxInputAdapter {
                     setPawnState(pawn, State.NONE)
                     return false
                 }
-                setPawnState(pawn, State.ATTACK)
+                if (pawn.apRemaining > 0) {
+                    setPawnState(pawn, State.ATTACK)
+                }
             }
             Input.Keys.E -> {  // Move
                 if (state == State.MOVE) {
                     setPawnState(pawn, State.NONE)
                     return false
                 }
-                setPawnState(pawn, State.MOVE)
+                if (pawn.apRemaining > 0) {
+                    setPawnState(pawn, State.MOVE)
+                }
             }
             Input.Keys.ESCAPE -> {  // Stop what you're doing!
                 setPawnState(pawn, State.NONE)

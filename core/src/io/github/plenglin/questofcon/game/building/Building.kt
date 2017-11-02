@@ -1,13 +1,13 @@
 package io.github.plenglin.questofcon.game.building
 
 import com.badlogic.gdx.graphics.Color
-import io.github.plenglin.questofcon.game.GameData
+import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.Sprite
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 import io.github.plenglin.questofcon.ui.ConfirmationDialog
 import io.github.plenglin.questofcon.ui.Selectable
 import io.github.plenglin.questofcon.ui.UI
-import io.github.plenglin.questofcon.ui.UnitSpawningDialog
 
 abstract class BuildingCreator(val name: String, val cost: Int) {
 
@@ -15,7 +15,9 @@ abstract class BuildingCreator(val name: String, val cost: Int) {
 
 }
 
-abstract class Building(val name: String, var team: Team, var pos: WorldCoords, val maxHealth: Int, val color: Color) {
+abstract class Building(val name: String, var team: Team, var pos: WorldCoords, val maxHealth: Int) {
+
+    abstract val texture: Texture
 
     var enabled = true
 

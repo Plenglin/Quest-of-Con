@@ -11,10 +11,11 @@ import io.github.plenglin.questofcon.game.pawn.SimplePawnCreator
 
 
 object GameData {
+    val grunt = SimplePawnCreator("grunt", 10, 3, 2, Color.MAROON)
+    val pike = SimplePawnCreator("pike mech", 20, 5, 4, Color.LIGHT_GRAY)
+    val laser = SimplePawnCreator("laser mech", 15, 3, 3, range = 2, color = Color.RED)
     val spawnableUnits = listOf<PawnCreator>(
-            SimplePawnCreator("grunt", 10, 3, 2, Color.MAROON),
-            SimplePawnCreator("pike mech", 20, 5, 4, Color.LIGHT_GRAY),
-            SimplePawnCreator("laser mech", 15, 3, 3, range = 2, color = Color.RED),
+            grunt, pike, laser,
             PawnArtillery,
             PawnKnight
     )
