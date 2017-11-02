@@ -8,10 +8,9 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import io.github.plenglin.questofcon.Assets
 import io.github.plenglin.questofcon.Textures
-import io.github.plenglin.questofcon.game.GameData
 import io.github.plenglin.questofcon.game.GameState
 import io.github.plenglin.questofcon.game.Team
-import io.github.plenglin.questofcon.game.building.buildings.BuildingFactory
+import io.github.plenglin.questofcon.game.building.BuildingFactory
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 import io.github.plenglin.questofcon.render.ShadeSet
 import io.github.plenglin.questofcon.render.WorldRenderer

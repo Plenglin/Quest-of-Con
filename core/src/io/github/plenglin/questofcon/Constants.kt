@@ -22,5 +22,6 @@ object Constants {
     val attackColor: Color = Color(1f, 0f, 0f, 0.5f)
     val STARTING_MONEY: Int = 50
     val BASE_ECO: Int = 10
+    val HQ_HEALTH = 50
 
 }

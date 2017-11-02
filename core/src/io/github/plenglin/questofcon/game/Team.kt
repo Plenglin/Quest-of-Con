@@ -3,7 +3,7 @@ package io.github.plenglin.questofcon.game
 import com.badlogic.gdx.graphics.Color
 import io.github.plenglin.questofcon.Constants
 import io.github.plenglin.questofcon.game.building.BuildingCreator
-import io.github.plenglin.questofcon.game.building.buildings.BuildingHQ
+import io.github.plenglin.questofcon.game.building.BuildingHQ
 import io.github.plenglin.questofcon.game.grid.World
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 

@@ -46,7 +46,12 @@ abstract class Building(val name: String, var team: Team, var pos: WorldCoords, 
     }
 
     open fun getProperties(): Map<String, Any> {
-        return mapOf("hp" to "$health/$maxHealth", "team" to team.name)
+        val map = mutableMapOf("type" to name, "hp" to "$health/$maxHealth", "team" to team.name)
+        val money = getMoneyPerTurn()
+        if (money > 0) {
+            map.put("Income", "$$money")
+        }
+        return map
     }
 
 }

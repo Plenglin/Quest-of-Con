@@ -2,8 +2,8 @@ package io.github.plenglin.questofcon.game
 
 import com.badlogic.gdx.graphics.Color
 import io.github.plenglin.questofcon.game.building.BuildingCreator
-import io.github.plenglin.questofcon.game.building.buildings.BuildingFactory
-import io.github.plenglin.questofcon.game.building.buildings.BuildingMine
+import io.github.plenglin.questofcon.game.building.BuildingFactory
+import io.github.plenglin.questofcon.game.building.BuildingMine
 import io.github.plenglin.questofcon.game.pawn.PawnArtillery
 import io.github.plenglin.questofcon.game.pawn.PawnCreator
 import io.github.plenglin.questofcon.game.pawn.PawnKnight
