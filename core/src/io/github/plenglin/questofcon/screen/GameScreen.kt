@@ -6,6 +6,8 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import io.github.plenglin.questofcon.Assets
+import io.github.plenglin.questofcon.Textures
 import io.github.plenglin.questofcon.game.GameData
 import io.github.plenglin.questofcon.game.GameState
 import io.github.plenglin.questofcon.game.Team
@@ -14,6 +16,7 @@ import io.github.plenglin.questofcon.render.ShadeSet
 import io.github.plenglin.questofcon.render.WorldRenderer
 import io.github.plenglin.questofcon.ui.*
 import ktx.app.KtxScreen
+import ktx.assets.disposeSafely
 
 /**
  *
@@ -34,6 +37,9 @@ object GameScreen : KtxScreen {
     val teamC = Team("le baguette", Color.RED)
 
     override fun show() {
+        Textures.values().forEach { it.load() }
+        Assets.manager.finishLoading()
+
         batch = SpriteBatch()
         gameState = GameState(listOf(teamA, teamB, teamC))
 
@@ -59,16 +65,25 @@ object GameScreen : KtxScreen {
         Gdx.gl20.glClearColor(0f, 0f, 0f ,1f)
 
         worldRenderer.shape.projectionMatrix = gridCam.combined
+        worldRenderer.batch.projectionMatrix = gridCam.combined
 
         worldRenderer.render(true, *shadeSets.toTypedArray())
 
         UI.draw()
+
+        /*
+        batch.projectionMatrix = gridCam.combined
+        val tex = Textures.HEADQUARTERS()
+        batch.begin()
+        batch.draw(tex, 0f, 0f, 1f, 1f)
+        batch.end()*/
 
     }
 
     override fun dispose() {
         batch.dispose()
         UI.dispose()
+        Assets.manager.disposeSafely()
     }
 
     override fun resize(width: Int, height: Int) {

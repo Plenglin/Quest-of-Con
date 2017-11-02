@@ -50,6 +50,7 @@ project(":core") {
     dependencies {
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile group: 'io.github.libktx', name: 'ktx-app', version: ktxVersion
+        compile group: 'io.github.libktx', name: 'ktx-assets', version: ktxVersion
         compile group: 'io.github.libktx', name: 'ktx-math', version: ktxVersion
         compile group: 'io.github.libktx', name: 'ktx-scene2d', version: ktxVersion
         //compile group: 'io.github.libktx', name: 'ktx-vis', version: ktxVersion

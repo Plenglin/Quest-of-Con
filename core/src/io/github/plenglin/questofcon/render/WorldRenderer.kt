@@ -1,6 +1,7 @@
 package io.github.plenglin.questofcon.render
 
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import io.github.plenglin.questofcon.game.grid.World
 import io.github.plenglin.questofcon.game.grid.WorldCoords
@@ -8,16 +9,16 @@ import io.github.plenglin.questofcon.game.grid.WorldCoords
 
 class WorldRenderer(val world: World) {
 
+    val batch: SpriteBatch = SpriteBatch()
     val shape: ShapeRenderer = ShapeRenderer()
 
     fun render(drawGrid: Boolean = true, vararg paints: ShadeSet) {
 
         shape.setAutoShapeType(true)
-        shape.begin()
 
         world.apply {
             // Draw the terrain
-            shape.set(ShapeRenderer.ShapeType.Filled)
+            shape.begin(ShapeRenderer.ShapeType.Filled)
             grid.forEachIndexed { i, col ->
                 col.forEachIndexed { j, tile ->
                     shape.color = tile.terrain.color
@@ -51,29 +52,41 @@ class WorldRenderer(val world: World) {
                 }
             }
 
+            shape.end()
 
-            // Draw things on tiles
+            // Draw buildings
+            batch.enableBlending()
+            batch.begin()
             for (i in (height - 1) downTo 0) {
                 val x = i.toFloat()
 
-                // Draw buildings
                 for (j in 0 until width) {
                     val building = this[i, j]!!.building
                     if (building != null) {
                         val y = j.toFloat()
 
-                        // Team outline
-                        shape.color = building.team.color
-                        shape.rect(x + 0.2f, y + 0.2f, 0.6f, 1f)
-
-                        // Type infill
-                        shape.color = building.color
-                        shape.rect(x + 0.25f, y + 0.25f, 0.5f, 0.9f)
-
+                        batch.color = Color.WHITE
+                        batch.draw(building.texture, x, y, 1f, 1f)
+                        val c = building.team.color
+                        batch.setColor(c.r, c.g, c.b, 0.5f)
+                        batch.draw(building.texture, x, y, 1f, 1f)
+                        /*
+                        building.sprite.apply {
+                            texture = building.texture
+                            color = building.team.color
+                            setBounds(x, y, 1f, 1f)
+                            draw(batch)
+                        }*/
                     }
                 }
+            }
+            batch.end()
 
-                // Draw pawns
+            // Draw pawns
+            shape.begin(ShapeRenderer.ShapeType.Filled)
+            for (i in (height - 1) downTo 0) {
+                val x = i.toFloat()
+
                 for (j in 0 until width) {
                     val pawn = this[i, j]!!.pawn
 
