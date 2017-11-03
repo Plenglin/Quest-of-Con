@@ -3,13 +3,20 @@ package io.github.plenglin.questofcon.game.grid
 import com.badlogic.gdx.graphics.Color
 
 
-open class Terrain(val name: String, val color: Color, val passable: Boolean, val buildable: Boolean, val movementCost: Int = 1)
+data class Terrain(val name: String, val color: Color, val passable: Boolean, val buildable: Boolean, val movementCost: Int = 1) {
+
+    override fun toString(): String {
+        return "Terrain($name)"
+    }
+
+}
 
 object Terrains {
 
     val lowlands    = Terrain("lowlands", Color.TAN, true, true)
     val grass       = Terrain("grassland", Color(0f, 0.7f, 0f, 1f), true, true)
-    val hills       = Terrain("hills", Color(0.3f, 0.5f, 0.1f, 1f), true, true, movementCost = 3)
+    val bigHills    = Terrain("big hills", Color(0.1f, 0.35f, 0.0f, 1f), true, true, movementCost = 3)
+    val hills       = Terrain("hills", Color(0.3f, 0.5f, 0.1f, 1f), true, true, movementCost = 2)
     val water       = Terrain("water", Color(0.1f, 0.4f, 0.8f, 1f), false, false, movementCost = 3)
     val mountains   = Terrain("mountains", Color.BLACK, false, false)
 

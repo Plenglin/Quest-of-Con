@@ -64,6 +64,8 @@ object GameScreen : KtxScreen {
         GameData.scout.createPawnAt(teamA, WorldCoords(gameState.world, 5, 5))
         BuildingFactory.createBuildingAt(teamA, WorldCoords(gameState.world, 5, 5))
         BuildingFactory.createBuildingAt(teamB, WorldCoords(gameState.world, 7, 5))
+        println(WorldCoords(gameState.world, 7, 5).tile!!.passableBy(teamA))
+        println(WorldCoords(gameState.world, 7, 5).tile!!.passableBy(teamB))
 
         worldRenderer = WorldRenderer(gameState.world)
 

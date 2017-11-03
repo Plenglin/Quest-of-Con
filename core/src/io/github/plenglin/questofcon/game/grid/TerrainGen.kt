@@ -162,6 +162,7 @@ class MapToHeight(val world: World, val grid: HeightMap) {
             val tile = it.tile!!
             tile.terrain = when {
                 h > 0.85 -> Terrains.mountains
+                h > 0.75 -> Terrains.bigHills
                 h > 0.65 -> Terrains.hills
                 h > 0.25 -> Terrains.grass
                 h > 0.15 -> Terrains.lowlands

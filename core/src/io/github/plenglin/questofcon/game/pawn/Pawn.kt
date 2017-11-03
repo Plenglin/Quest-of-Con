@@ -35,22 +35,25 @@ abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val 
 
         while (unvisited.isNotEmpty()) {
             val coord = unvisited.removeAt(0)  // Pop this new coordinate
-            println(coord)
             val tile = coord.tile!!
             val terrain = tile.terrain
             val cost = terrain.movementCost
+            println("$terrain, ${tile.building}, ${tile.passableBy(team)}")
             val fullDist = dist[coord]!!
-            println(fullDist)
 
             if (tile.passableBy(team) && fullDist + cost <= apRemaining) {  // Can we even get past this tile?
                 coord.surrounding().forEach { neighbor ->  // For each neighbor...
                     val alt = fullDist + cost
                     val neighborDist = dist[neighbor]
-                    if (neighborDist == null) {  // If we haven't added the neighbor, add it now
-                        unvisited.add(neighbor)
-                        dist[neighbor] = fullDist + cost
-                    } else if (neighborDist > alt) {  // Is going through coord to neighbor faster than before?
-                        dist[neighbor] = fullDist  + cost  // Put it in
+                    val passable = neighbor.tile!!.passableBy(team)
+                    println("neigh: ${neighbor.tile.terrain}, ${tile.building}, ${tile.passableBy(team)}")
+                    if (passable) {
+                        if (neighborDist == null) {  // If we haven't added the neighbor, add it now
+                            unvisited.add(neighbor)
+                            dist[neighbor] = fullDist + cost
+                        } else if (neighborDist > alt) {  // Is going through coord to neighbor faster than before?
+                            dist[neighbor] = fullDist + cost  // Put it in
+                        }
                     }
                 }
             }
