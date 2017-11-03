@@ -2,6 +2,7 @@ package io.github.plenglin.questofcon.game.grid
 
 import io.github.plenglin.questofcon.linMap
 import java.util.*
+import javax.swing.plaf.multi.MultiOptionPaneUI
 
 
 class DiamondSquareHeightGenerator(val scale: Int, val initialOffsets: Double = 0.5, val iterativeRescale: Double = 0.5, seed: Long = 0) {
@@ -103,6 +104,43 @@ class DiamondSquareHeightGenerator(val scale: Int, val initialOffsets: Double = 
         }.toTypedArray()
     }
 
+}
+
+/**
+ * Takes a terrain height map and turns it into a [World].
+ */
+class MapToHeight(val width: Int, val grid: Array<Array<Double>>) {
+    val out = World(width, width)
+
+    fun doHeightMap() {
+        val data = out.forEach {
+            // Numbers and the cells
+            val x = it.i.toDouble() * grid.size / width
+            val y = it.j.toDouble() * grid.size / width
+            val i1 = x.toInt()
+            val j1 = y.toInt()
+            val i2 = i1 + 1
+            val j2 = j1 + 1
+
+            // Get the sides
+            val s1 = linMap(x, i1.toDouble(), i2.toDouble(), grid[i1][j1], grid[i2][j1])
+            val s2 = linMap(x, i1.toDouble(), i2.toDouble(), grid[i1][j2], grid[i2][j1])
+
+            // Interpolate the values at the sides
+            val h = linMap(y, j1.toDouble(), j2.toDouble(), s1, s2)
+
+            val tile = it.tile!!
+            if (h > 0.9) {
+                tile.terrain = Terrains.mountains
+            } else if (h > 0.65) {
+                tile.terrain = Terrains.hills
+            } else if (h > 0.25) {
+                tile.terrain = Terrains.grass
+            } else {
+                tile.terrain = Terrains.plains
+            }
+        }
+    }
 }
 
 fun main(args: Array<String>) {
