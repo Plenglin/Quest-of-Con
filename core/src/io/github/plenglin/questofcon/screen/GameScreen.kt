@@ -95,13 +95,6 @@ object GameScreen : KtxScreen {
 
         UI.draw()
 
-        /*
-        batch.projectionMatrix = gridCam.combined
-        val tex = Textures.HEADQUARTERS()
-        batch.begin()
-        batch.draw(tex, 0f, 0f, 1f, 1f)
-        batch.end()*/
-
     }
 
     override fun dispose() {

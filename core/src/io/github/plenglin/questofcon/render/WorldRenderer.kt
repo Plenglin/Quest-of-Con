@@ -1,6 +1,8 @@
 package io.github.plenglin.questofcon.render
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import io.github.plenglin.questofcon.game.grid.World
@@ -47,11 +49,16 @@ class WorldRenderer(val world: World) {
                     shape.line(0f, y, width.toFloat(), y)
                 }
             }
+            shape.end()
 
             // Draw in the selection sets
+            Gdx.gl20.glEnable(GL20.GL_BLEND);
+            Gdx.gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+            shape.begin()
+            println(paints.size)
             paints.forEach { it.draw(shape) }
-
             shape.end()
+            Gdx.gl20.glDisable(GL20.GL_BLEND);
 
             // Draw buildings
             batch.enableBlending()
@@ -121,10 +128,10 @@ data class ShadeSet(
     fun draw(shape: ShapeRenderer) {
 
         // Draw shading
-        shape.color = shading
         shape.set(ShapeRenderer.ShapeType.Filled)
         if (mode and SHADE > 0) {
             coords.forEach {
+                shape.color = shading
                 shape.rect(it.i.toFloat(), it.j.toFloat(), 1f, 1f)
             }
         }
