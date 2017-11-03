@@ -93,7 +93,7 @@ abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val 
     fun attemptAttack(coords: WorldCoords): Boolean {
         apRemaining -= 1
         val result = onAttack(coords)
-        if (!result) {
+        if (result) {
             attacksRemaining -= 1
         }
         return result

@@ -182,21 +182,23 @@ object GridSelectionInputManager : KtxInputAdapter {
 
 object RadialMenuInputManager : KtxInputAdapter {
 
+    lateinit var selected: WorldCoords
+
     val move = Selectable("Move", {
         PawnActionInputManager.setPawnState(
-                GridSelectionInputManager.hovering!!.tile!!.pawn!!,
+                selected.tile!!.pawn!!,
                 PawnActionInputManager.State.MOVE
         )
     })
     val attack = Selectable("Attack", {
         PawnActionInputManager.setPawnState(
-                GridSelectionInputManager.hovering!!.tile!!.pawn!!,
+                selected.tile!!.pawn!!,
                 PawnActionInputManager.State.ATTACK
         )
     })
     val disband = Selectable("Disband", {
         ConfirmationDialog("Disband Pawn", UI.skin, {
-            GridSelectionInputManager.selection!!.tile!!.pawn!!.health = 0
+            selected.tile!!.pawn!!.health = 0
         }).show(UI.stage)
     })
 
@@ -206,12 +208,16 @@ object RadialMenuInputManager : KtxInputAdapter {
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         when (button) {
             Input.Buttons.RIGHT -> {
-                radialMenu.items = getSelectables()
-                radialMenu.setPosition(screenX.toFloat(), UI.viewport.screenHeight - screenY.toFloat())
-                radialMenu.updateUI()
-                radialMenu.active = true
-                radialMenu.isVisible = true
-                return true
+                val hov = GridSelectionInputManager.hovering
+                if (hov != null) {
+                    selected = hov
+                    radialMenu.items = getSelectables()
+                    radialMenu.setPosition(screenX.toFloat(), UI.viewport.screenHeight - screenY.toFloat())
+                    radialMenu.updateUI()
+                    radialMenu.active = true
+                    radialMenu.isVisible = true
+                    return true
+                }
             }
         }
         return false
