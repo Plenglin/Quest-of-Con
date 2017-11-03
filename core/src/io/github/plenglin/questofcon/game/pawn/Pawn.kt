@@ -26,7 +26,41 @@ abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val 
     var apRemaining: Int = actionPoints
 
     fun getMovableSquares(): Set<WorldCoords> {
-        return this.pos.floodfill(apRemaining, { it.tile!!.terrain.passable && it.tile.pawn == null })
+        // Dijkstra
+        val dist = mutableMapOf<WorldCoords, Int>(pos to 0)  // coord, cost
+        val previous = mutableMapOf<WorldCoords, WorldCoords>()  // coord, prev
+        val unvisited = pos.surrounding().filter { it.tile!!.passableBy(team) }.toMutableList()
+        unvisited.forEach {
+            previous[it] = pos
+            dist[it] = it.tile!!.terrain.movementCost
+        }
+
+        while (unvisited.isNotEmpty()) {
+            val coord = unvisited.removeAt(0)  // Pop this new coordinate
+            println(coord)
+            val tile = coord.tile!!
+            val terrain = tile.terrain
+            val cost = terrain.movementCost
+            val fullDist = dist[coord]!!
+            println(fullDist)
+
+            if (tile.passableBy(team) && fullDist + cost <= apRemaining) {  // Can we even get past this tile?
+                coord.surrounding().forEach { neighbor ->  // For each neighbor...
+                    val alt = fullDist + cost
+                    val neighborDist = dist[neighbor]
+                    if (neighborDist == null) {  // If we haven't added the neighbor, add it now
+                        unvisited.add(neighbor)
+                        dist[neighbor] = fullDist + cost
+                        previous[neighbor] = coord
+                    } else if (neighborDist > alt) {  // Is going through coord to neighbor faster than before?
+                        dist[neighbor] = fullDist  + cost  // Put it in
+                        previous[neighbor] = coord
+                    }
+                }
+            }
+        }
+
+        return dist.keys
     }
 
     abstract fun getAttackableSquares(): Set<WorldCoords>

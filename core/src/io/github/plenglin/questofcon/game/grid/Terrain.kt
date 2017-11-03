@@ -3,7 +3,7 @@ package io.github.plenglin.questofcon.game.grid
 import com.badlogic.gdx.graphics.Color
 
 
-open class Terrain(val name: String, val color: Color, val passable: Boolean, val buildable: Boolean, movementCost: Int = 1)
+open class Terrain(val name: String, val color: Color, val passable: Boolean, val buildable: Boolean, val movementCost: Int = 1)
 
 object Terrains {
 

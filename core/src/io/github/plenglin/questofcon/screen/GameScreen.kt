@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import io.github.plenglin.questofcon.Assets
 import io.github.plenglin.questofcon.Textures
+import io.github.plenglin.questofcon.game.GameData
 import io.github.plenglin.questofcon.game.GameState
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.building.BuildingFactory
@@ -60,6 +61,7 @@ object GameScreen : KtxScreen {
         println("Mapping height data to world...")
         MapToHeight(gameState.world, heightData).doHeightMap()
 
+        GameData.scout.createPawnAt(teamA, WorldCoords(gameState.world, 5, 5))
         BuildingFactory.createBuildingAt(teamA, WorldCoords(gameState.world, 5, 5))
         BuildingFactory.createBuildingAt(teamB, WorldCoords(gameState.world, 7, 5))
 
