@@ -133,8 +133,8 @@ data class ShadeSet(
                 listOf(
                         Line(x, y, x + 1, y),
                         Line(x, y, x, y + 1),
-                        Line(x + 1, y, x, y + 1),
-                        Line(x, y + 1, x + 1, y)
+                        Line(x + 1, y, x + 1, y + 1),
+                        Line(x, y + 1, x + 1, y + 1)
                 )}.flatten().toSet().forEach {
                 it.draw(shape, width = 0.03f)
             }

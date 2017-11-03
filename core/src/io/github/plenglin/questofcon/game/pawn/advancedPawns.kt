@@ -6,6 +6,9 @@ import io.github.plenglin.questofcon.game.grid.WorldCoords
 
 
 class PawnArtillery(team: Team, pos: WorldCoords) : Pawn("Bertha", team, pos, 3, 1, Color.BLACK) {
+    override fun getTargetingRadius(coords: WorldCoords): Set<WorldCoords> {
+        return coords.floodfill(radius = dmgRadius)
+    }
 
     override fun getAttackableSquares(): Set<WorldCoords> {
         return pos.floodfill(maxRange).subtract(pos.floodfill(minRange))
@@ -48,6 +51,8 @@ class PawnKnight(team: Team, pos: WorldCoords) : Pawn("KangarooBot", team, pos, 
             Pair( distA, -distB)
         ).map { WorldCoords(pos.world, pos.i + it.first, pos.j + it.second) }.toSet()
     }
+
+    override fun getTargetingRadius(coords: WorldCoords) = coords.floodfill(dmgRadius)
 
     override fun onAttack(coords: WorldCoords): Boolean {
         val pawn = coords.tile!!.pawn

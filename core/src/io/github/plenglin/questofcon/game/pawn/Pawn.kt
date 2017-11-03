@@ -32,6 +32,8 @@ abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val 
 
     abstract fun getAttackableSquares(): Set<WorldCoords>
 
+    open fun getTargetingRadius(coords: WorldCoords): Set<WorldCoords> = setOf(coords)
+
     /**
      * Try to attemptAttack a square.
      * @param coords the square to attemptAttack
@@ -80,6 +82,10 @@ class SimplePawnCreator(name: String, cost: Int, val maxHealth: Int, val attack:
 
         override fun getAttackableSquares(): Set<WorldCoords> {
             return pos.floodfill(range).minus(this.pos)
+        }
+
+        override fun getTargetingRadius(coords: WorldCoords): Set<WorldCoords> {
+            return setOf(coords)
         }
 
         override fun onAttack(coords: WorldCoords): Boolean {
