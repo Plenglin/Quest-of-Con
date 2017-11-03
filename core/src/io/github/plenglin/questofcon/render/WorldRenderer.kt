@@ -22,7 +22,10 @@ class WorldRenderer(val world: World) {
             batch.color = Color.WHITE
             grid.forEachIndexed { i, col ->
                 col.forEachIndexed { j, tile ->
-                    batch.draw(tile.terrain.texture(), i.toFloat(), j.toFloat(), 1f, 1f)
+                    batch.draw(tile.terrain.texture.bg(), i.toFloat(), j.toFloat(), 1f, 1f)
+                    if (tile.getTeam() != null) {
+                        batch.draw(tile.terrain.texture.fg(), i.toFloat(), j.toFloat(), 1f, 1f)
+                    }
                 }
             }
             batch.end()
@@ -62,10 +65,10 @@ class WorldRenderer(val world: World) {
                         val y = j.toFloat()
 
                         batch.color = Color.WHITE
-                        batch.draw(building.texture, x, y, 1f, 1f)
+                        batch.draw(building.texture, x + 0.1f, y + 0.1f, 0.8f, 0.8f)
                         val c = building.team.color
                         batch.setColor(c.r, c.g, c.b, 0.5f)
-                        batch.draw(building.texture, x, y, 1f, 1f)
+                        batch.draw(building.texture, x + 0.1f, y + 0.1f, 0.8f, 0.8f)
                         /*
                         building.sprite.apply {
                             texture = building.texture
