@@ -144,6 +144,7 @@ object GridSelectionInputManager : KtxInputAdapter {
         } else {
             attackableShadeSet = null
         }
+        UI.updateData()
         return false
     }
 
@@ -279,7 +280,7 @@ object RadialMenuInputManager : KtxInputAdapter {
 object PawnActionInputManager : KtxInputAdapter {
 
     var state = State.NONE
-    private lateinit var pawn: Pawn
+    lateinit var pawn: Pawn
 
     private var shadeSet: ShadeSet? = null
         set(value) {
@@ -291,7 +292,7 @@ object PawnActionInputManager : KtxInputAdapter {
         }
 
     private var hoveringShadeSet: ShadeSet = ShadeSet(emptySet())
-    private var movementData: Map<WorldCoords, Int> = mapOf()
+    var movementData: Map<WorldCoords, Int> = mapOf()
 
     fun setPawnState(pawn: Pawn, state: State) {
         this.pawn = pawn

@@ -66,6 +66,8 @@ abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val 
 
     open fun getTargetingRadius(coords: WorldCoords): Set<WorldCoords> = setOf(coords)
 
+    abstract fun damageTo(coords: WorldCoords): Int
+
     /**
      * Try to attemptAttack a square.
      * @param coords the square to attemptAttack
@@ -113,6 +115,8 @@ class SimplePawnCreator(name: String, cost: Int, val maxHealth: Int, val attack:
      * A simple pawn that can be melee or ranged.
      */
     inner class SimplePawn(team: Team, pos: WorldCoords) : Pawn(name, team, pos, maxHealth, actionPoints, color) {
+
+        override fun damageTo(coords: WorldCoords): Int = attack
 
         override val maxAttacks = this@SimplePawnCreator.maxAttacks
 
