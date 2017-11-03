@@ -17,9 +17,10 @@ object Constants {
     val camSpeed = 7f
 
     val selectionColor = Color(0.5f, 0.75f, 0f, 0.5f)
-    val hoveringColor = Color(0f, 0.75f, 0f, 0.5f)
+    val hoveringColor = Color(0.2f, 0.6f, 0.2f, 1f)
     val movementColor: Color = Color(0f, 0f, 1f, 0.5f)
     val attackColor: Color = Color(1f, 0f, 0f, 0.5f)
+
     val STARTING_MONEY: Int = 50
     val BASE_ECO: Int = 10
     val HQ_HEALTH = 50

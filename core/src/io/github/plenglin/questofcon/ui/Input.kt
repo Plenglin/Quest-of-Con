@@ -1,5 +1,6 @@
 package io.github.plenglin.questofcon.ui
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.math.Vector3
@@ -88,6 +89,7 @@ object MapControlInputManager : KtxInputAdapter {
     fun update(delta: Float) {
         val mult = if (fast) 2 else 1
         cam.translate(vx * mult * Constants.camSpeed * delta, vy * mult * Constants.camSpeed * delta)
+        GridSelectionInputManager.mouseMoved(Gdx.input.x, Gdx.input.y)
     }
 
 }
@@ -192,7 +194,6 @@ object RadialMenuInputManager : KtxInputAdapter {
         )
     })
     val disband = Selectable("Disband", {
-        println("disbanding pawn")
         ConfirmationDialog("Disband Pawn", UI.skin, {
             GridSelectionInputManager.selection!!.tile!!.pawn!!.health = 0
         }).show(UI.stage)
@@ -223,7 +224,6 @@ object RadialMenuInputManager : KtxInputAdapter {
                 Input.Buttons.RIGHT -> {
                     val selected = radialMenu.getSelected((sx - radialMenu.x).toDouble(), (sy - radialMenu.y).toDouble())
                     selected?.onSelected?.invoke()
-                    println(selected)
                     radialMenu.active = false
                     radialMenu.isVisible = false
                     return true
@@ -252,7 +252,6 @@ object RadialMenuInputManager : KtxInputAdapter {
             }
 
             val building = selection.tile.building
-            println("building enabled: ${building?.enabled}")
             if (building != null && building.team == currentTeam && building.enabled) {
                 actions.addAll(selection.tile.building!!.getActions())
             }
@@ -291,6 +290,8 @@ object PawnActionInputManager : KtxInputAdapter {
             field = value
         }
 
+    private var hoveringShadeSet: ShadeSet = ShadeSet(emptySet())
+
     fun setPawnState(pawn: Pawn, state: State) {
         this.pawn = pawn
         when (state) {
@@ -304,6 +305,7 @@ object PawnActionInputManager : KtxInputAdapter {
             }
             else -> {
                 shadeSet = null
+                GameScreen.shadeSets.remove(hoveringShadeSet)
             }
         }
         this.state = state
@@ -365,6 +367,23 @@ object PawnActionInputManager : KtxInputAdapter {
                     setPawnState(pawn, State.NONE)
                     return true
                 }
+            }
+        }
+        return false
+    }
+
+    override fun mouseMoved(screenX: Int, screenY: Int): Boolean {
+        if (state == State.ATTACK) {
+            val hovering = GridSelectionInputManager.hovering
+            GameScreen.shadeSets.remove(hoveringShadeSet)
+            if (hovering != null && selectionSet.contains(hovering)) {
+                hoveringShadeSet = ShadeSet(
+                        pawn.getTargetingRadius(hovering),
+                        mode = ShadeSet.INNER_LINES,
+                        shading = Constants.attackColor,
+                        lines = Constants.attackColor
+                )
+                GameScreen.shadeSets.add(hoveringShadeSet)
             }
         }
         return false

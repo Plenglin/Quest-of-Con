@@ -17,7 +17,7 @@ class Tile(var terrain: Terrain) {
     }
 
     fun canBuildOn(team: Team): Boolean {
-        return building == null && pawn?.let { it.team == team } ?: true
+        return building == null && pawn?.let { it.team == team } != false
     }
 
     fun doDamage(hp: Int): Boolean {

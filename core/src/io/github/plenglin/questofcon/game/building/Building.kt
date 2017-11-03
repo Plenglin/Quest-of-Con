@@ -23,7 +23,6 @@ abstract class Building(val name: String, var team: Team, var pos: WorldCoords, 
         set(value) {
             field = value
             if (health <= 0) {
-                println("$this died")
                 pos.tile!!.building = null
             }
         }
