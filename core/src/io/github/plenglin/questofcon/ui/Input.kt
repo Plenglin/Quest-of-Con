@@ -114,12 +114,6 @@ object GridSelectionInputManager : KtxInputAdapter {
             } else {
                 field = null
             }
-
-            if (field != null) {
-                UI.tileInfo.target = field
-            }
-
-            UI.tileInfo.isVisible = (field != null)
         }
 
     var hovering: WorldCoords? = null
@@ -132,6 +126,12 @@ object GridSelectionInputManager : KtxInputAdapter {
             } else {
                 field = null
             }
+
+            if (field != null) {
+                UI.tileInfo.target = field
+            }
+
+            UI.tileInfo.isVisible = (field != null)
         }
 
     override fun mouseMoved(screenX: Int, screenY: Int): Boolean {
