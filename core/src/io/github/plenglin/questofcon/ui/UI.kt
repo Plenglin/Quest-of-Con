@@ -5,10 +5,8 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.utils.viewport.ScreenViewport
 import com.badlogic.gdx.utils.viewport.Viewport
-import io.github.plenglin.questofcon.game.GameState
 import io.github.plenglin.questofcon.screen.GameScreen
-import ktx.scene2d.*
-import org.w3c.dom.events.UIEvent
+import ktx.scene2d.Scene2DSkin
 
 
 object UI {

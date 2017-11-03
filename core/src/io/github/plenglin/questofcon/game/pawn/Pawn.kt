@@ -1,8 +1,8 @@
 package io.github.plenglin.questofcon.game.pawn
 
 import com.badlogic.gdx.graphics.Color
-import io.github.plenglin.questofcon.game.grid.WorldCoords
 import io.github.plenglin.questofcon.game.Team
+import io.github.plenglin.questofcon.game.grid.WorldCoords
 
 
 abstract class PawnCreator(val name: String, val cost: Int) {
@@ -14,13 +14,12 @@ abstract class PawnCreator(val name: String, val cost: Int) {
 abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val maxHealth: Int, val actionPoints: Int, val color: Color) {
 
     open val maxAttacks = 1
-    var attacksRemaining = maxAttacks
+    var attacksRemaining = 0
 
     var health: Int = maxHealth
         set(value) {
             field = value
             if (health <= 0) {
-                println("$this died")
                 pos.tile!!.pawn = null
             }
         }

@@ -17,7 +17,7 @@ class World(val width: Int, val height: Int) : Sequence<WorldCoords> {
     })
 
     /**
-     * Get the tile. If out of bounds, returns [null]
+     * Get the tile. If out of bounds, returns null
      */
     operator fun get(i: Int, j: Int): Tile? {
         try {
@@ -46,14 +46,12 @@ data class WorldCoords(val world: World, val i: Int, val j: Int) {
     /**
      * Perform a floodfill starting from this point.
      * @param radius how far from here to floodfill
-     * @param set the set to add points to.
      * @param predicate should we include this in our floodfill?
      */
     fun floodfill(radius: Int, predicate: (WorldCoords) -> Boolean = { true }): MutableSet<WorldCoords> {
 
         var set = mutableSetOf<WorldCoords>(this)
         for (n in 1..radius) {
-            println(n)
             val newSet = mutableSetOf<WorldCoords>()
             set.forEach { coord ->
                 listOf(
@@ -86,7 +84,7 @@ data class WorldCoords(val world: World, val i: Int, val j: Int) {
 
 fun main(args: Array<String>) {
     val world = World(10, 10)
-    var set = WorldCoords(world, 5, 5).floodfill(4)
+    val set = WorldCoords(world, 5, 5).floodfill(4)
 
     for (i in 0 until 10) {
         for (j in 0 until 10) {

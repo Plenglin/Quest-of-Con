@@ -194,7 +194,6 @@ object RadialMenuInputManager : KtxInputAdapter {
         )
     })
     val disband = Selectable("Disband", {
-        println("disbanding pawn")
         ConfirmationDialog("Disband Pawn", UI.skin, {
             GridSelectionInputManager.selection!!.tile!!.pawn!!.health = 0
         }).show(UI.stage)
@@ -225,7 +224,6 @@ object RadialMenuInputManager : KtxInputAdapter {
                 Input.Buttons.RIGHT -> {
                     val selected = radialMenu.getSelected((sx - radialMenu.x).toDouble(), (sy - radialMenu.y).toDouble())
                     selected?.onSelected?.invoke()
-                    println(selected)
                     radialMenu.active = false
                     radialMenu.isVisible = false
                     return true
@@ -254,7 +252,6 @@ object RadialMenuInputManager : KtxInputAdapter {
             }
 
             val building = selection.tile.building
-            println("building enabled: ${building?.enabled}")
             if (building != null && building.team == currentTeam && building.enabled) {
                 actions.addAll(selection.tile.building!!.getActions())
             }

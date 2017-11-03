@@ -91,8 +91,6 @@ class RadialMenu(val skin: Skin, var radiusX: Float, var radiusY: Float) : Group
     var deadzoneY = 0f
 
     fun updateUI() {
-        println(items)
-
         clearChildren()
         for (i in 0 until items.size) {
             val sel = items[i]
@@ -105,7 +103,6 @@ class RadialMenu(val skin: Skin, var radiusX: Float, var radiusY: Float) : Group
                     radiusX * Math.sin(angle).toFloat() - button.width / 2,
                     radiusY * Math.cos(angle).toFloat() - button.height / 2)
 
-            println(radiusX * Math.sin(angle).toFloat() - button.width / 2)
 
             button.isVisible = true
             button.debug = true
@@ -117,12 +114,9 @@ class RadialMenu(val skin: Skin, var radiusX: Float, var radiusY: Float) : Group
         if (items.isEmpty() || xOff * xOff / deadzoneX / deadzoneX + yOff * yOff / deadzoneY / deadzoneY < 1) {  // In deadzone ellipse?
             return null
         }
-        println("$xOff, $yOff, ${Math.toDegrees(Math.atan2(yOff, xOff))}")
         val bearing = (450 - Math.toDegrees(Math.atan2(yOff, xOff))) % 360
-        println("bearing $bearing")
         for (i in items.indices) {
             val rot = 360 * (i + 0.5) / items.size
-            println("$i: is $rot")
             if (bearing <= rot) {
                 return items[i]
             }
@@ -172,7 +166,6 @@ class UnitSpawningDialog(val units: List<PawnCreator>, skin: Skin, val worldCoor
 
                     addListener(object : ChangeListener() {
                         override fun changed(event: ChangeEvent?, actor: Actor?) {
-                            println("spawning ${pawn.name}")
                             team.money -= pawn.cost
                             val newPawn = pawn.createPawnAt(team, worldCoords)
                             newPawn.apRemaining = 0
@@ -196,7 +189,6 @@ class BuildingSpawningDialog(val team: Team, skin: Skin, val worldCoords: WorldC
 
     init {
         val buildings = team.getBuildable()
-        println(buildings)
         contentTable.apply {
             add(Label("Type", skin))
             add(Label("Cost", skin))
@@ -209,7 +201,6 @@ class BuildingSpawningDialog(val team: Team, skin: Skin, val worldCoords: WorldC
 
                     addListener(object : ChangeListener() {
                         override fun changed(event: ChangeEvent?, actor: Actor?) {
-                            println("spawning ${bldg.name}")
                             team.money -= bldg.cost
                             val building = bldg.createBuildingAt(team, worldCoords)
                             building.enabled = false
