@@ -5,7 +5,7 @@ import java.util.*
 import javax.swing.plaf.multi.MultiOptionPaneUI
 
 
-class DiamondSquareHeightGenerator(val scale: Int, val initialOffsets: Double = 0.5, val iterativeRescale: Double = 0.5, seed: Long = 0) {
+class DiamondSquareHeightGenerator(scale: Int, val initialOffsets: Double = 0.5, val iterativeRescale: Double = 0.5, seed: Long = 0) {
 
     val iterations = scale + 1
     val side = (2 shl scale)
@@ -13,7 +13,7 @@ class DiamondSquareHeightGenerator(val scale: Int, val initialOffsets: Double = 
     val grid = Array<Array<Double>>(length, { Array(length, {0.0}) })
     val random = Random(seed)
 
-    fun generate() {
+    fun generate(): DiamondSquareHeightGenerator {
         // Initialize corners
         grid[0][0] = rand()
         grid[side][0] = rand()
@@ -40,6 +40,7 @@ class DiamondSquareHeightGenerator(val scale: Int, val initialOffsets: Double = 
 
             offset *= iterativeRescale
         }
+        return this
     }
 
     fun rand(): Double {
@@ -109,14 +110,15 @@ class DiamondSquareHeightGenerator(val scale: Int, val initialOffsets: Double = 
 /**
  * Takes a terrain height map and turns it into a [World].
  */
-class MapToHeight(val width: Int, val grid: Array<Array<Double>>) {
-    val out = World(width, width)
+class MapToHeight(val world: World, val grid: Array<Array<Double>>) {
+
+    val width = world.width
 
     fun doHeightMap() {
-        val data = out.forEach {
+        val data = world.forEach {
             // Numbers and the cells
-            val x = it.i.toDouble() * grid.size / width
-            val y = it.j.toDouble() * grid.size / width
+            val x = it.i.toDouble() * (grid.size - 1) / width
+            val y = it.j.toDouble() * (grid.size - 1) / width
             val i1 = x.toInt()
             val j1 = y.toInt()
             val i2 = i1 + 1
@@ -130,14 +132,11 @@ class MapToHeight(val width: Int, val grid: Array<Array<Double>>) {
             val h = linMap(y, j1.toDouble(), j2.toDouble(), s1, s2)
 
             val tile = it.tile!!
-            if (h > 0.9) {
-                tile.terrain = Terrains.mountains
-            } else if (h > 0.65) {
-                tile.terrain = Terrains.hills
-            } else if (h > 0.25) {
-                tile.terrain = Terrains.grass
-            } else {
-                tile.terrain = Terrains.plains
+            when {
+                h > 0.9 -> tile.terrain = Terrains.mountains
+                h > 0.65 -> tile.terrain = Terrains.hills
+                h > 0.25 -> tile.terrain = Terrains.grass
+                else -> tile.terrain = Terrains.plains
             }
         }
     }
