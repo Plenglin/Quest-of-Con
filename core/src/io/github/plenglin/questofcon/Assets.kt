@@ -14,7 +14,7 @@ object Assets {
 
 enum class Textures(dir: String) {
     HEADQUARTERS("building"), MINE("building"), FACTORY("building"),
-    GRASS("terrain"), SMALLHILL("terrain"), BIGHILL("terrain"), WATER("terrain"), MOUNTAIN("terrain");
+    GRASS("terrain"), SMALLHILL("terrain"), BIGHILL("terrain"), SAND("terrain"), WATER("terrain"), MOUNTAIN("terrain");
 
     val path = "sprites/$dir/${name.toLowerCase()}.png"
     fun load() = manager.load<Texture>(path)

@@ -18,15 +18,17 @@ class WorldRenderer(val world: World) {
 
         world.apply {
             // Draw the terrain
-            shape.begin(ShapeRenderer.ShapeType.Filled)
+            batch.begin()
+            batch.color = Color.WHITE
             grid.forEachIndexed { i, col ->
                 col.forEachIndexed { j, tile ->
-                    shape.color = tile.terrain.color
-                    shape.rect(i.toFloat(), j.toFloat(), 1f, 1f)
+                    batch.draw(tile.terrain.texture(), i.toFloat(), j.toFloat(), 1f, 1f)
                 }
             }
+            batch.end()
 
             // Draw the grid if necessary
+            shape.begin(ShapeRenderer.ShapeType.Filled)
             if (drawGrid) {
                 shape.color = Color(0f, 0.5f, 1f, 0.5f)
                 shape.set(ShapeRenderer.ShapeType.Line)
