@@ -16,8 +16,13 @@ class Tile(var terrain: Terrain) {
         return pawn?.team ?: building?.team
     }
 
+    fun passableBy(team: Team): Boolean {
+        val tileTeam = getTeam()
+        return terrain.passable && (tileTeam == null || tileTeam == team)
+    }
+
     fun canBuildOn(team: Team): Boolean {
-        return building == null && pawn?.let { it.team == team } != false
+        return terrain.buildable && building == null && pawn?.let { it.team == team } != false
     }
 
     fun doDamage(hp: Int): Boolean {

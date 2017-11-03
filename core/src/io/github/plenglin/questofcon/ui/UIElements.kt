@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
 import io.github.plenglin.questofcon.game.GameState
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
+import io.github.plenglin.questofcon.game.pawn.Pawn
 import io.github.plenglin.questofcon.game.pawn.PawnCreator
 
 
@@ -43,7 +44,7 @@ class TileInfoPanel(skin: Skin) : Table(skin) {
     fun updateData() {
         val coord = target
         if (coord?.tile != null) {
-            titleLabel.setText("${coord.tile.terrain.name.capitalize()} at ${coord.i}, ${coord.j}")
+            titleLabel.setText("${coord.tile.terrain.name.capitalize()} at ${coord.i}, ${coord.j} (Cost: ${coord.tile.terrain.movementCost})")
 
             val pawn = coord.tile.pawn
             this.pawn.data = pawn?.getProperties() ?: emptyMap()
@@ -252,6 +253,66 @@ class GameStateInfoController(val gameState: GameState, skin: Skin) : Window("St
         currentTeamLabel.setText("${team.name}'s turn")
         moneyLabel.setText("$${team.money}")
         ecoLabel.setText("+$${team.getMoneyPerTurn()}")
+        pack()
+    }
+
+}
+
+class ActionTooltip(skin: Skin) : Table(skin) {
+
+    val a: Label = Label("", skin)
+    val b: Label = Label("", skin)
+    val c: Label = Label("", skin)
+    val d: Label = Label("", skin)
+
+    init {
+        add(a).width(100f).left()
+        add(b).right()
+        row()
+        add(c).left()
+        add(d).right()
+    }
+
+    fun updateData() {
+        val pawn: Pawn
+        try {
+            pawn = PawnActionInputManager.pawn
+        } catch (e: UninitializedPropertyAccessException) {
+            return
+        }
+        when (PawnActionInputManager.state) {
+            PawnActionInputManager.State.NONE -> this.isVisible = false
+            PawnActionInputManager.State.MOVE -> {
+                val hov = GridSelectionInputManager.hovering
+                if (hov != null) {
+                    val cost = PawnActionInputManager.movementData[hov]
+                    if (cost != null) {
+                        isVisible = true
+                        a.setText(hov.tile!!.terrain.name.capitalize())
+                        b.setText("$cost")
+                        c.setText("Actions")
+                        d.setText("${pawn.apRemaining} -> ${pawn.apRemaining - cost}")
+                    } else {
+                        this.isVisible = false
+                    }
+                }
+            }
+            PawnActionInputManager.State.ATTACK -> {
+                val target = GridSelectionInputManager.hovering
+                if (target != null) {
+                    isVisible = true
+                    val ptarget = target.tile!!.pawn
+                    val building = target.tile.building
+                    val damage = pawn.damageTo(target)
+                    a.setText(ptarget?.name ?: "")
+                    b.setText(if (ptarget != null) "${ptarget.health} -> ${ptarget.health - damage}" else "")
+                    c.setText(building?.name ?: "")
+                    d.setText(if (building != null) "${building.health} -> ${building.health - damage}" else "")
+                } else {
+                    isVisible = false
+                }
+            }
+        }
         pack()
     }
 

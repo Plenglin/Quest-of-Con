@@ -25,13 +25,48 @@ abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val 
         }
     var apRemaining: Int = actionPoints
 
-    fun getMovableSquares(): Set<WorldCoords> {
-        return this.pos.floodfill(apRemaining, { it.tile!!.terrain.passable && it.tile.pawn == null })
+    fun getMovableSquares(): Map<WorldCoords, Int> {
+        // Dijkstra
+        val dist = mutableMapOf<WorldCoords, Int>(pos to 0)  // coord, cost
+        val unvisited = pos.surrounding().filter { it.tile!!.passableBy(team) }.toMutableList()
+        unvisited.forEach {
+            dist[it] = it.tile!!.terrain.movementCost
+        }
+
+        while (unvisited.isNotEmpty()) {
+            val coord = unvisited.removeAt(0)  // Pop this new coordinate
+            val tile = coord.tile!!
+            val terrain = tile.terrain
+            val cost = terrain.movementCost
+            println("$terrain, ${tile.building}, ${tile.passableBy(team)}")
+            val fullDist = dist[coord]!!
+
+            if (tile.passableBy(team) && fullDist + cost <= apRemaining) {  // Can we even get past this tile?
+                coord.surrounding().forEach { neighbor ->  // For each neighbor...
+                    val alt = fullDist + cost
+                    val neighborDist = dist[neighbor]
+                    val passable = neighbor.tile!!.passableBy(team)
+                    println("neigh: ${neighbor.tile.terrain}, ${tile.building}, ${tile.passableBy(team)}")
+                    if (passable) {
+                        if (neighborDist == null) {  // If we haven't added the neighbor, add it now
+                            unvisited.add(neighbor)
+                            dist[neighbor] = fullDist + cost
+                        } else if (neighborDist > alt) {  // Is going through coord to neighbor faster than before?
+                            dist[neighbor] = fullDist + cost  // Put it in
+                        }
+                    }
+                }
+            }
+        }
+
+        return dist
     }
 
     abstract fun getAttackableSquares(): Set<WorldCoords>
 
     open fun getTargetingRadius(coords: WorldCoords): Set<WorldCoords> = setOf(coords)
+
+    abstract fun damageTo(coords: WorldCoords): Int
 
     /**
      * Try to attemptAttack a square.
@@ -40,8 +75,12 @@ abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val 
      */
     abstract fun onAttack(coords: WorldCoords): Boolean
 
-    fun moveTo(coords: WorldCoords) {
-        apRemaining -= Math.abs(coords.i - pos.i) + Math.abs(coords.j - pos.j)
+    fun moveTo(coords: WorldCoords, movementData: Map<WorldCoords, Int>) {
+        moveTo(coords, movementData[coords]!!)
+    }
+
+    fun moveTo(coords: WorldCoords, apCost: Int) {
+        apRemaining -= apCost
         pos.tile!!.pawn = null  // clear old tile
         coords.tile!!.pawn = this  // set new tile to this
         pos = coords  // set this pawn's reference
@@ -54,7 +93,7 @@ abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val 
     fun attemptAttack(coords: WorldCoords): Boolean {
         apRemaining -= 1
         val result = onAttack(coords)
-        if (!result) {
+        if (result) {
             attacksRemaining -= 1
         }
         return result
@@ -76,6 +115,8 @@ class SimplePawnCreator(name: String, cost: Int, val maxHealth: Int, val attack:
      * A simple pawn that can be melee or ranged.
      */
     inner class SimplePawn(team: Team, pos: WorldCoords) : Pawn(name, team, pos, maxHealth, actionPoints, color) {
+
+        override fun damageTo(coords: WorldCoords): Int = attack
 
         override val maxAttacks = this@SimplePawnCreator.maxAttacks
 

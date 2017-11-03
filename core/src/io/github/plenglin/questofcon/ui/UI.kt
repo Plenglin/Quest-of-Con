@@ -20,6 +20,7 @@ object UI {
     lateinit var gameState: GameStateInfoController
     lateinit var tileInfo: TileInfoPanel
     lateinit var radialMenu: RadialMenu
+    lateinit var pawnTooltip: ActionTooltip
 
     fun generateUI() {
         stage.clear()
@@ -37,6 +38,9 @@ object UI {
         radialMenu.deadzoneY = 15f
         stage.addActor(radialMenu)
 
+        pawnTooltip = ActionTooltip(skin)
+        stage.addActor(pawnTooltip)
+
         gameState = GameStateInfoController(GameScreen.gameState, skin)
         stage.addActor(gameState)
         gameState.updateData()
@@ -45,6 +49,9 @@ object UI {
     fun updateData() {
         gameState.updateData()
         tileInfo.updateData()
+        pawnTooltip.updateData()
+
+        pawnTooltip.setPosition(Gdx.input.x.toFloat(), viewport.screenHeight - Gdx.input.y.toFloat())
     }
 
     fun update(delta: Float) {

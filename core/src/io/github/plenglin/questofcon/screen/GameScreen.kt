@@ -8,9 +8,13 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import io.github.plenglin.questofcon.Assets
 import io.github.plenglin.questofcon.Textures
+import io.github.plenglin.questofcon.game.GameData
 import io.github.plenglin.questofcon.game.GameState
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.building.BuildingFactory
+import io.github.plenglin.questofcon.game.grid.DiamondSquareHeightGenerator
+import io.github.plenglin.questofcon.game.grid.HeightMap
+import io.github.plenglin.questofcon.game.grid.MapToHeight
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 import io.github.plenglin.questofcon.render.ShadeSet
 import io.github.plenglin.questofcon.render.WorldRenderer
@@ -42,9 +46,26 @@ object GameScreen : KtxScreen {
 
         batch = SpriteBatch()
         gameState = GameState(listOf(teamA, teamB, teamC))
+        println("Generating terrain...")
 
+        println("Generating height data...")
+        val heightData = HeightMap(DiamondSquareHeightGenerator(3, initialOffsets = 2.0, iterativeRescale = 0.8).generate().grid).normalized
+
+        heightData.grid.forEach { col ->
+            col.forEach {
+                print("%.2f\t".format(it))
+            }
+            println()
+        }
+
+        println("Mapping height data to world...")
+        MapToHeight(gameState.world, heightData).doHeightMap()
+
+        GameData.scout.createPawnAt(teamA, WorldCoords(gameState.world, 5, 5))
         BuildingFactory.createBuildingAt(teamA, WorldCoords(gameState.world, 5, 5))
         BuildingFactory.createBuildingAt(teamB, WorldCoords(gameState.world, 7, 5))
+        println(WorldCoords(gameState.world, 7, 5).tile!!.passableBy(teamA))
+        println(WorldCoords(gameState.world, 7, 5).tile!!.passableBy(teamB))
 
         worldRenderer = WorldRenderer(gameState.world)
 

@@ -114,12 +114,6 @@ object GridSelectionInputManager : KtxInputAdapter {
             } else {
                 field = null
             }
-
-            if (field != null) {
-                UI.tileInfo.target = field
-            }
-
-            UI.tileInfo.isVisible = (field != null)
         }
 
     var hovering: WorldCoords? = null
@@ -132,6 +126,12 @@ object GridSelectionInputManager : KtxInputAdapter {
             } else {
                 field = null
             }
+
+            if (field != null) {
+                UI.tileInfo.target = field
+            }
+
+            UI.tileInfo.isVisible = (field != null)
         }
 
     override fun mouseMoved(screenX: Int, screenY: Int): Boolean {
@@ -144,6 +144,7 @@ object GridSelectionInputManager : KtxInputAdapter {
         } else {
             attackableShadeSet = null
         }
+        UI.updateData()
         return false
     }
 
@@ -181,21 +182,23 @@ object GridSelectionInputManager : KtxInputAdapter {
 
 object RadialMenuInputManager : KtxInputAdapter {
 
+    lateinit var selected: WorldCoords
+
     val move = Selectable("Move", {
         PawnActionInputManager.setPawnState(
-                GridSelectionInputManager.hovering!!.tile!!.pawn!!,
+                selected.tile!!.pawn!!,
                 PawnActionInputManager.State.MOVE
         )
     })
     val attack = Selectable("Attack", {
         PawnActionInputManager.setPawnState(
-                GridSelectionInputManager.hovering!!.tile!!.pawn!!,
+                selected.tile!!.pawn!!,
                 PawnActionInputManager.State.ATTACK
         )
     })
     val disband = Selectable("Disband", {
         ConfirmationDialog("Disband Pawn", UI.skin, {
-            GridSelectionInputManager.selection!!.tile!!.pawn!!.health = 0
+            selected.tile!!.pawn!!.health = 0
         }).show(UI.stage)
     })
 
@@ -205,12 +208,16 @@ object RadialMenuInputManager : KtxInputAdapter {
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         when (button) {
             Input.Buttons.RIGHT -> {
-                radialMenu.items = getSelectables()
-                radialMenu.setPosition(screenX.toFloat(), UI.viewport.screenHeight - screenY.toFloat())
-                radialMenu.updateUI()
-                radialMenu.active = true
-                radialMenu.isVisible = true
-                return true
+                val hov = GridSelectionInputManager.hovering
+                if (hov != null) {
+                    selected = hov
+                    radialMenu.items = getSelectables()
+                    radialMenu.setPosition(screenX.toFloat(), UI.viewport.screenHeight - screenY.toFloat())
+                    radialMenu.updateUI()
+                    radialMenu.active = true
+                    radialMenu.isVisible = true
+                    return true
+                }
             }
         }
         return false
@@ -279,7 +286,7 @@ object RadialMenuInputManager : KtxInputAdapter {
 object PawnActionInputManager : KtxInputAdapter {
 
     var state = State.NONE
-    private lateinit var pawn: Pawn
+    lateinit var pawn: Pawn
 
     private var shadeSet: ShadeSet? = null
         set(value) {
@@ -291,12 +298,14 @@ object PawnActionInputManager : KtxInputAdapter {
         }
 
     private var hoveringShadeSet: ShadeSet = ShadeSet(emptySet())
+    var movementData: Map<WorldCoords, Int> = mapOf()
 
     fun setPawnState(pawn: Pawn, state: State) {
         this.pawn = pawn
         when (state) {
             State.MOVE -> {
-                selectionSet = pawn.getMovableSquares()
+                movementData = pawn.getMovableSquares()
+                selectionSet = movementData.keys
                 shadeSet = ShadeSet(selectionSet, Constants.movementColor)
             }
             State.ATTACK -> {
@@ -363,7 +372,7 @@ object PawnActionInputManager : KtxInputAdapter {
             }
             State.MOVE -> {
                 if (selectionSet.contains(hovering)) {
-                    pawn.moveTo(hovering)
+                    pawn.moveTo(hovering, movementData)
                     setPawnState(pawn, State.NONE)
                     return true
                 }

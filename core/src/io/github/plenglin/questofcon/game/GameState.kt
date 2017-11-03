@@ -7,7 +7,7 @@ import io.github.plenglin.questofcon.game.grid.World
  */
 class GameState(val teams: List<Team>) {
 
-    val world = World(16, 16)
+    val world = World(32, 32)
     private var teamIndex = 0
 
     init {
