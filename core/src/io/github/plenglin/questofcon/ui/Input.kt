@@ -291,12 +291,14 @@ object PawnActionInputManager : KtxInputAdapter {
         }
 
     private var hoveringShadeSet: ShadeSet = ShadeSet(emptySet())
+    private var movementData: Map<WorldCoords, Int> = mapOf()
 
     fun setPawnState(pawn: Pawn, state: State) {
         this.pawn = pawn
         when (state) {
             State.MOVE -> {
-                selectionSet = pawn.getMovableSquares()
+                movementData = pawn.getMovableSquares()
+                selectionSet = movementData.keys
                 shadeSet = ShadeSet(selectionSet, Constants.movementColor)
             }
             State.ATTACK -> {
@@ -363,7 +365,7 @@ object PawnActionInputManager : KtxInputAdapter {
             }
             State.MOVE -> {
                 if (selectionSet.contains(hovering)) {
-                    pawn.moveTo(hovering)
+                    pawn.moveTo(hovering, movementData)
                     setPawnState(pawn, State.NONE)
                     return true
                 }

@@ -25,13 +25,11 @@ abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val 
         }
     var apRemaining: Int = actionPoints
 
-    fun getMovableSquares(): Set<WorldCoords> {
+    fun getMovableSquares(): Map<WorldCoords, Int> {
         // Dijkstra
         val dist = mutableMapOf<WorldCoords, Int>(pos to 0)  // coord, cost
-        val previous = mutableMapOf<WorldCoords, WorldCoords>()  // coord, prev
         val unvisited = pos.surrounding().filter { it.tile!!.passableBy(team) }.toMutableList()
         unvisited.forEach {
-            previous[it] = pos
             dist[it] = it.tile!!.terrain.movementCost
         }
 
@@ -51,16 +49,14 @@ abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val 
                     if (neighborDist == null) {  // If we haven't added the neighbor, add it now
                         unvisited.add(neighbor)
                         dist[neighbor] = fullDist + cost
-                        previous[neighbor] = coord
                     } else if (neighborDist > alt) {  // Is going through coord to neighbor faster than before?
                         dist[neighbor] = fullDist  + cost  // Put it in
-                        previous[neighbor] = coord
                     }
                 }
             }
         }
 
-        return dist.keys
+        return dist
     }
 
     abstract fun getAttackableSquares(): Set<WorldCoords>
@@ -74,8 +70,12 @@ abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val 
      */
     abstract fun onAttack(coords: WorldCoords): Boolean
 
-    fun moveTo(coords: WorldCoords) {
-        apRemaining -= Math.abs(coords.i - pos.i) + Math.abs(coords.j - pos.j)
+    fun moveTo(coords: WorldCoords, movementData: Map<WorldCoords, Int>) {
+        moveTo(coords, movementData[coords]!!)
+    }
+
+    fun moveTo(coords: WorldCoords, apCost: Int) {
+        apRemaining -= apCost
         pos.tile!!.pawn = null  // clear old tile
         coords.tile!!.pawn = this  // set new tile to this
         pos = coords  // set this pawn's reference

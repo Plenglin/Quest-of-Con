@@ -68,7 +68,7 @@ class PawnKnight(team: Team, pos: WorldCoords) : Pawn("KangarooBot", team, pos, 
         coords.floodfill(dmgRadius).forEach {
             it.tile!!.doDamage(damage)
         }
-        moveTo(coords)
+        moveTo(coords, apCost = actionPoints)
         return true
     }
 
