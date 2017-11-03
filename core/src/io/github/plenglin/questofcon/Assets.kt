@@ -12,10 +12,11 @@ object Assets {
 
 }
 
-enum class Textures {
-    HEADQUARTERS, MINE, FACTORY;
+enum class Textures(dir: String) {
+    HEADQUARTERS("building"), MINE("building"), FACTORY("building"),
+    GRASS("terrain"), SMALLHILL("terrain"), BIGHILL("terrain"), WATER("terrain"), MOUNTAIN("terrain");
 
-    val path = "sprites/${name.toLowerCase()}.png"
+    val path = "sprites/$dir/${name.toLowerCase()}.png"
     fun load() = manager.load<Texture>(path)
     operator fun invoke() = manager.getAsset<Texture>(path)
     companion object {
