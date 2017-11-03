@@ -12,6 +12,7 @@ import io.github.plenglin.questofcon.game.GameState
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.building.BuildingFactory
 import io.github.plenglin.questofcon.game.grid.DiamondSquareHeightGenerator
+import io.github.plenglin.questofcon.game.grid.HeightMap
 import io.github.plenglin.questofcon.game.grid.MapToHeight
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 import io.github.plenglin.questofcon.render.ShadeSet
@@ -47,9 +48,9 @@ object GameScreen : KtxScreen {
         println("Generating terrain...")
 
         println("Generating height data...")
-        val heightData = DiamondSquareHeightGenerator(3, initialOffsets = 2.0, iterativeRescale = 0.8).generate().normalized()
+        val heightData = HeightMap(DiamondSquareHeightGenerator(3, initialOffsets = 2.0, iterativeRescale = 0.8).generate().grid).normalized
 
-        heightData.forEach { col ->
+        heightData.grid.forEach { col ->
             col.forEach {
                 print("%.2f\t".format(it))
             }

@@ -96,14 +96,6 @@ class DiamondSquareHeightGenerator(scale: Int, val initialOffsets: Double = 0.5,
         grid[i][j] = avg + offset
     }
 
-    fun normalized(): Array<Array<Double>> {
-        val max = grid.flatten().max()!!
-        val min = grid.flatten().min()!!
-        return grid.map { col ->
-            col.map { linMap(it, min, max, 0.0, 1.0) }.toTypedArray()
-        }.toTypedArray()
-    }
-
 }
 
 class HeightMap(val grid: Array<Array<Double>>) {
@@ -115,6 +107,7 @@ class HeightMap(val grid: Array<Array<Double>>) {
     val normalized get(): HeightMap {
         val max = grid.flatten().max()!!
         val min = grid.flatten().min()!!
+        println("max: $max, min: $min")
         return HeightMap(grid.map { col ->
             col.map { linMap(it, min, max, 0.0, 1.0) }.toTypedArray()
         }.toTypedArray())
@@ -123,21 +116,26 @@ class HeightMap(val grid: Array<Array<Double>>) {
     operator fun times(other: HeightMap): HeightMap {
         return HeightMap((0 until width).map { i ->
             (0 until width).map { j ->
-                this[i, j] * other[i, j]
+                this[i][j] * other[i][j]
             }
         })
     }
 
-    operator fun get(i: Int, j: Int): Double {
-        return grid[i][j]
+    operator fun get(i: Int): Array<Double> {
+        return grid[i]
     }
 
+    /**
+     * Interpolate the data.
+     * @param x A number in [0, 1]
+     * @param y A number in [0, 1]
+     */
     operator fun get(x: Double, y: Double): Double {
         // Numbers and the cells
-        val i = x * (grid.size - 1) / width
-        val j = y * (grid.size - 1) / width
-        val i1 = x.toInt()
-        val j1 = y.toInt()
+        val i = x * (width - 1)
+        val j = y * (width - 1)
+        val i1 = i.toInt()
+        val j1 = j.toInt()
         val i2 = i1 + 1
         val j2 = j1 + 1
 
@@ -154,27 +152,13 @@ class HeightMap(val grid: Array<Array<Double>>) {
 /**
  * Takes a terrain height map and turns it into a [World].
  */
-class MapToHeight(val world: World, val grid: Array<Array<Double>>) {
-
-    val width = world.width
+class MapToHeight(val world: World, val grid: HeightMap) {
 
     fun doHeightMap() {
-        val data = world.forEach {
-            // Numbers and the cells
-            val x = it.i.toDouble() * (grid.size - 1) / width
-            val y = it.j.toDouble() * (grid.size - 1) / width
-            val i1 = x.toInt()
-            val j1 = y.toInt()
-            val i2 = i1 + 1
-            val j2 = j1 + 1
-
-            // Get the sides
-            val s1 = linMap(x, i1.toDouble(), i2.toDouble(), grid[i1][j1], grid[i2][j1])
-            val s2 = linMap(x, i1.toDouble(), i2.toDouble(), grid[i1][j2], grid[i2][j1])
-
+        world.forEach {
             // Interpolate the values at the sides
-            val h = linMap(y, j1.toDouble(), j2.toDouble(), s1, s2)
-
+            val h = grid[it.i.toDouble() / world.width, it.j.toDouble() / world.height]
+            //println("${it.i.toDouble() / world.width}")
             val tile = it.tile!!
             tile.terrain = when {
                 h > 0.85 -> Terrains.mountains
@@ -188,7 +172,10 @@ class MapToHeight(val world: World, val grid: Array<Array<Double>>) {
     }
 }
 
-class VegetationGenerator(val world: World, val height: Array<Array<Double>>, val rainfall: Array<Array<Double>>) {
+/**
+ * Populate the world with vegetation. Assumes that lower areas get more water.
+ */
+class VegetationGenerator(val world: World, val height: HeightMap, val rainfall: HeightMap) {
 
 }
 
@@ -197,10 +184,12 @@ fun main(args: Array<String>) {
     val g = DiamondSquareHeightGenerator(3, seed = 0)
     //println(g.getDiamonds(0))
     g.generate()
-    g.normalized().forEach { col ->
+    val data = HeightMap(g.grid).normalized
+    data.grid.forEach { col ->
         col.forEach {
             print("%.2f\t".format(it))
         }
         println()
     }
+    println(data[0.0, 0.0])
 }
