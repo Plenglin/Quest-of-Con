@@ -2,7 +2,6 @@ package io.github.plenglin.questofcon.game.grid
 
 import io.github.plenglin.questofcon.linMap
 import java.util.*
-import javax.swing.plaf.multi.MultiOptionPaneUI
 
 
 class DiamondSquareHeightGenerator(scale: Int, val initialOffsets: Double = 0.5, val iterativeRescale: Double = 0.5, seed: Long = 0) {
@@ -132,11 +131,13 @@ class MapToHeight(val world: World, val grid: Array<Array<Double>>) {
             val h = linMap(y, j1.toDouble(), j2.toDouble(), s1, s2)
 
             val tile = it.tile!!
-            when {
-                h > 0.9 -> tile.terrain = Terrains.mountains
-                h > 0.65 -> tile.terrain = Terrains.hills
-                h > 0.25 -> tile.terrain = Terrains.grass
-                else -> tile.terrain = Terrains.plains
+            tile.terrain = when {
+                h > 0.85 -> Terrains.mountains
+                h > 0.65 -> Terrains.hills
+                h > 0.25 -> Terrains.grass
+                h > 0.15 -> Terrains.lowlands
+                //h > 0.15 -> Terrains.desert
+                else -> Terrains.water
             }
         }
     }
