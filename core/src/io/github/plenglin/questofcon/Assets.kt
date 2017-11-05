@@ -33,6 +33,20 @@ enum class TerrainTextures(simple: Boolean = false) {
     }
 }
 
+enum class PawnTextures {
+    ARTILLERY, DEFENDER, DRILLMECH, GRUNT, KANGAROOBOT, SCOUT, TANKDESTR;
+
+    val path = "sprites/pawn/$name.png"
+
+    fun load() = manager.load<Texture>(path)
+    operator fun invoke() = manager.getAsset<Texture>(path)
+
+    companion object {
+        var manager: AssetManager = Assets.manager
+
+    }
+}
+
 enum class Textures(dir: String) {
     HEADQUARTERS("building"), MINE("building"), FACTORY("building");
 

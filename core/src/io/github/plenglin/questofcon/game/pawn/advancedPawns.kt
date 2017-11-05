@@ -1,11 +1,12 @@
 package io.github.plenglin.questofcon.game.pawn
 
 import com.badlogic.gdx.graphics.Color
+import io.github.plenglin.questofcon.PawnTextures
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 
 
-class PawnArtillery(team: Team, pos: WorldCoords) : Pawn("Bertha", team, pos, 3, 1, Color.BLACK) {
+class PawnArtillery(team: Team, pos: WorldCoords) : Pawn("Bertha", team, pos, 3, 1, PawnTextures.ARTILLERY) {
 
     override fun damageTo(coords: WorldCoords): Int = damage
 
@@ -40,7 +41,7 @@ class PawnArtillery(team: Team, pos: WorldCoords) : Pawn("Bertha", team, pos, 3,
     }
 }
 
-class PawnKnight(team: Team, pos: WorldCoords) : Pawn("KangarooBot", team, pos, 5, 1, Color.PINK) {
+class PawnKnight(team: Team, pos: WorldCoords) : Pawn("KangarooBot", team, pos, 5, 1, PawnTextures.KANGAROOBOT) {
 
     override fun damageTo(coords: WorldCoords): Int = damage
 

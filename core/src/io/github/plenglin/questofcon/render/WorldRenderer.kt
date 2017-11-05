@@ -86,10 +86,8 @@ class WorldRenderer(val world: World) {
                     }
                 }
             }
-            batch.end()
 
             // Draw pawns
-            shape.begin(ShapeRenderer.ShapeType.Filled)
             for (i in (height - 1) downTo 0) {
                 val x = i.toFloat()
 
@@ -100,20 +98,19 @@ class WorldRenderer(val world: World) {
                         val y = j.toFloat()
 
                         // Team outline
-                        shape.color = pawn.team.color
-                        shape.circle(x + 0.5f, y + 0.5f, 0.35f, 16)
-
-                        // Type infill
-                        shape.color = pawn.color
-                        shape.circle(x + 0.5f, y + 0.5f, 0.3f, 16)
+                        batch.color = Color.WHITE
+                        batch.draw(pawn.texture(), x, y, 1f, 1f)
+                        val color = pawn.team.color.cpy()
+                        //color.a = 0.5f
+                        batch.color = color
+                        batch.draw(pawn.texture(), x, y, 1f, 1f)
                     }
                 }
 
             }
+            batch.end()
 
         }
-
-        shape.end()
 
     }
 
