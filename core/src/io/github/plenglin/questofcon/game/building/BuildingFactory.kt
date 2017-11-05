@@ -13,8 +13,8 @@ class BuildingFactory(team: Team, pos: WorldCoords) : Building("factory", team, 
 
     override val texture: Texture = Textures.FACTORY()
 
-    override fun getActions(): List<Selectable> {
-        return super.getActions() + if (pos.tile!!.pawn == null) listOf(
+    override fun getRadialActions(): List<Selectable> {
+        return super.getRadialActions() + if (pos.tile!!.pawn == null) listOf(
             Selectable("Make", {
                 UI.stage.addActor(UnitSpawningDialog(GameData.spawnableUnits, UI.skin, pos, team))
             })

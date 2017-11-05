@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Texture
 import io.github.plenglin.questofcon.Assets
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
+import io.github.plenglin.questofcon.ui.*
 
 
 abstract class PawnCreator(val title: String, val cost: Int) {
@@ -98,6 +99,36 @@ abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val 
             attacksRemaining -= 1
         }
         return result
+    }
+
+    open fun getRadialActions(): List<Selectable> {
+
+        val actions = mutableListOf<Selectable>(Selectable("Disband $name", {
+            ConfirmationDialog("Disband $name", UI.skin, {
+                RadialMenuInputManager.selected.tile!!.pawn!!.health = 0
+            }).show(UI.stage)
+        }))
+
+        if (apRemaining > 0) {
+
+            actions.add(Selectable("Move $name", {
+                PawnActionInputManager.setPawnState(
+                        RadialMenuInputManager.selected.tile!!.pawn!!,
+                        PawnActionInputManager.State.MOVE
+                )
+            }))
+
+            if (attacksRemaining > 0) {
+                actions.add(Selectable("Attack with $name", {
+                    PawnActionInputManager.setPawnState(
+                            RadialMenuInputManager.selected.tile!!.pawn!!,
+                            PawnActionInputManager.State.ATTACK
+                    )
+                }))
+            }
+
+        }
+        return actions
     }
 
 }

@@ -184,25 +184,6 @@ object RadialMenuInputManager : KtxInputAdapter {
 
     lateinit var selected: WorldCoords
 
-    val move = Selectable("Move", {
-        PawnActionInputManager.setPawnState(
-                selected.tile!!.pawn!!,
-                PawnActionInputManager.State.MOVE
-        )
-    })
-    val attack = Selectable("Attack", {
-        PawnActionInputManager.setPawnState(
-                selected.tile!!.pawn!!,
-                PawnActionInputManager.State.ATTACK
-        )
-    })
-    val disband = Selectable("Disband", {
-        ConfirmationDialog("Disband Pawn", UI.skin, {
-            selected.tile!!.pawn!!.health = 0
-        }).show(UI.stage)
-    })
-
-
     private val radialMenu = UI.radialMenu
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
@@ -249,18 +230,12 @@ object RadialMenuInputManager : KtxInputAdapter {
 
             val pawn = selection.tile!!.pawn
             if (pawn != null && pawn.team == currentTeam) {
-                actions.add(disband)
-                if (pawn.apRemaining > 0) {
-                    actions.add(move)
-                    if (pawn.attacksRemaining > 0) {
-                        actions.add(attack)
-                    }
-                }
+                actions.addAll(pawn.getRadialActions())
             }
 
             val building = selection.tile.building
             if (building != null && building.team == currentTeam && building.enabled) {
-                actions.addAll(selection.tile.building!!.getActions())
+                actions.addAll(building.getRadialActions())
             }
             if (selection.tile.canBuildOn(currentTeam)) {
                 actions.add(Selectable("Build", {
