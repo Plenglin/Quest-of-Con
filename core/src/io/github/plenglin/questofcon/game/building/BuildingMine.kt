@@ -11,7 +11,7 @@ class BuildingMine(team: Team, pos: WorldCoords) : Building("Mine", team, pos, 5
 
     override fun getMoneyPerTurn(): Int = 50
 
-    companion object : BuildingCreator("Mine", 25) {
+    companion object : BuildingCreator("Mine", 250) {
 
         override fun createBuildingAt(team: Team, worldCoords: WorldCoords): Building {
             val building = BuildingMine(team, worldCoords)

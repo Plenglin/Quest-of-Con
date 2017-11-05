@@ -21,7 +21,7 @@ class BuildingFactory(team: Team, pos: WorldCoords) : Building("factory", team, 
         ) else emptyList()
     }
 
-    companion object : BuildingCreator("factory", 20) {
+    companion object : BuildingCreator("factory", 200) {
 
         override fun createBuildingAt(team: Team, worldCoords: WorldCoords): Building {
             val building = BuildingFactory(team, worldCoords)
