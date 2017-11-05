@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import io.github.plenglin.questofcon.Assets
-import io.github.plenglin.questofcon.PawnTextures
 import io.github.plenglin.questofcon.TerrainTextures
 import io.github.plenglin.questofcon.Textures
 import io.github.plenglin.questofcon.game.GameData
@@ -45,7 +44,7 @@ object GameScreen : KtxScreen {
     override fun show() {
         Textures.values().forEach { it.load() }
         TerrainTextures.values().forEach { it.load() }
-        PawnTextures.values().forEach { it.load() }
+        Assets.load()
         Assets.manager.finishLoading()
 
         batch = SpriteBatch()
@@ -78,7 +77,7 @@ object GameScreen : KtxScreen {
 
         UI.generateUI()
 
-        Gdx.input.inputProcessor = InputMultiplexer(UI.stage, MapControlInputManager, PawnActionInputManager, RadialMenuInputManager, GridSelectionInputManager)
+        Gdx.input.inputProcessor = InputMultiplexer(UI.stage, MapControlInputManager, PawnActionInputProcessor, RadialMenuInputManager, GridSelectionInputManager)
     }
 
     override fun render(delta: Float) {

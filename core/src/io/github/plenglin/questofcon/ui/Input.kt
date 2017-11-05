@@ -8,7 +8,6 @@ import io.github.plenglin.questofcon.Constants
 import io.github.plenglin.questofcon.game.building.BuildingHQ
 import io.github.plenglin.questofcon.game.grid.World
 import io.github.plenglin.questofcon.game.grid.WorldCoords
-import io.github.plenglin.questofcon.game.pawn.Pawn
 import io.github.plenglin.questofcon.render.ShadeSet
 import io.github.plenglin.questofcon.screen.GameScreen
 import ktx.app.KtxInputAdapter
@@ -182,26 +181,7 @@ object GridSelectionInputManager : KtxInputAdapter {
 
 object RadialMenuInputManager : KtxInputAdapter {
 
-    lateinit var selected: WorldCoords
-
-    val move = Selectable("Move", {
-        PawnActionInputManager.setPawnState(
-                selected.tile!!.pawn!!,
-                PawnActionInputManager.State.MOVE
-        )
-    })
-    val attack = Selectable("Attack", {
-        PawnActionInputManager.setPawnState(
-                selected.tile!!.pawn!!,
-                PawnActionInputManager.State.ATTACK
-        )
-    })
-    val disband = Selectable("Disband", {
-        ConfirmationDialog("Disband Pawn", UI.skin, {
-            selected.tile!!.pawn!!.health = 0
-        }).show(UI.stage)
-    })
-
+    lateinit var selectedCoord: WorldCoords
 
     private val radialMenu = UI.radialMenu
 
@@ -210,7 +190,7 @@ object RadialMenuInputManager : KtxInputAdapter {
             Input.Buttons.RIGHT -> {
                 val hov = GridSelectionInputManager.hovering
                 if (hov != null) {
-                    selected = hov
+                    selectedCoord = hov
                     radialMenu.items = getSelectables()
                     radialMenu.setPosition(screenX.toFloat(), UI.viewport.screenHeight - screenY.toFloat())
                     radialMenu.updateUI()
@@ -230,7 +210,7 @@ object RadialMenuInputManager : KtxInputAdapter {
             when (button) {
                 Input.Buttons.RIGHT -> {
                     val selected = radialMenu.getSelected((sx - radialMenu.x).toDouble(), (sy - radialMenu.y).toDouble())
-                    selected?.onSelected?.invoke()
+                    selected?.onSelected?.invoke(selectedCoord)
                     radialMenu.active = false
                     radialMenu.isVisible = false
                     return true
@@ -245,33 +225,34 @@ object RadialMenuInputManager : KtxInputAdapter {
         val selection = GridSelectionInputManager.hovering ?: return emptyList()
 
         if (currentTeam.hasBuiltHQ) {
+
             val actions = mutableListOf<Selectable>()
 
+            // Pawn actions
             val pawn = selection.tile!!.pawn
             if (pawn != null && pawn.team == currentTeam) {
-                actions.add(disband)
-                if (pawn.apRemaining > 0) {
-                    actions.add(move)
-                    if (pawn.attacksRemaining > 0) {
-                        actions.add(attack)
-                    }
-                }
+                actions.addAll(pawn.getRadialActions())
             }
 
+            // Building actions
             val building = selection.tile.building
             if (building != null && building.team == currentTeam && building.enabled) {
-                actions.addAll(selection.tile.building!!.getActions())
+                actions.addAll(building.getRadialActions())
             }
+
+            // Construction actions
             if (selection.tile.canBuildOn(currentTeam)) {
                 actions.add(Selectable("Build", {
                     BuildingSpawningDialog(
                             GameScreen.gameState.getCurrentTeam(),
                             UI.skin,
-                            GridSelectionInputManager.hovering!!
+                            it
                     ).show(UI.stage)
                 }))
             }
+
             return actions
+
         } else {
             return if (selection.tile?.canBuildOn(currentTeam) == true)
                 listOf(Selectable("Build HQ", {
@@ -279,127 +260,6 @@ object RadialMenuInputManager : KtxInputAdapter {
                 }))
             else emptyList()
         }
-    }
-
-}
-
-object PawnActionInputManager : KtxInputAdapter {
-
-    var state = State.NONE
-    lateinit var pawn: Pawn
-
-    private var shadeSet: ShadeSet? = null
-        set(value) {
-            GameScreen.shadeSets.remove(field)
-            if (value != null) {
-                GameScreen.shadeSets.add(value)
-            }
-            field = value
-        }
-
-    private var hoveringShadeSet: ShadeSet = ShadeSet(emptySet())
-    var movementData: Map<WorldCoords, Int> = mapOf()
-
-    fun setPawnState(pawn: Pawn, state: State) {
-        this.pawn = pawn
-        when (state) {
-            State.MOVE -> {
-                movementData = pawn.getMovableSquares()
-                selectionSet = movementData.keys
-                shadeSet = ShadeSet(selectionSet, Constants.movementColor)
-            }
-            State.ATTACK -> {
-                selectionSet = pawn.getAttackableSquares()
-                shadeSet = ShadeSet(selectionSet, Constants.attackColor)
-            }
-            else -> {
-                shadeSet = null
-                GameScreen.shadeSets.remove(hoveringShadeSet)
-            }
-        }
-        this.state = state
-    }
-
-    private lateinit var selectionSet: Set<WorldCoords>
-
-    override fun keyDown(keycode: Int): Boolean {
-        val pawn = GridSelectionInputManager.selection?.tile?.pawn ?: return false
-        if (pawn.team != GameScreen.gameState.getCurrentTeam() && pawn.apRemaining <= 0) {
-            return false
-        }
-        this.pawn = pawn
-        when (keycode) {
-            Input.Keys.Q -> {  // Attack
-                if (state == State.ATTACK) {
-                    setPawnState(pawn, State.NONE)
-                    return false
-                }
-                if (pawn.apRemaining > 0 && pawn.attacksRemaining > 0) {
-                    setPawnState(pawn, State.ATTACK)
-                }
-            }
-            Input.Keys.E -> {  // Move
-                if (state == State.MOVE) {
-                    setPawnState(pawn, State.NONE)
-                    return false
-                }
-                if (pawn.apRemaining > 0) {
-                    setPawnState(pawn, State.MOVE)
-                }
-            }
-            Input.Keys.ESCAPE -> {  // Stop what you're doing!
-                setPawnState(pawn, State.NONE)
-                return false
-            }
-        }
-
-        return true
-    }
-
-    override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        if (button == Input.Buttons.MIDDLE) {
-            return false
-        }
-        val hovering = GridSelectionInputManager.hovering ?: return false
-        when (state) {
-            State.NONE -> return false
-            State.ATTACK -> {
-                if (selectionSet.contains(hovering) && pawn.attemptAttack(hovering)) {
-                    UI.tileInfo.updateData()
-                    setPawnState(pawn, State.NONE)
-                    return true
-                }
-            }
-            State.MOVE -> {
-                if (selectionSet.contains(hovering)) {
-                    pawn.moveTo(hovering, movementData)
-                    setPawnState(pawn, State.NONE)
-                    return true
-                }
-            }
-        }
-        return false
-    }
-
-    override fun mouseMoved(screenX: Int, screenY: Int): Boolean {
-        if (state == State.ATTACK) {
-            val hovering = GridSelectionInputManager.hovering
-            GameScreen.shadeSets.remove(hoveringShadeSet)
-            if (hovering != null && selectionSet.contains(hovering)) {
-                hoveringShadeSet = ShadeSet(
-                        pawn.getTargetingRadius(hovering),
-                        mode = ShadeSet.INNER_LINES,
-                        shading = Constants.attackColor,
-                        lines = Constants.attackColor
-                )
-                GameScreen.shadeSets.add(hoveringShadeSet)
-            }
-        }
-        return false
-    }
-
-    enum class State {
-        NONE, MOVE, ATTACK
     }
 
 }

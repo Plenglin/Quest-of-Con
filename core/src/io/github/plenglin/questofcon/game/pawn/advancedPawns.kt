@@ -1,12 +1,11 @@
 package io.github.plenglin.questofcon.game.pawn
 
-import com.badlogic.gdx.graphics.Color
-import io.github.plenglin.questofcon.PawnTextures
+import io.github.plenglin.questofcon.Assets
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 
 
-class PawnArtillery(team: Team, pos: WorldCoords) : Pawn("Bertha", team, pos, 3, 1, PawnTextures.ARTILLERY) {
+class PawnArtillery(team: Team, pos: WorldCoords) : Pawn("Artillery", team, pos, 30, 1, { Assets[Assets.artillery] }) {
 
     override fun damageTo(coords: WorldCoords): Int = damage
 
@@ -25,9 +24,9 @@ class PawnArtillery(team: Team, pos: WorldCoords) : Pawn("Bertha", team, pos, 3,
         return true
     }
 
-    companion object : PawnCreator("Bertha", 50) {
+    companion object : PawnCreator("Artillery", 500) {
 
-        val damage = 15
+        val damage = 100
         val dmgRadius = 1
         val maxRange = 5
         val minRange = 3
@@ -41,7 +40,7 @@ class PawnArtillery(team: Team, pos: WorldCoords) : Pawn("Bertha", team, pos, 3,
     }
 }
 
-class PawnKnight(team: Team, pos: WorldCoords) : Pawn("KangarooBot", team, pos, 5, 1, PawnTextures.KANGAROOBOT) {
+class PawnKnight(team: Team, pos: WorldCoords) : Pawn("KangarooBot", team, pos, 50, 1, { Assets[Assets.kangaroobot] }) {
 
     override fun damageTo(coords: WorldCoords): Int = damage
 
@@ -78,11 +77,11 @@ class PawnKnight(team: Team, pos: WorldCoords) : Pawn("KangarooBot", team, pos, 
         return true
     }
 
-    companion object : PawnCreator("KangarooBot", 30) {
+    companion object : PawnCreator("KangarooBot", 300) {
 
         val distA = 3
         val distB = 2
-        val damage = 5
+        val damage = 50
         val dmgRadius = 1
 
         override fun createPawnAt(team: Team, worldCoords: WorldCoords): Pawn {

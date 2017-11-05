@@ -1,18 +1,19 @@
 package io.github.plenglin.questofcon.game.pawn
 
-import com.badlogic.gdx.graphics.Color
-import io.github.plenglin.questofcon.PawnTextures
+import com.badlogic.gdx.graphics.Texture
+import io.github.plenglin.questofcon.Assets
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
+import io.github.plenglin.questofcon.ui.*
 
 
-abstract class PawnCreator(val name: String, val cost: Int) {
+abstract class PawnCreator(val title: String, val cost: Int) {
 
     abstract fun createPawnAt(team: Team, worldCoords: WorldCoords): Pawn
 
 }
 
-abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val maxHealth: Int, val actionPoints: Int, val texture: PawnTextures) {
+abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val maxHealth: Int, val actionPoints: Int, val texture: () -> Texture) {
 
     open val maxAttacks = 1
     var attacksRemaining = 0
@@ -76,15 +77,24 @@ abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val 
      */
     abstract fun onAttack(coords: WorldCoords): Boolean
 
-    fun moveTo(coords: WorldCoords, movementData: Map<WorldCoords, Int>) {
-        moveTo(coords, movementData[coords]!!)
+    fun moveTo(coords: WorldCoords, movementData: Map<WorldCoords, Int>): Boolean {
+        val cost = movementData[coords]
+        if (cost != null) {
+            return moveTo(coords, cost)
+        } else {
+            return false
+        }
     }
 
-    fun moveTo(coords: WorldCoords, apCost: Int) {
-        apRemaining -= apCost
-        pos.tile!!.pawn = null  // clear old tile
-        coords.tile!!.pawn = this  // set new tile to this
-        pos = coords  // set this pawn's reference
+    fun moveTo(coords: WorldCoords, apCost: Int): Boolean {
+        if (apRemaining - apCost >= 0) {
+            apRemaining -= apCost
+            pos.tile!!.pawn = null  // clear old tile
+            coords.tile!!.pawn = this  // set new tile to this
+            pos = coords  // set this pawn's reference
+            return true
+        }
+        return false
     }
 
     open fun getProperties(): Map<String, Any> {
@@ -100,11 +110,41 @@ abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val 
         return result
     }
 
+    open fun getRadialActions(): List<Selectable> {
+
+        val actions = mutableListOf<Selectable>(Selectable("Disband $name", {
+            ConfirmationDialog("Disband $name", UI.skin, {
+                health = 0
+            }).show(UI.stage)
+        }))
+
+        if (apRemaining > 0) {
+
+            actions.add(Selectable("Move $name", {
+                PawnActionManager.beginMoving(this)
+            }))
+
+            if (attacksRemaining > 0) {
+                actions.add(Selectable("Attack with $name", {
+                    PawnActionManager.beginAttacking(this)
+                }))
+            }
+
+        }
+        return actions
+    }
+
 }
 
 
-class SimplePawnCreator(name: String, cost: Int, val maxHealth: Int, val attack: Int, val texture: PawnTextures, val actionPoints: Int = 3, val range: Int = 1, val maxAttacks: Int = 1) :
-        PawnCreator(name, cost) {
+class SimplePawnCreator(name: String, cost: Int) : PawnCreator(name, cost) {
+
+    var maxHealth: Int = 0
+    var attack: Int = 0
+    var texture: () -> Texture = { Assets.manager[Assets.missing] }
+    var actionPoints: Int = 3
+    var range: Int = 1
+    var maxAttacks: Int = 1
 
     override fun createPawnAt(team: Team, worldCoords: WorldCoords): Pawn {
         val pawn = SimplePawn(team, worldCoords)
@@ -115,7 +155,7 @@ class SimplePawnCreator(name: String, cost: Int, val maxHealth: Int, val attack:
     /**
      * A simple pawn that can be melee or ranged.
      */
-    inner class SimplePawn(team: Team, pos: WorldCoords) : Pawn(name, team, pos, maxHealth, actionPoints, texture) {
+    inner class SimplePawn(team: Team, pos: WorldCoords) : Pawn(title, team, pos, maxHealth, actionPoints, texture) {
 
         override fun damageTo(coords: WorldCoords): Int = attack
 

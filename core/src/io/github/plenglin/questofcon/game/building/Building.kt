@@ -33,14 +33,11 @@ abstract class Building(val name: String, var team: Team, var pos: WorldCoords, 
 
     open fun onTurnEnd() = Unit
 
-    open fun getActions(): List<Selectable> {
-        return listOf(Selectable("Demolish", {
-                ConfirmationDialog("Demolish", UI.skin, {
-                    health = 0
-                }).show(UI.stage)
-            })
-        )
-    }
+    open fun getRadialActions() = listOf(Selectable("Demolish $name", {
+        ConfirmationDialog("Demolish $name", UI.skin, {
+            health = 0
+        }).show(UI.stage)
+    }))
 
     open fun getProperties(): Map<String, Any> {
         val map = mutableMapOf("type" to name, "hp" to "$health/$maxHealth", "team" to team.name)

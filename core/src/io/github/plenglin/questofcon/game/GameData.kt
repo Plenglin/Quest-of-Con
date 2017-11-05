@@ -1,8 +1,6 @@
 package io.github.plenglin.questofcon.game
 
-import com.badlogic.gdx.graphics.Color
-import io.github.plenglin.questofcon.PawnTextures
-import io.github.plenglin.questofcon.game.GameData.grunt
+import io.github.plenglin.questofcon.Assets
 import io.github.plenglin.questofcon.game.building.BuildingCreator
 import io.github.plenglin.questofcon.game.building.BuildingFactory
 import io.github.plenglin.questofcon.game.building.BuildingMine
@@ -13,17 +11,53 @@ import io.github.plenglin.questofcon.game.pawn.SimplePawnCreator
 
 
 object GameData {
-    val grunt = SimplePawnCreator("grunt", 10, 3, 2, texture = PawnTextures.GRUNT)
-    val drill = SimplePawnCreator("drill mech", 20, 5, 4, texture = PawnTextures.DRILLMECH)
-    val beam = SimplePawnCreator("laser mech", 15, 3, 3, range = 2, texture = PawnTextures.BEAMMECH)
-    val sniper = SimplePawnCreator("tank destroyer", 30, 2, 5, texture = PawnTextures.TANKDESTR, actionPoints = 1, range = 4)
-    val defender = SimplePawnCreator("defender", 25, 10, 3, texture = PawnTextures.DEFENDER, actionPoints = 2)
-    val scout = SimplePawnCreator("scout", 15, 3, 2, actionPoints = 5, range = 2, texture = PawnTextures.SCOUT)
+
+    val grunt = SimplePawnCreator("grunt", 100).apply {
+        maxHealth = 30
+        attack = 20
+        texture = { Assets[Assets.grunt] }
+    }
+
+    val drill = SimplePawnCreator("drill mech", 150).apply {
+        attack = 40
+        maxHealth = 50
+        texture = { Assets[Assets.drillmech] }
+    }
+
+    val beam = SimplePawnCreator("laser mech", 150).apply {
+        attack = 30
+        maxHealth = 40
+        range = 2
+        texture = { Assets[Assets.beammech] }
+    }
+
+    val tankdes = SimplePawnCreator("tank destroyer", 300).apply {
+        attack = 50
+        maxHealth = 20
+        range = 4
+        actionPoints = 20
+        texture = { Assets[Assets.tankdestroyer] }
+    }
+
+    val defender = SimplePawnCreator("defender", 250).apply {
+        attack = 30
+        maxHealth = 100
+        actionPoints = 2
+        texture = { Assets[Assets.defender] }
+    }
+
+    val scout = SimplePawnCreator("scout", 200).apply {
+        attack = 20
+        maxHealth = 30
+        actionPoints = 5
+        range = 2
+        texture = { Assets[Assets.scout] }
+    }
 
     val spawnableUnits = listOf<PawnCreator>(
-            grunt, drill, beam, sniper, defender, scout,
+            grunt, drill, beam, tankdes, defender, scout,
             PawnArtillery, PawnKnight
-    ).sortedBy { it.name }
+    ).sortedBy { it.cost }
 
     val spawnableBuildings = listOf<BuildingCreator>(
             BuildingFactory, BuildingMine
