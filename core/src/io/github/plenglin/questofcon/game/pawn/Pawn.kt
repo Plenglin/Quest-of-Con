@@ -105,7 +105,7 @@ abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val 
 
         val actions = mutableListOf<Selectable>(Selectable("Disband $name", {
             ConfirmationDialog("Disband $name", UI.skin, {
-                RadialMenuInputManager.selected.tile!!.pawn!!.health = 0
+                health = 0
             }).show(UI.stage)
         }))
 
@@ -113,7 +113,7 @@ abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val 
 
             actions.add(Selectable("Move $name", {
                 PawnActionInputManager.setPawnState(
-                        RadialMenuInputManager.selected.tile!!.pawn!!,
+                        this,
                         PawnActionInputManager.State.MOVE
                 )
             }))
@@ -121,7 +121,7 @@ abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val 
             if (attacksRemaining > 0) {
                 actions.add(Selectable("Attack with $name", {
                     PawnActionInputManager.setPawnState(
-                            RadialMenuInputManager.selected.tile!!.pawn!!,
+                            this,
                             PawnActionInputManager.State.ATTACK
                     )
                 }))
@@ -129,6 +129,34 @@ abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val 
 
         }
         return actions
+    }
+
+    /**
+     * The action bound to the Q key
+     */
+    var primaryAction: () -> Boolean = {
+        if (apRemaining > 0 && attacksRemaining > 0) {
+            PawnActionInputManager.setPawnState(
+                    this,
+                    PawnActionInputManager.State.ATTACK
+            )
+            true
+        }
+        false
+    }
+
+    /**
+     * The action bound to the E key
+     */
+    var secondaryAction: () -> Boolean = {
+        if (apRemaining > 0) {
+            PawnActionInputManager.setPawnState(
+                    this,
+                    PawnActionInputManager.State.MOVE
+            )
+            true
+        }
+        false
     }
 
 }
