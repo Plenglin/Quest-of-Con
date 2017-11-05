@@ -5,7 +5,7 @@ import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 
 
-class PawnArtillery(team: Team, pos: WorldCoords) : Pawn("Bertha", team, pos, 3, 1, { Assets[Assets.artillery] }) {
+class PawnArtillery(team: Team, pos: WorldCoords) : Pawn("Artillery", team, pos, 3, 1, { Assets[Assets.artillery] }) {
 
     override fun damageTo(coords: WorldCoords): Int = damage
 
@@ -24,9 +24,9 @@ class PawnArtillery(team: Team, pos: WorldCoords) : Pawn("Bertha", team, pos, 3,
         return true
     }
 
-    companion object : PawnCreator("Bertha", 50) {
+    companion object : PawnCreator("Artillery", 50) {
 
-        val damage = 15
+        val damage = 10
         val dmgRadius = 1
         val maxRange = 5
         val minRange = 3

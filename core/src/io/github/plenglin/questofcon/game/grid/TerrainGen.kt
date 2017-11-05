@@ -158,15 +158,13 @@ class MapToHeight(val world: World, val grid: HeightMap) {
         world.forEach {
             // Interpolate the values at the sides
             val h = grid[it.i.toDouble() / world.width, it.j.toDouble() / world.height]
-            //println("${it.i.toDouble() / world.width}")
             val tile = it.tile!!
             tile.terrain = when {
                 h > 0.85 -> Terrains.mountains
                 h > 0.75 -> Terrains.bigHills
                 h > 0.65 -> Terrains.hills
                 h > 0.25 -> Terrains.grass
-                h > 0.15 -> Terrains.lowlands
-                //h > 0.15 -> Terrains.desert
+                h > 0.15 -> Terrains.sandy
                 else -> Terrains.water
             }
         }
@@ -183,7 +181,6 @@ class VegetationGenerator(val world: World, val height: HeightMap, val rainfall:
 fun main(args: Array<String>) {
     println("hello wurd")
     val g = DiamondSquareHeightGenerator(3, seed = 0)
-    //println(g.getDiamonds(0))
     g.generate()
     val data = HeightMap(g.grid).normalized
     data.grid.forEach { col ->

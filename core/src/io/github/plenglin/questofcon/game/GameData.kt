@@ -18,7 +18,7 @@ object GameData {
         texture = { Assets[Assets.grunt] }
     }
 
-    val drill = SimplePawnCreator("drill mech", 20).apply {
+    val drill = SimplePawnCreator("drill mech", 15).apply {
         attack = 4
         maxHealth = 5
         texture = { Assets[Assets.drillmech] }
@@ -31,7 +31,7 @@ object GameData {
         texture = { Assets[Assets.beammech] }
     }
 
-    val sniper = SimplePawnCreator("tank destroyer", 30).apply {
+    val tankdes = SimplePawnCreator("tank destroyer", 30).apply {
         attack = 5
         maxHealth = 2
         range = 4
@@ -46,7 +46,7 @@ object GameData {
         texture = { Assets[Assets.defender] }
     }
 
-    val scout = SimplePawnCreator("scout", 15).apply {
+    val scout = SimplePawnCreator("scout", 20).apply {
         attack = 2
         maxHealth = 3
         actionPoints = 5
@@ -55,9 +55,9 @@ object GameData {
     }
 
     val spawnableUnits = listOf<PawnCreator>(
-            grunt, drill, beam, sniper, defender, scout,
+            grunt, drill, beam, tankdes, defender, scout,
             PawnArtillery, PawnKnight
-    ).sortedBy { it.title }
+    ).sortedBy { it.cost }
 
     val spawnableBuildings = listOf<BuildingCreator>(
             BuildingFactory, BuildingMine
