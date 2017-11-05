@@ -14,7 +14,7 @@ class BuildingHQ(team: Team, pos: WorldCoords) : Building("Headquarters", team, 
 
     override fun getMoneyPerTurn(): Int = Constants.BASE_ECO
 
-    override fun getActions(): List<Selectable> {
+    override fun getRadialActions(): List<Selectable> {
         return emptyList()  // No demolishing the HQ!
     }
 

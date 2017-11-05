@@ -35,7 +35,6 @@ class Tile(var terrain: Terrain) {
         }
 
         if (pawn != null) {
-            println(pawn!!.team.name)
             pawn!!.health -= hp
             output = true
         }

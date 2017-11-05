@@ -9,19 +9,19 @@ import io.github.plenglin.questofcon.ui.Selectable
 import io.github.plenglin.questofcon.ui.UI
 import io.github.plenglin.questofcon.ui.UnitSpawningDialog
 
-class BuildingFactory(team: Team, pos: WorldCoords) : Building("factory", team, pos, 10) {
+class BuildingFactory(team: Team, pos: WorldCoords) : Building("factory", team, pos, 100) {
 
     override val texture: Texture = Textures.FACTORY()
 
-    override fun getActions(): List<Selectable> {
-        return super.getActions() + if (pos.tile!!.pawn == null) listOf(
+    override fun getRadialActions(): List<Selectable> {
+        return super.getRadialActions() + if (pos.tile!!.pawn == null) listOf(
             Selectable("Make", {
                 UI.stage.addActor(UnitSpawningDialog(GameData.spawnableUnits, UI.skin, pos, team))
             })
         ) else emptyList()
     }
 
-    companion object : BuildingCreator("factory", 20) {
+    companion object : BuildingCreator("factory", 200) {
 
         override fun createBuildingAt(team: Team, worldCoords: WorldCoords): Building {
             val building = BuildingFactory(team, worldCoords)

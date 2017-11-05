@@ -104,7 +104,6 @@ class RadialMenu(val skin: Skin, var radiusX: Float, var radiusY: Float) : Group
                     radiusX * Math.sin(angle).toFloat() - button.width / 2,
                     radiusY * Math.cos(angle).toFloat() - button.height / 2)
 
-
             button.isVisible = true
             button.debug = true
             addActor(button)
@@ -127,7 +126,8 @@ class RadialMenu(val skin: Skin, var radiusX: Float, var radiusY: Float) : Group
 
 }
 
-data class Selectable(val title: String, val onSelected: () -> Unit) {
+data class Selectable(val title: String, val onSelected: (WorldCoords) -> Unit) {
+
     override fun toString(): String {
         return "Selectable($title)"
     }
@@ -159,7 +159,7 @@ class UnitSpawningDialog(val units: List<PawnCreator>, skin: Skin, val worldCoor
             add(Label("Cost", skin))
             row()
             units.forEach { pawn ->
-                add(Label(pawn.name.capitalize(), skin))
+                add(Label(pawn.title.capitalize(), skin))
                 add(Label("$${pawn.cost}", skin))
                 add(TextButton("Spawn", skin).apply {
 
@@ -274,18 +274,13 @@ class ActionTooltip(skin: Skin) : Table(skin) {
     }
 
     fun updateData() {
-        val pawn: Pawn
-        try {
-            pawn = PawnActionInputManager.pawn
-        } catch (e: UninitializedPropertyAccessException) {
-            return
-        }
-        when (PawnActionInputManager.state) {
-            PawnActionInputManager.State.NONE -> this.isVisible = false
-            PawnActionInputManager.State.MOVE -> {
+        val pawn = PawnActionManager.pawn ?: return
+        when (PawnActionManager.state) {
+            PawnActionState.NONE -> this.isVisible = false
+            PawnActionState.MOVE -> {
                 val hov = GridSelectionInputManager.hovering
                 if (hov != null) {
-                    val cost = PawnActionInputManager.movementData[hov]
+                    val cost = PawnActionManager.movementSquares[hov]
                     if (cost != null) {
                         isVisible = true
                         a.setText(hov.tile!!.terrain.name.capitalize())
@@ -297,7 +292,7 @@ class ActionTooltip(skin: Skin) : Table(skin) {
                     }
                 }
             }
-            PawnActionInputManager.State.ATTACK -> {
+            PawnActionState.ATTACK -> {
                 val target = GridSelectionInputManager.hovering
                 if (target != null) {
                     isVisible = true

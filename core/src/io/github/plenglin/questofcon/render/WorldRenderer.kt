@@ -1,6 +1,8 @@
 package io.github.plenglin.questofcon.render
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import io.github.plenglin.questofcon.game.grid.World
@@ -18,15 +20,20 @@ class WorldRenderer(val world: World) {
 
         world.apply {
             // Draw the terrain
-            shape.begin(ShapeRenderer.ShapeType.Filled)
+            batch.begin()
+            batch.color = Color.WHITE
             grid.forEachIndexed { i, col ->
                 col.forEachIndexed { j, tile ->
-                    shape.color = tile.terrain.color
-                    shape.rect(i.toFloat(), j.toFloat(), 1f, 1f)
+                    batch.draw(tile.terrain.texture.bg(), i.toFloat(), j.toFloat(), 1f, 1f)
+                    if (tile.getTeam() != null) {
+                        batch.draw(tile.terrain.texture.fg(), i.toFloat(), j.toFloat(), 1f, 1f)
+                    }
                 }
             }
+            batch.end()
 
             // Draw the grid if necessary
+            shape.begin(ShapeRenderer.ShapeType.Filled)
             if (drawGrid) {
                 shape.color = Color(0f, 0.5f, 1f, 0.5f)
                 shape.set(ShapeRenderer.ShapeType.Line)
@@ -42,11 +49,15 @@ class WorldRenderer(val world: World) {
                     shape.line(0f, y, width.toFloat(), y)
                 }
             }
+            shape.end()
 
             // Draw in the selection sets
+            Gdx.gl20.glEnable(GL20.GL_BLEND);
+            Gdx.gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+            shape.begin()
             paints.forEach { it.draw(shape) }
-
             shape.end()
+            Gdx.gl20.glDisable(GL20.GL_BLEND);
 
             // Draw buildings
             batch.enableBlending()
@@ -60,10 +71,10 @@ class WorldRenderer(val world: World) {
                         val y = j.toFloat()
 
                         batch.color = Color.WHITE
-                        batch.draw(building.texture, x, y, 1f, 1f)
+                        batch.draw(building.texture, x + 0.1f, y + 0.1f, 0.8f, 0.8f)
                         val c = building.team.color
                         batch.setColor(c.r, c.g, c.b, 0.5f)
-                        batch.draw(building.texture, x, y, 1f, 1f)
+                        batch.draw(building.texture, x + 0.1f, y + 0.1f, 0.8f, 0.8f)
                         /*
                         building.sprite.apply {
                             texture = building.texture
@@ -74,10 +85,8 @@ class WorldRenderer(val world: World) {
                     }
                 }
             }
-            batch.end()
 
             // Draw pawns
-            shape.begin(ShapeRenderer.ShapeType.Filled)
             for (i in (height - 1) downTo 0) {
                 val x = i.toFloat()
 
@@ -88,20 +97,19 @@ class WorldRenderer(val world: World) {
                         val y = j.toFloat()
 
                         // Team outline
-                        shape.color = pawn.team.color
-                        shape.circle(x + 0.5f, y + 0.5f, 0.35f, 16)
-
-                        // Type infill
-                        shape.color = pawn.color
-                        shape.circle(x + 0.5f, y + 0.5f, 0.3f, 16)
+                        batch.color = Color.WHITE
+                        batch.draw(pawn.texture(), x, y, 1f, 1f)
+                        val color = pawn.team.color.cpy()
+                        color.a = 0.5f
+                        batch.color = color
+                        batch.draw(pawn.texture(), x, y, 1f, 1f)
                     }
                 }
 
             }
+            batch.end()
 
         }
-
-        shape.end()
 
     }
 
@@ -116,10 +124,10 @@ data class ShadeSet(
     fun draw(shape: ShapeRenderer) {
 
         // Draw shading
-        shape.color = shading
         shape.set(ShapeRenderer.ShapeType.Filled)
         if (mode and SHADE > 0) {
             coords.forEach {
+                shape.color = shading
                 shape.rect(it.i.toFloat(), it.j.toFloat(), 1f, 1f)
             }
         }
