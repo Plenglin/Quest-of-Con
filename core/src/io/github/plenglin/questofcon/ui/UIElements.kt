@@ -159,7 +159,7 @@ class UnitSpawningDialog(val units: List<PawnCreator>, skin: Skin, val worldCoor
             add(Label("Cost", skin))
             row()
             units.forEach { pawn ->
-                add(Label(pawn.name.capitalize(), skin))
+                add(Label(pawn.title.capitalize(), skin))
                 add(Label("$${pawn.cost}", skin))
                 add(TextButton("Spawn", skin).apply {
 

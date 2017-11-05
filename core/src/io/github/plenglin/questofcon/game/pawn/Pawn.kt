@@ -1,18 +1,18 @@
 package io.github.plenglin.questofcon.game.pawn
 
-import com.badlogic.gdx.graphics.Color
-import io.github.plenglin.questofcon.PawnTextures
+import com.badlogic.gdx.graphics.Texture
+import io.github.plenglin.questofcon.Assets
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 
 
-abstract class PawnCreator(val name: String, val cost: Int) {
+abstract class PawnCreator(val title: String, val cost: Int) {
 
     abstract fun createPawnAt(team: Team, worldCoords: WorldCoords): Pawn
 
 }
 
-abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val maxHealth: Int, val actionPoints: Int, val texture: PawnTextures) {
+abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val maxHealth: Int, val actionPoints: Int, val texture: () -> Texture) {
 
     open val maxAttacks = 1
     var attacksRemaining = 0
@@ -103,8 +103,14 @@ abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val 
 }
 
 
-class SimplePawnCreator(name: String, cost: Int, val maxHealth: Int, val attack: Int, val texture: PawnTextures, val actionPoints: Int = 3, val range: Int = 1, val maxAttacks: Int = 1) :
-        PawnCreator(name, cost) {
+class SimplePawnCreator(name: String, cost: Int) : PawnCreator(name, cost) {
+
+    var maxHealth: Int = 0
+    var attack: Int = 0
+    var texture: () -> Texture = { Assets.manager[Assets.missing] }
+    var actionPoints: Int = 3
+    var range: Int = 1
+    var maxAttacks: Int = 1
 
     override fun createPawnAt(team: Team, worldCoords: WorldCoords): Pawn {
         val pawn = SimplePawn(team, worldCoords)
@@ -115,7 +121,7 @@ class SimplePawnCreator(name: String, cost: Int, val maxHealth: Int, val attack:
     /**
      * A simple pawn that can be melee or ranged.
      */
-    inner class SimplePawn(team: Team, pos: WorldCoords) : Pawn(name, team, pos, maxHealth, actionPoints, texture) {
+    inner class SimplePawn(team: Team, pos: WorldCoords) : Pawn(title, team, pos, maxHealth, actionPoints, texture) {
 
         override fun damageTo(coords: WorldCoords): Int = attack
 
