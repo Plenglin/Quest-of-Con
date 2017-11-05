@@ -55,7 +55,6 @@ class WorldRenderer(val world: World) {
             Gdx.gl20.glEnable(GL20.GL_BLEND);
             Gdx.gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
             shape.begin()
-            println(paints.size)
             paints.forEach { it.draw(shape) }
             shape.end()
             Gdx.gl20.glDisable(GL20.GL_BLEND);
@@ -101,7 +100,7 @@ class WorldRenderer(val world: World) {
                         batch.color = Color.WHITE
                         batch.draw(pawn.texture(), x, y, 1f, 1f)
                         val color = pawn.team.color.cpy()
-                        //color.a = 0.5f
+                        color.a = 0.5f
                         batch.color = color
                         batch.draw(pawn.texture(), x, y, 1f, 1f)
                     }

@@ -34,7 +34,7 @@ enum class TerrainTextures(simple: Boolean = false) {
 }
 
 enum class PawnTextures {
-    ARTILLERY, DEFENDER, DRILLMECH, GRUNT, KANGAROOBOT, SCOUT, TANKDESTR;
+    ARTILLERY, DEFENDER, DRILLMECH, GRUNT, KANGAROOBOT, SCOUT, TANKDESTR, BEAMMECH;
 
     val path = "sprites/pawn/$name.png"
 
