@@ -5,11 +5,11 @@ import io.github.plenglin.questofcon.Textures
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 
-class BuildingMine(team: Team, pos: WorldCoords) : Building("Mine", team, pos, 5) {
+class BuildingMine(team: Team, pos: WorldCoords) : Building("Mine", team, pos, 50) {
 
     override val texture: Texture = Textures.MINE()
 
-    override fun getMoneyPerTurn(): Int = 5
+    override fun getMoneyPerTurn(): Int = 50
 
     companion object : BuildingCreator("Mine", 25) {
 

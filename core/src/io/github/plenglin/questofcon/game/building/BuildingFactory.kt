@@ -9,7 +9,7 @@ import io.github.plenglin.questofcon.ui.Selectable
 import io.github.plenglin.questofcon.ui.UI
 import io.github.plenglin.questofcon.ui.UnitSpawningDialog
 
-class BuildingFactory(team: Team, pos: WorldCoords) : Building("factory", team, pos, 10) {
+class BuildingFactory(team: Team, pos: WorldCoords) : Building("factory", team, pos, 100) {
 
     override val texture: Texture = Textures.FACTORY()
 

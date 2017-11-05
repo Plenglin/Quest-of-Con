@@ -12,43 +12,43 @@ import io.github.plenglin.questofcon.game.pawn.SimplePawnCreator
 
 object GameData {
 
-    val grunt = SimplePawnCreator("grunt", 10).apply {
-        maxHealth = 3
-        attack = 2
+    val grunt = SimplePawnCreator("grunt", 100).apply {
+        maxHealth = 30
+        attack = 20
         texture = { Assets[Assets.grunt] }
     }
 
-    val drill = SimplePawnCreator("drill mech", 15).apply {
-        attack = 4
-        maxHealth = 5
+    val drill = SimplePawnCreator("drill mech", 150).apply {
+        attack = 40
+        maxHealth = 50
         texture = { Assets[Assets.drillmech] }
     }
 
-    val beam = SimplePawnCreator("laser mech", 15).apply {
-        attack = 3
-        maxHealth = 4
+    val beam = SimplePawnCreator("laser mech", 150).apply {
+        attack = 30
+        maxHealth = 40
         range = 2
         texture = { Assets[Assets.beammech] }
     }
 
-    val tankdes = SimplePawnCreator("tank destroyer", 30).apply {
-        attack = 5
-        maxHealth = 2
+    val tankdes = SimplePawnCreator("tank destroyer", 300).apply {
+        attack = 50
+        maxHealth = 20
         range = 4
-        actionPoints = 2
+        actionPoints = 20
         texture = { Assets[Assets.tankdestroyer] }
     }
 
-    val defender = SimplePawnCreator("defender", 25).apply {
-        attack = 3
-        maxHealth = 10
+    val defender = SimplePawnCreator("defender", 250).apply {
+        attack = 30
+        maxHealth = 100
         actionPoints = 2
         texture = { Assets[Assets.defender] }
     }
 
-    val scout = SimplePawnCreator("scout", 20).apply {
-        attack = 2
-        maxHealth = 3
+    val scout = SimplePawnCreator("scout", 200).apply {
+        attack = 20
+        maxHealth = 30
         actionPoints = 5
         range = 2
         texture = { Assets[Assets.scout] }
