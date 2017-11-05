@@ -1,6 +1,7 @@
 package io.github.plenglin.questofcon.game.pawn
 
 import com.badlogic.gdx.graphics.Color
+import io.github.plenglin.questofcon.PawnTextures
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 
@@ -11,7 +12,7 @@ abstract class PawnCreator(val name: String, val cost: Int) {
 
 }
 
-abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val maxHealth: Int, val actionPoints: Int, val color: Color) {
+abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val maxHealth: Int, val actionPoints: Int, val texture: PawnTextures) {
 
     open val maxAttacks = 1
     var attacksRemaining = 0
@@ -102,7 +103,7 @@ abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val 
 }
 
 
-class SimplePawnCreator(name: String, cost: Int, val maxHealth: Int, val attack: Int, val color: Color, val actionPoints: Int = 3, val range: Int = 1, val maxAttacks: Int = 1) :
+class SimplePawnCreator(name: String, cost: Int, val maxHealth: Int, val attack: Int, val texture: PawnTextures, val actionPoints: Int = 3, val range: Int = 1, val maxAttacks: Int = 1) :
         PawnCreator(name, cost) {
 
     override fun createPawnAt(team: Team, worldCoords: WorldCoords): Pawn {
@@ -114,7 +115,7 @@ class SimplePawnCreator(name: String, cost: Int, val maxHealth: Int, val attack:
     /**
      * A simple pawn that can be melee or ranged.
      */
-    inner class SimplePawn(team: Team, pos: WorldCoords) : Pawn(name, team, pos, maxHealth, actionPoints, color) {
+    inner class SimplePawn(team: Team, pos: WorldCoords) : Pawn(name, team, pos, maxHealth, actionPoints, texture) {
 
         override fun damageTo(coords: WorldCoords): Int = attack
 
