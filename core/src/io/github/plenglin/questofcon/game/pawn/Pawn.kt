@@ -77,15 +77,24 @@ abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val 
      */
     abstract fun onAttack(coords: WorldCoords): Boolean
 
-    fun moveTo(coords: WorldCoords, movementData: Map<WorldCoords, Int>) {
-        moveTo(coords, movementData[coords]!!)
+    fun moveTo(coords: WorldCoords, movementData: Map<WorldCoords, Int>): Boolean {
+        val cost = movementData[coords]
+        if (cost != null) {
+            return moveTo(coords, cost)
+        } else {
+            return false
+        }
     }
 
-    fun moveTo(coords: WorldCoords, apCost: Int) {
-        apRemaining -= apCost
-        pos.tile!!.pawn = null  // clear old tile
-        coords.tile!!.pawn = this  // set new tile to this
-        pos = coords  // set this pawn's reference
+    fun moveTo(coords: WorldCoords, apCost: Int): Boolean {
+        if (apRemaining - apCost >= 0) {
+            apRemaining -= apCost
+            pos.tile!!.pawn = null  // clear old tile
+            coords.tile!!.pawn = this  // set new tile to this
+            pos = coords  // set this pawn's reference
+            return true
+        }
+        return false
     }
 
     open fun getProperties(): Map<String, Any> {
