@@ -104,7 +104,6 @@ class RadialMenu(val skin: Skin, var radiusX: Float, var radiusY: Float) : Group
                     radiusX * Math.sin(angle).toFloat() - button.width / 2,
                     radiusY * Math.cos(angle).toFloat() - button.height / 2)
 
-
             button.isVisible = true
             button.debug = true
             addActor(button)
@@ -127,7 +126,8 @@ class RadialMenu(val skin: Skin, var radiusX: Float, var radiusY: Float) : Group
 
 }
 
-data class Selectable(val title: String, val onSelected: () -> Unit) {
+data class Selectable(val title: String, val onSelected: (WorldCoords) -> Unit) {
+
     override fun toString(): String {
         return "Selectable($title)"
     }

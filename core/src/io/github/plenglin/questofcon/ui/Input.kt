@@ -8,7 +8,6 @@ import io.github.plenglin.questofcon.Constants
 import io.github.plenglin.questofcon.game.building.BuildingHQ
 import io.github.plenglin.questofcon.game.grid.World
 import io.github.plenglin.questofcon.game.grid.WorldCoords
-import io.github.plenglin.questofcon.game.pawn.Pawn
 import io.github.plenglin.questofcon.render.ShadeSet
 import io.github.plenglin.questofcon.screen.GameScreen
 import ktx.app.KtxInputAdapter
@@ -182,7 +181,7 @@ object GridSelectionInputManager : KtxInputAdapter {
 
 object RadialMenuInputManager : KtxInputAdapter {
 
-    lateinit var selected: WorldCoords
+    lateinit var selectedCoord: WorldCoords
 
     private val radialMenu = UI.radialMenu
 
@@ -191,7 +190,7 @@ object RadialMenuInputManager : KtxInputAdapter {
             Input.Buttons.RIGHT -> {
                 val hov = GridSelectionInputManager.hovering
                 if (hov != null) {
-                    selected = hov
+                    selectedCoord = hov
                     radialMenu.items = getSelectables()
                     radialMenu.setPosition(screenX.toFloat(), UI.viewport.screenHeight - screenY.toFloat())
                     radialMenu.updateUI()
@@ -211,7 +210,7 @@ object RadialMenuInputManager : KtxInputAdapter {
             when (button) {
                 Input.Buttons.RIGHT -> {
                     val selected = radialMenu.getSelected((sx - radialMenu.x).toDouble(), (sy - radialMenu.y).toDouble())
-                    selected?.onSelected?.invoke()
+                    selected?.onSelected?.invoke(selectedCoord)
                     radialMenu.active = false
                     radialMenu.isVisible = false
                     return true
@@ -226,27 +225,34 @@ object RadialMenuInputManager : KtxInputAdapter {
         val selection = GridSelectionInputManager.hovering ?: return emptyList()
 
         if (currentTeam.hasBuiltHQ) {
+
             val actions = mutableListOf<Selectable>()
 
+            // Pawn actions
             val pawn = selection.tile!!.pawn
             if (pawn != null && pawn.team == currentTeam) {
                 actions.addAll(pawn.getRadialActions())
             }
 
+            // Building actions
             val building = selection.tile.building
             if (building != null && building.team == currentTeam && building.enabled) {
                 actions.addAll(building.getRadialActions())
             }
+
+            // Construction actions
             if (selection.tile.canBuildOn(currentTeam)) {
                 actions.add(Selectable("Build", {
                     BuildingSpawningDialog(
                             GameScreen.gameState.getCurrentTeam(),
                             UI.skin,
-                            GridSelectionInputManager.hovering!!
+                            it
                     ).show(UI.stage)
                 }))
             }
+
             return actions
+
         } else {
             return if (selection.tile?.canBuildOn(currentTeam) == true)
                 listOf(Selectable("Build HQ", {
