@@ -274,18 +274,13 @@ class ActionTooltip(skin: Skin) : Table(skin) {
     }
 
     fun updateData() {
-        val pawn: Pawn
-        try {
-            pawn = PawnActionInputManager.pawn
-        } catch (e: UninitializedPropertyAccessException) {
-            return
-        }
-        when (PawnActionInputManager.state) {
-            PawnActionInputManager.State.NONE -> this.isVisible = false
-            PawnActionInputManager.State.MOVE -> {
+        val pawn = PawnActionManager.pawn ?: return
+        when (PawnActionManager.state) {
+            PawnActionState.NONE -> this.isVisible = false
+            PawnActionState.MOVE -> {
                 val hov = GridSelectionInputManager.hovering
                 if (hov != null) {
-                    val cost = PawnActionInputManager.movementData[hov]
+                    val cost = PawnActionManager.movementSquares[hov]
                     if (cost != null) {
                         isVisible = true
                         a.setText(hov.tile!!.terrain.name.capitalize())
@@ -297,7 +292,7 @@ class ActionTooltip(skin: Skin) : Table(skin) {
                     }
                 }
             }
-            PawnActionInputManager.State.ATTACK -> {
+            PawnActionState.ATTACK -> {
                 val target = GridSelectionInputManager.hovering
                 if (target != null) {
                     isVisible = true

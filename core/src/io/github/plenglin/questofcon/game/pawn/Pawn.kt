@@ -121,51 +121,17 @@ abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val 
         if (apRemaining > 0) {
 
             actions.add(Selectable("Move $name", {
-                PawnActionInputManager.setPawnState(
-                        this,
-                        PawnActionInputManager.State.MOVE
-                )
+                PawnActionManager.beginMoving(this)
             }))
 
             if (attacksRemaining > 0) {
                 actions.add(Selectable("Attack with $name", {
-                    PawnActionInputManager.setPawnState(
-                            this,
-                            PawnActionInputManager.State.ATTACK
-                    )
+                    PawnActionManager.beginAttacking(this)
                 }))
             }
 
         }
         return actions
-    }
-
-    /**
-     * The action bound to the Q key
-     */
-    var primaryAction: () -> Boolean = {
-        if (apRemaining > 0 && attacksRemaining > 0) {
-            PawnActionInputManager.setPawnState(
-                    this,
-                    PawnActionInputManager.State.ATTACK
-            )
-            true
-        }
-        false
-    }
-
-    /**
-     * The action bound to the E key
-     */
-    var secondaryAction: () -> Boolean = {
-        if (apRemaining > 0) {
-            PawnActionInputManager.setPawnState(
-                    this,
-                    PawnActionInputManager.State.MOVE
-            )
-            true
-        }
-        false
     }
 
 }
