@@ -22,7 +22,7 @@ object PawnActionManager {
     var pawn: Pawn? = null
 
     fun beginMoving(pawn: Pawn) {
-        UI.tileInfo.isVisible = true
+        UI.pawnTooltip.isVisible = true
         if (pawn != this.pawn || state != PawnActionState.MOVE) {
             cleanAction()
             this.pawn = pawn
@@ -30,7 +30,7 @@ object PawnActionManager {
             primaryShadeSet = ShadeSet(
                     movementSquares.keys,
                     mode = ShadeSet.SHADE,
-                    shading = Constants.hoveringColor
+                    shading = Constants.movementColor
             )
             GameScreen.shadeSets.add(primaryShadeSet)
             state = PawnActionState.MOVE
@@ -48,7 +48,7 @@ object PawnActionManager {
     }
 
     fun beginAttacking(pawn: Pawn) {
-        UI.tileInfo.isVisible = true
+        UI.pawnTooltip.isVisible = true
         if (pawn != this.pawn || state != PawnActionState.ATTACK) {
             cleanAction()
             this.pawn = pawn
@@ -89,7 +89,7 @@ object PawnActionManager {
         state = PawnActionState.NONE
         GameScreen.shadeSets.remove(hoveringShadeSet)
         GameScreen.shadeSets.remove(primaryShadeSet)
-        UI.tileInfo.isVisible = false
+        UI.pawnTooltip.isVisible = false
     }
 
 }
@@ -108,10 +108,14 @@ object PawnActionInputProcessor : KtxInputAdapter {
         }
         when (keycode) {
             Input.Keys.Q -> {  // Attack
-                PawnActionManager.beginAttacking(pawn)
+                if (pawn.attacksRemaining > 0 && pawn.actionPoints > 0) {
+                    PawnActionManager.beginAttacking(pawn)
+                }
             }
             Input.Keys.E -> {  // Move
-                PawnActionManager.beginMoving(pawn)
+                if (pawn.actionPoints > 0) {
+                    PawnActionManager.beginMoving(pawn)
+                }
             }
             Input.Keys.ESCAPE -> {  // Stop what you're doing!
                 PawnActionManager.cleanAction()
