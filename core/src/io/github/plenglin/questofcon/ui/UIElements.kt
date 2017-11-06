@@ -43,7 +43,7 @@ class TileInfoPanel(skin: Skin) : Table(skin) {
     fun updateData() {
         val coord = target
         if (coord?.tile != null) {
-            titleLabel.setText("${coord.tile.elevation} high ${coord.tile.terrain.name.capitalize()} at ${coord.i}, ${coord.j}  (Cost: ${coord.tile.terrain.movementCost})")
+            titleLabel.setText("${coord.tile.elevation} high ${coord.tile.biome.name.capitalize()} at ${coord.i}, ${coord.j}  (Cost: ${coord.tile.biome.movementCost})")
 
             val pawn = coord.tile.pawn
             this.pawn.data = pawn?.getProperties() ?: emptyMap()
@@ -282,7 +282,7 @@ class ActionTooltip(skin: Skin) : Table(skin) {
                     val cost = PawnActionManager.movementSquares[hov]
                     if (cost != null) {
                         isVisible = true
-                        a.setText(hov.tile!!.terrain.name.capitalize())
+                        a.setText(hov.tile!!.biome.name.capitalize())
                         b.setText("$cost")
                         c.setText("Actions")
                         d.setText("${pawn.apRemaining} -> ${pawn.apRemaining - cost}")

@@ -9,7 +9,7 @@ import io.github.plenglin.questofcon.game.pawn.Pawn
  */
 class Tile {
 
-    var terrain: Terrain = Terrains.grass
+    var biome: Biome = Biomes.grass
     var elevation: Int = 0
     var pawn: Pawn? = null
     var building: Building? = null
@@ -20,11 +20,11 @@ class Tile {
 
     fun passableBy(team: Team): Boolean {
         val tileTeam = getTeam()
-        return terrain.passable && (tileTeam == null || tileTeam == team)
+        return biome.passable && (tileTeam == null || tileTeam == team)
     }
 
     fun canBuildOn(team: Team): Boolean {
-        return terrain.buildable && building == null && pawn?.let { it.team == team } != false
+        return biome.buildable && building == null && pawn?.let { it.team == team } != false
     }
 
     fun doDamage(hp: Int): Boolean {

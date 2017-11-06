@@ -32,13 +32,13 @@ abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val 
         val dist = mutableMapOf<WorldCoords, Int>(pos to 0)  // coord, cost
         val unvisited = pos.surrounding().filter { it.tile!!.passableBy(team) }.toMutableList()
         unvisited.forEach {
-            dist[it] = it.tile!!.terrain.movementCost
+            dist[it] = it.tile!!.biome.movementCost
         }
 
         while (unvisited.isNotEmpty()) {
             val coord = unvisited.removeAt(0)  // Pop this new coordinate
             val tile = coord.tile!!
-            val terrain = tile.terrain
+            val terrain = tile.biome
             val cost = terrain.movementCost
             println("$terrain, ${tile.building}, ${tile.passableBy(team)}")
             val fullDist = dist[coord]!!
@@ -48,7 +48,7 @@ abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val 
                     val alt = fullDist + cost
                     val neighborDist = dist[neighbor]
                     val passable = neighbor.tile!!.passableBy(team)
-                    println("neigh: ${neighbor.tile.terrain}, ${tile.building}, ${tile.passableBy(team)}")
+                    println("neigh: ${neighbor.tile.biome}, ${tile.building}, ${tile.passableBy(team)}")
                     if (passable) {
                         if (neighborDist == null) {  // If we haven't added the neighbor, add it now
                             unvisited.add(neighbor)

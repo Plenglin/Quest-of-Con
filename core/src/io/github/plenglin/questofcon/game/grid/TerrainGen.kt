@@ -151,7 +151,7 @@ class HeightMap(val grid: Array<Array<Double>>) {
 }
 
 /**
- * Takes a terrain height map and turns it into a [World].
+ * Takes a biome height map and turns it into a [World].
  */
 class MapToHeight(val world: World, val grid: HeightMap) {
 
@@ -161,13 +161,13 @@ class MapToHeight(val world: World, val grid: HeightMap) {
             val h = grid[it.i.toDouble() / world.width, it.j.toDouble() / world.height]
             val tile = it.tile!!
             /*
-            tile.terrain = when {
-                h > 0.85 -> Terrains.mountains
-                h > 0.75 -> Terrains.bigHills
-                h > 0.65 -> Terrains.hills
-                h > 0.25 -> Terrains.grass
-                h > 0.15 -> Terrains.sandy
-                else -> Terrains.water
+            tile.biome = when {
+                h > 0.85 -> Biomes.mountains
+                h > 0.75 -> Biomes.bigHills
+                h > 0.65 -> Biomes.hills
+                h > 0.25 -> Biomes.grass
+                h > 0.15 -> Biomes.sandy
+                else -> Biomes.water
             }*/
             tile.elevation = (h * Constants.ELEVATION_LEVELS).toInt()
         }

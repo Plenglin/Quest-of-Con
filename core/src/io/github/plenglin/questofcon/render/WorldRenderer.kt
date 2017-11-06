@@ -37,14 +37,14 @@ class WorldRenderer(val world: World) {
         shape.setAutoShapeType(true)
 
         world.apply {
-            // Draw the terrain
+            // Draw the biome
             batch.begin()
             batch.color = Color.WHITE
             grid.forEachIndexed { i, col ->
                 val x = i.toFloat()
                 col.forEachIndexed { j, tile ->
                     val y = j.toFloat()
-                    batch.draw(tile.terrain.texture.bg(), x, y, 1f, 1f)
+                    batch.draw(tile.biome.texture.bg(), x, y, 1f, 1f)
                 }
             }
 
