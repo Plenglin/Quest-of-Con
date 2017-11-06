@@ -3,11 +3,13 @@ package io.github.plenglin.questofcon.ui
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
 import io.github.plenglin.questofcon.Constants
 import io.github.plenglin.questofcon.game.building.BuildingHQ
 import io.github.plenglin.questofcon.game.grid.World
 import io.github.plenglin.questofcon.game.grid.WorldCoords
+import io.github.plenglin.questofcon.render.CameraTransformBuffer
 import io.github.plenglin.questofcon.render.ShadeSet
 import io.github.plenglin.questofcon.screen.GameScreen
 import ktx.app.KtxInputAdapter
@@ -16,16 +18,21 @@ import ktx.app.KtxInputAdapter
 object MapControlInputManager : KtxInputAdapter {
 
     val cam: OrthographicCamera = GameScreen.gridCam
+    val buffer = CameraTransformBuffer(cam)
+
+    var zoomTarget = Constants.minZoom
+    val positionTarget = Vector2(0f, 0f)
+
     var vx: Int = 0
     var vy: Int = 0
     var fast: Boolean = false
 
     override fun scrolled(amount: Int): Boolean {
         when (amount) {
-            1 -> cam.zoom = cam.zoom * Constants.zoomRate
-            -1 -> cam.zoom = cam.zoom / Constants.zoomRate
+            1 -> zoomTarget *= Constants.zoomRate
+            -1 -> zoomTarget /= Constants.zoomRate
         }
-        cam.zoom = minOf(maxOf(cam.zoom, Constants.minZoom), Constants.maxZoom)
+        zoomTarget = minOf(maxOf(cam.zoom, Constants.minZoom), Constants.maxZoom)
         return true
     }
 
@@ -87,7 +94,10 @@ object MapControlInputManager : KtxInputAdapter {
 
     fun update(delta: Float) {
         val mult = if (fast) 2 else 1
-        cam.translate(vx * mult * Constants.camSpeed * delta, vy * mult * Constants.camSpeed * delta)
+        println("$vx, $vy")
+        positionTarget.add(vx * mult * Constants.camSpeed * delta, vy * mult * Constants.camSpeed * delta)
+        buffer.push(Vector3(positionTarget.x, positionTarget.y, 0f), zoomTarget)
+        buffer.updateCamera()
         GridSelectionInputManager.mouseMoved(Gdx.input.x, Gdx.input.y)
     }
 
