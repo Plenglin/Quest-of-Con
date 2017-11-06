@@ -92,7 +92,7 @@ object GameScreen : KtxScreen {
         worldRenderer.shape.projectionMatrix = gridCam.combined
         worldRenderer.batch.projectionMatrix = gridCam.combined
 
-        worldRenderer.render(true, *shadeSets.toTypedArray())
+        worldRenderer.render(false, *shadeSets.toTypedArray())
 
         UI.draw()
 

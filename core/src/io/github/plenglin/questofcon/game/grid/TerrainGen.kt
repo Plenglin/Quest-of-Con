@@ -160,6 +160,7 @@ class MapToHeight(val world: World, val grid: HeightMap) {
             // Interpolate the values at the sides
             val h = grid[it.i.toDouble() / world.width, it.j.toDouble() / world.height]
             val tile = it.tile!!
+            /*
             tile.terrain = when {
                 h > 0.85 -> Terrains.mountains
                 h > 0.75 -> Terrains.bigHills
@@ -167,7 +168,7 @@ class MapToHeight(val world: World, val grid: HeightMap) {
                 h > 0.25 -> Terrains.grass
                 h > 0.15 -> Terrains.sandy
                 else -> Terrains.water
-            }
+            }*/
             tile.elevation = (h * Constants.ELEVATION_LEVELS).toInt()
         }
     }
