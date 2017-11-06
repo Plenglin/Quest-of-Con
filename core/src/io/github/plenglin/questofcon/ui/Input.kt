@@ -32,7 +32,7 @@ object MapControlInputManager : KtxInputAdapter {
             1 -> zoomTarget *= Constants.zoomRate
             -1 -> zoomTarget /= Constants.zoomRate
         }
-        zoomTarget = minOf(maxOf(cam.zoom, Constants.minZoom), Constants.maxZoom)
+        zoomTarget = minOf(maxOf(zoomTarget, Constants.minZoom), Constants.maxZoom)
         return true
     }
 
