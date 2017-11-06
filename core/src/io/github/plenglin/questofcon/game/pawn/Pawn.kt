@@ -136,6 +136,14 @@ abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val 
         return actions
     }
 
+    companion object {
+        fun elevationDamageMultiplier(from: Int, to: Int): Double {
+            val elevationChange = maxOf(to - from, 0)
+            println(elevationChange)
+            return minOf(Math.pow(1.125, -elevationChange.toDouble()), 1.0)
+        }
+    }
+
 }
 
 
@@ -159,7 +167,11 @@ class SimplePawnCreator(name: String, cost: Int) : PawnCreator(name, cost) {
      */
     inner class SimplePawn(team: Team, pos: WorldCoords) : Pawn(title, team, pos, maxHealth, actionPoints, texture) {
 
-        override fun damageTo(coords: WorldCoords): Int = attack
+        override fun damageTo(coords: WorldCoords): Int {
+            val mult = Pawn.elevationDamageMultiplier(pos.tile!!.elevation, coords.tile!!.elevation)
+            println(mult)
+            return (attack * mult).toInt()
+        }
 
         override val maxAttacks = this@SimplePawnCreator.maxAttacks
 
@@ -175,7 +187,7 @@ class SimplePawnCreator(name: String, cost: Int) : PawnCreator(name, cost) {
             //val inRange = Math.abs(coords.i - this.pos.i) + Math.abs(coords.j - this.pos.j) <= range
             val tile = coords.tile
             if (tile != null && tile.getTeam() != this.team) {
-                return tile.doDamage(attack)
+                return tile.doDamage(damageTo(coords))
             } else {
                 return false
             }

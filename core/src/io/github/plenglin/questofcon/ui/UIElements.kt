@@ -273,7 +273,7 @@ class ActionTooltip(skin: Skin) : Table(skin) {
     }
 
     fun updateData() {
-        val pawn = PawnActionManager.pawn ?: return
+        val thePawn = PawnActionManager.pawn ?: return
         when (PawnActionManager.state) {
             PawnActionState.NONE -> this.isVisible = false
             PawnActionState.MOVE -> {
@@ -285,7 +285,7 @@ class ActionTooltip(skin: Skin) : Table(skin) {
                         a.setText(hov.tile!!.biome.name.capitalize())
                         b.setText("$cost")
                         c.setText("Actions")
-                        d.setText("${pawn.apRemaining} -> ${pawn.apRemaining - cost}")
+                        d.setText("${thePawn.apRemaining} -> ${thePawn.apRemaining - cost}")
                     } else {
                         this.isVisible = false
                     }
@@ -297,7 +297,7 @@ class ActionTooltip(skin: Skin) : Table(skin) {
                     isVisible = true
                     val ptarget = target.tile!!.pawn
                     val building = target.tile.building
-                    val damage = pawn.damageTo(target)
+                    val damage = thePawn.damageTo(target)
                     a.setText(ptarget?.name ?: "")
                     b.setText(if (ptarget != null) "${ptarget.health} -> ${ptarget.health - damage}" else "")
                     c.setText(building?.name ?: "")
