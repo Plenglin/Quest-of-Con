@@ -32,28 +32,28 @@ abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val 
         val dist = mutableMapOf<WorldCoords, Int>(pos to 0)  // coord, cost
         val unvisited = pos.surrounding().filter { it.tile!!.passableBy(team) }.toMutableList()
         unvisited.forEach {
-            dist[it] = it.tile!!.terrain.movementCost
+            dist[it] = it.tile!!.biome.movementCost + maxOf(it.tile.elevation - pos.tile!!.elevation, 1)
         }
 
         while (unvisited.isNotEmpty()) {
             val coord = unvisited.removeAt(0)  // Pop this new coordinate
             val tile = coord.tile!!
-            val terrain = tile.terrain
+            val terrain = tile.biome
             val cost = terrain.movementCost
-            println("$terrain, ${tile.building}, ${tile.passableBy(team)}")
+            println("$terrain, ${cost}, ${tile.passableBy(team)}")
             val fullDist = dist[coord]!!
 
             if (tile.passableBy(team) && fullDist + cost <= apRemaining) {  // Can we even get past this tile?
                 coord.surrounding().forEach { neighbor ->  // For each neighbor...
-                    val alt = fullDist + cost
+                    val totalCost = fullDist + cost + maxOf(neighbor.tile!!.elevation - tile.elevation, 1)
                     val neighborDist = dist[neighbor]
-                    val passable = neighbor.tile!!.passableBy(team)
-                    println("neigh: ${neighbor.tile.terrain}, ${tile.building}, ${tile.passableBy(team)}")
+                    val passable = neighbor.tile.passableBy(team)
+                    println("neigh: ${neighbor.tile.biome}, ${tile.building}, ${tile.passableBy(team)}")
                     if (passable) {
                         if (neighborDist == null) {  // If we haven't added the neighbor, add it now
                             unvisited.add(neighbor)
                             dist[neighbor] = fullDist + cost
-                        } else if (neighborDist > alt) {  // Is going through coord to neighbor faster than before?
+                        } else if (neighborDist > totalCost) {  // Is going through coord to neighbor faster than before?
                             dist[neighbor] = fullDist + cost  // Put it in
                         }
                     }
@@ -61,7 +61,9 @@ abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val 
             }
         }
 
-        return dist
+        //val keyset = dist.keys.subtract()
+
+        return dist.filter { true }
     }
 
     abstract fun getAttackableSquares(): Set<WorldCoords>
@@ -134,6 +136,14 @@ abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val 
         return actions
     }
 
+    companion object {
+        fun elevationDamageMultiplier(from: Int, to: Int): Double {
+            val elevationChange = maxOf(to - from, 0)
+            println(elevationChange)
+            return minOf(Math.pow(1.125, -elevationChange.toDouble()), 1.0)
+        }
+    }
+
 }
 
 
@@ -157,7 +167,11 @@ class SimplePawnCreator(name: String, cost: Int) : PawnCreator(name, cost) {
      */
     inner class SimplePawn(team: Team, pos: WorldCoords) : Pawn(title, team, pos, maxHealth, actionPoints, texture) {
 
-        override fun damageTo(coords: WorldCoords): Int = attack
+        override fun damageTo(coords: WorldCoords): Int {
+            val mult = Pawn.elevationDamageMultiplier(pos.tile!!.elevation, coords.tile!!.elevation)
+            println(mult)
+            return (attack * mult).toInt()
+        }
 
         override val maxAttacks = this@SimplePawnCreator.maxAttacks
 
@@ -173,7 +187,7 @@ class SimplePawnCreator(name: String, cost: Int) : PawnCreator(name, cost) {
             //val inRange = Math.abs(coords.i - this.pos.i) + Math.abs(coords.j - this.pos.j) <= range
             val tile = coords.tile
             if (tile != null && tile.getTeam() != this.team) {
-                return tile.doDamage(attack)
+                return tile.doDamage(damageTo(coords))
             } else {
                 return false
             }

@@ -8,7 +8,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
 import io.github.plenglin.questofcon.game.GameState
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
-import io.github.plenglin.questofcon.game.pawn.Pawn
 import io.github.plenglin.questofcon.game.pawn.PawnCreator
 
 
@@ -44,7 +43,7 @@ class TileInfoPanel(skin: Skin) : Table(skin) {
     fun updateData() {
         val coord = target
         if (coord?.tile != null) {
-            titleLabel.setText("${coord.tile.terrain.name.capitalize()} at ${coord.i}, ${coord.j} (Cost: ${coord.tile.terrain.movementCost})")
+            titleLabel.setText("${coord.tile.elevation} high ${coord.tile.biome.name.capitalize()} at ${coord.i}, ${coord.j}  (Cost: ${coord.tile.biome.movementCost})")
 
             val pawn = coord.tile.pawn
             this.pawn.data = pawn?.getProperties() ?: emptyMap()
@@ -274,7 +273,7 @@ class ActionTooltip(skin: Skin) : Table(skin) {
     }
 
     fun updateData() {
-        val pawn = PawnActionManager.pawn ?: return
+        val thePawn = PawnActionManager.pawn ?: return
         when (PawnActionManager.state) {
             PawnActionState.NONE -> this.isVisible = false
             PawnActionState.MOVE -> {
@@ -283,10 +282,10 @@ class ActionTooltip(skin: Skin) : Table(skin) {
                     val cost = PawnActionManager.movementSquares[hov]
                     if (cost != null) {
                         isVisible = true
-                        a.setText(hov.tile!!.terrain.name.capitalize())
+                        a.setText(hov.tile!!.biome.name.capitalize())
                         b.setText("$cost")
                         c.setText("Actions")
-                        d.setText("${pawn.apRemaining} -> ${pawn.apRemaining - cost}")
+                        d.setText("${thePawn.apRemaining} -> ${thePawn.apRemaining - cost}")
                     } else {
                         this.isVisible = false
                     }
@@ -298,7 +297,7 @@ class ActionTooltip(skin: Skin) : Table(skin) {
                     isVisible = true
                     val ptarget = target.tile!!.pawn
                     val building = target.tile.building
-                    val damage = pawn.damageTo(target)
+                    val damage = thePawn.damageTo(target)
                     a.setText(ptarget?.name ?: "")
                     b.setText(if (ptarget != null) "${ptarget.health} -> ${ptarget.health - damage}" else "")
                     c.setText(building?.name ?: "")

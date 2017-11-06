@@ -13,7 +13,7 @@ class World(val width: Int, val height: Int) : Sequence<WorldCoords> {
     }
 
     val grid = Array(width, {
-        Array(height, { Tile(Terrains.grass) })
+        Array(height, { Tile() })
     })
 
     /**
