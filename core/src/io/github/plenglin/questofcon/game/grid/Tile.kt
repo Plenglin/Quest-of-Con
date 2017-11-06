@@ -7,8 +7,10 @@ import io.github.plenglin.questofcon.game.pawn.Pawn
 /**
  *
  */
-class Tile(var terrain: Terrain) {
+class Tile {
 
+    var terrain: Terrain = Terrains.grass
+    var elevation: Int = 0
     var pawn: Pawn? = null
     var building: Building? = null
 

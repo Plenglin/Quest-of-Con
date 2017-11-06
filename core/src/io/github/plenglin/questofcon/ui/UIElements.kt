@@ -8,7 +8,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
 import io.github.plenglin.questofcon.game.GameState
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
-import io.github.plenglin.questofcon.game.pawn.Pawn
 import io.github.plenglin.questofcon.game.pawn.PawnCreator
 
 
@@ -44,7 +43,7 @@ class TileInfoPanel(skin: Skin) : Table(skin) {
     fun updateData() {
         val coord = target
         if (coord?.tile != null) {
-            titleLabel.setText("${coord.tile.terrain.name.capitalize()} at ${coord.i}, ${coord.j} (Cost: ${coord.tile.terrain.movementCost})")
+            titleLabel.setText("${coord.tile.elevation} high ${coord.tile.terrain.name.capitalize()} at ${coord.i}, ${coord.j}  (Cost: ${coord.tile.terrain.movementCost})")
 
             val pawn = coord.tile.pawn
             this.pawn.data = pawn?.getProperties() ?: emptyMap()

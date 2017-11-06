@@ -1,5 +1,6 @@
 package io.github.plenglin.questofcon.game.grid
 
+import io.github.plenglin.questofcon.Constants
 import io.github.plenglin.questofcon.linMap
 import java.util.*
 
@@ -167,6 +168,7 @@ class MapToHeight(val world: World, val grid: HeightMap) {
                 h > 0.15 -> Terrains.sandy
                 else -> Terrains.water
             }
+            tile.elevation = (h * Constants.ELEVATION_LEVELS).toInt()
         }
     }
 }

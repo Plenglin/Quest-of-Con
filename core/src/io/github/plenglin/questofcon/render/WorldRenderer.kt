@@ -5,6 +5,8 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
+import io.github.plenglin.questofcon.Assets
+import io.github.plenglin.questofcon.Constants
 import io.github.plenglin.questofcon.game.grid.World
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 
@@ -21,13 +23,14 @@ class WorldRenderer(val world: World) {
         world.apply {
             // Draw the terrain
             batch.begin()
-            batch.color = Color.WHITE
             grid.forEachIndexed { i, col ->
+                val x = i.toFloat()
                 col.forEachIndexed { j, tile ->
-                    batch.draw(tile.terrain.texture.bg(), i.toFloat(), j.toFloat(), 1f, 1f)
-                    if (tile.getTeam() != null) {
-                        batch.draw(tile.terrain.texture.fg(), i.toFloat(), j.toFloat(), 1f, 1f)
-                    }
+                    val y = j.toFloat()
+                    batch.color = Color.WHITE
+                    batch.draw(tile.terrain.texture.bg(), x, y, 1f, 1f)
+                    batch.color = Color(1f, 1f, 1f, 0.25f * tile.elevation.toFloat() / Constants.ELEVATION_LEVELS)
+                    batch.draw(Assets[Assets.q], x, y, 1f, 1f)
                 }
             }
             batch.end()
