@@ -1,6 +1,8 @@
 package io.github.plenglin.questofcon.game.grid
 
+import io.github.plenglin.questofcon.Constants
 import io.github.plenglin.questofcon.linMap
+import io.github.plenglin.questofcon.logit
 import java.util.*
 
 
@@ -121,6 +123,22 @@ class HeightMap(val grid: Array<Array<Double>>) {
         })
     }
 
+    operator fun times(other: Double): HeightMap {
+        return HeightMap((0 until width).map { i ->
+            (0 until width).map { j ->
+                this[i][j] * other
+            }
+        })
+    }
+
+    operator fun plus(other: Double): HeightMap {
+        return HeightMap((0 until width).map { i ->
+            (0 until width).map { j ->
+                this[i][j] + other
+            }
+        })
+    }
+
     operator fun get(i: Int): Array<Double> {
         return grid[i]
     }
@@ -150,7 +168,7 @@ class HeightMap(val grid: Array<Array<Double>>) {
 }
 
 /**
- * Takes a terrain height map and turns it into a [World].
+ * Takes a biome height map and turns it into a [World].
  */
 class MapToHeight(val world: World, val grid: HeightMap) {
 
@@ -159,16 +177,52 @@ class MapToHeight(val world: World, val grid: HeightMap) {
             // Interpolate the values at the sides
             val h = grid[it.i.toDouble() / world.width, it.j.toDouble() / world.height]
             val tile = it.tile!!
-            tile.terrain = when {
-                h > 0.85 -> Terrains.mountains
-                h > 0.75 -> Terrains.bigHills
-                h > 0.65 -> Terrains.hills
-                h > 0.25 -> Terrains.grass
-                h > 0.15 -> Terrains.sandy
-                else -> Terrains.water
-            }
+            tile.elevation = (logit(h, 0.2) * Constants.ELEVATION_LEVELS).toInt()
         }
     }
+}
+
+class BiomeGenerator(val world: World, val height: HeightMap, val rainfall: HeightMap) {
+
+    fun applyBiomes() {
+        val waterDistribution = (rainfall * (height * -1.0 + 1.0)).normalized
+        println(waterDistribution)
+        world.forEach {
+            // Interpolate the values at the sides
+            val x = it.i.toDouble() / world.width
+            val y = it.j.toDouble() / world.height
+
+            val h = height[x, y]
+            val tile = it.tile!!
+            val water = waterDistribution[x, y]
+
+            tile.biome = {
+                if (tile.elevation == Constants.ELEVATION_LEVELS - 1) {
+                    Biomes.mountains
+                }
+                if (tile.elevation == 0) {
+                    Biomes.water
+                }
+                when {
+                    tile.elevation == Constants.ELEVATION_LEVELS - 1 -> Biomes.mountains
+                    h > 0.7 -> Biomes.highlands
+                    h > 0.25 -> if (water > 0.5) Biomes.grass else Biomes.desert
+                    else -> Biomes.water
+                }
+            }()
+
+        }
+
+        val waterTiles = world.filter { it.tile!!.biome == Biomes.water }
+        val singleWaterTiles = waterTiles.filter { !it.surrounding().any { it.tile!!.biome == Biomes.water} }
+        singleWaterTiles.forEach { waterTile ->
+            waterTile.tile!!.biome = waterTile.surrounding()[0].tile!!.biome
+        }
+
+        val beachTiles = waterTiles.map { it.surrounding().toSet() }.reduce { acc, list -> acc + list } - waterTiles
+        beachTiles.forEach { it.tile!!.biome = Biomes.beach }
+    }
+
 }
 
 /**

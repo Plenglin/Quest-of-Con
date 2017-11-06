@@ -12,6 +12,7 @@ object Assets {
     val manager = AssetManager()
 
     val missing = AssetDescriptor<Texture>("sprites/missing.png", Texture::class.java)
+    val q = AssetDescriptor<Texture>("sprites/1x1.png", Texture::class.java)
 
     val artillery = AssetDescriptor<Texture>("sprites/pawn/artillery.png", Texture::class.java)
     val defender = AssetDescriptor<Texture>("sprites/pawn/defender.png", Texture::class.java)
@@ -31,7 +32,9 @@ object Assets {
         manager.load(scout)
         manager.load(tankdestroyer)
         manager.load(beammech)
+
         manager.load(missing)
+        manager.load(q)
     }
 
     operator fun <T> get(descriptor: AssetDescriptor<T>): T {
@@ -43,7 +46,6 @@ object Assets {
 enum class TerrainTextures(simple: Boolean = false) {
     GRASS, SMALLHILL, BIGHILL, SAND, WATER(true), MOUNTAIN(true);
 
-    val simplePath = name.toLowerCase()
     private val bgPath = "sprites/terrain/${name.toLowerCase()}${if (!simple) "-bg" else ""}.png"
     private val fgPath = "sprites/terrain/${name.toLowerCase()}${if (!simple) "-fg" else ""}.png"
 

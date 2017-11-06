@@ -3,8 +3,11 @@ package io.github.plenglin.questofcon.render
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
+import com.badlogic.gdx.graphics.Pixmap
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
+import io.github.plenglin.questofcon.Constants
 import io.github.plenglin.questofcon.game.grid.World
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 
@@ -14,22 +17,40 @@ class WorldRenderer(val world: World) {
     val batch: SpriteBatch = SpriteBatch()
     val shape: ShapeRenderer = ShapeRenderer()
 
+    var elevation: Texture = generateElevation()
+
+    fun generateElevation(): Texture {
+        val pixmap = Pixmap(world.width, world.height, Pixmap.Format.RGBA8888)
+        world.grid.forEachIndexed { i, col ->
+            col.forEachIndexed { j, tile ->
+                pixmap.setColor(1f, 1f, 1f, tile.elevation.toFloat() / Constants.ELEVATION_LEVELS)
+                pixmap.drawPixel(i, world.height - j - 1)
+            }
+        }
+        val out = Texture(pixmap)
+        pixmap.dispose()
+        return out
+    }
+
     fun render(drawGrid: Boolean = true, vararg paints: ShadeSet) {
 
         shape.setAutoShapeType(true)
 
         world.apply {
-            // Draw the terrain
+            // Draw the biome
             batch.begin()
             batch.color = Color.WHITE
             grid.forEachIndexed { i, col ->
+                val x = i.toFloat()
                 col.forEachIndexed { j, tile ->
-                    batch.draw(tile.terrain.texture.bg(), i.toFloat(), j.toFloat(), 1f, 1f)
-                    if (tile.getTeam() != null) {
-                        batch.draw(tile.terrain.texture.fg(), i.toFloat(), j.toFloat(), 1f, 1f)
-                    }
+                    val y = j.toFloat()
+                    batch.draw(tile.biome.texture.bg(), x, y, 1f, 1f)
                 }
             }
+
+            batch.setColor(1f, 1f, 1f, 0.75f)
+            batch.draw(elevation, 0f, 0f, world.width.toFloat(), world.height.toFloat())
+
             batch.end()
 
             // Draw the grid if necessary
