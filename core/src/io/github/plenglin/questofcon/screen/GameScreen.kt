@@ -13,10 +13,7 @@ import io.github.plenglin.questofcon.game.GameData
 import io.github.plenglin.questofcon.game.GameState
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.building.BuildingFactory
-import io.github.plenglin.questofcon.game.grid.DiamondSquareHeightGenerator
-import io.github.plenglin.questofcon.game.grid.HeightMap
-import io.github.plenglin.questofcon.game.grid.MapToHeight
-import io.github.plenglin.questofcon.game.grid.WorldCoords
+import io.github.plenglin.questofcon.game.grid.*
 import io.github.plenglin.questofcon.render.ShadeSet
 import io.github.plenglin.questofcon.render.WorldRenderer
 import io.github.plenglin.questofcon.ui.*
@@ -53,6 +50,7 @@ object GameScreen : KtxScreen {
 
         println("Generating height data...")
         val heightData = HeightMap(DiamondSquareHeightGenerator(3, initialOffsets = 2.0, iterativeRescale = 0.8).generate().grid).normalized
+        val rainfallData = HeightMap(DiamondSquareHeightGenerator(3, initialOffsets = 2.0, iterativeRescale = 0.8).generate().grid).normalized
 
         heightData.grid.forEach { col ->
             col.forEach {
@@ -63,6 +61,9 @@ object GameScreen : KtxScreen {
 
         println("Mapping height data to world...")
         MapToHeight(gameState.world, heightData).doHeightMap()
+
+        println("Adding biomes...")
+        BiomeGenerator(gameState.world, heightData, rainfallData).applyBiomes()
 
         GameData.scout.createPawnAt(teamA, WorldCoords(gameState.world, 5, 5))
         BuildingFactory.createBuildingAt(teamA, WorldCoords(gameState.world, 5, 5))
