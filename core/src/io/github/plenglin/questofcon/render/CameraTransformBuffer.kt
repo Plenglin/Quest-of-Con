@@ -27,7 +27,6 @@ class CameraTransformBuffer(val camera: OrthographicCamera, val maxPositionSize:
 
         positionSum.add(position)
         zoomSum += zoom
-        println(positionSum)
     }
 
     fun updateCamera() {

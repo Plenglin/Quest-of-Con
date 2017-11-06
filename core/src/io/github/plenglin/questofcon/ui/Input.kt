@@ -94,7 +94,6 @@ object MapControlInputManager : KtxInputAdapter {
 
     fun update(delta: Float) {
         val mult = if (fast) 2 else 1
-        println("$vx, $vy")
         positionTarget.add(vx * mult * Constants.camSpeed * delta, vy * mult * Constants.camSpeed * delta)
         buffer.push(Vector3(positionTarget.x, positionTarget.y, 0f), zoomTarget)
         buffer.updateCamera()
