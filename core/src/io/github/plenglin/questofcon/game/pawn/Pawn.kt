@@ -32,7 +32,7 @@ abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val 
         val dist = mutableMapOf<WorldCoords, Int>(pos to 0)  // coord, cost
         val unvisited = pos.surrounding().filter { it.tile!!.passableBy(team) }.toMutableList()
         unvisited.forEach {
-            dist[it] = it.tile!!.biome.movementCost
+            dist[it] = it.tile!!.biome.movementCost + maxOf(it.tile.elevation - pos.tile!!.elevation, 1)
         }
 
         while (unvisited.isNotEmpty()) {
@@ -40,20 +40,20 @@ abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val 
             val tile = coord.tile!!
             val terrain = tile.biome
             val cost = terrain.movementCost
-            println("$terrain, ${tile.building}, ${tile.passableBy(team)}")
+            println("$terrain, ${cost}, ${tile.passableBy(team)}")
             val fullDist = dist[coord]!!
 
             if (tile.passableBy(team) && fullDist + cost <= apRemaining) {  // Can we even get past this tile?
                 coord.surrounding().forEach { neighbor ->  // For each neighbor...
-                    val alt = fullDist + cost
+                    val totalCost = fullDist + cost + maxOf(neighbor.tile!!.elevation - tile.elevation, 1)
                     val neighborDist = dist[neighbor]
-                    val passable = neighbor.tile!!.passableBy(team)
+                    val passable = neighbor.tile.passableBy(team)
                     println("neigh: ${neighbor.tile.biome}, ${tile.building}, ${tile.passableBy(team)}")
                     if (passable) {
                         if (neighborDist == null) {  // If we haven't added the neighbor, add it now
                             unvisited.add(neighbor)
                             dist[neighbor] = fullDist + cost
-                        } else if (neighborDist > alt) {  // Is going through coord to neighbor faster than before?
+                        } else if (neighborDist > totalCost) {  // Is going through coord to neighbor faster than before?
                             dist[neighbor] = fullDist + cost  // Put it in
                         }
                     }
@@ -61,7 +61,9 @@ abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val 
             }
         }
 
-        return dist
+        //val keyset = dist.keys.subtract()
+
+        return dist.filter { true }
     }
 
     abstract fun getAttackableSquares(): Set<WorldCoords>
