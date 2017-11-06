@@ -212,6 +212,15 @@ class BiomeGenerator(val world: World, val height: HeightMap, val rainfall: Heig
             }()
 
         }
+
+        val waterTiles = world.filter { it.tile!!.biome == Biomes.water }
+        val singleWaterTiles = waterTiles.filter { !it.surrounding().any { it.tile!!.biome == Biomes.water} }
+        singleWaterTiles.forEach { waterTile ->
+            waterTile.tile!!.biome = waterTile.surrounding()[0].tile!!.biome
+        }
+
+        val beachTiles = waterTiles.map { it.surrounding().toSet() }.reduce { acc, list -> acc + list } - waterTiles
+        beachTiles.forEach { it.tile!!.biome = Biomes.beach }
     }
 
 }
