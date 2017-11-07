@@ -2,16 +2,19 @@ package io.github.plenglin.questofcon.server
 
 import io.github.plenglin.questofcon.Constants
 import io.github.plenglin.questofcon.server.data.ClientActions
-import io.github.plenglin.questofcon.server.data.DataAction
-import java.io.IOException
+import io.github.plenglin.questofcon.server.data.DataClientAction
 import java.io.ObjectOutputStream
 import java.net.ServerSocket
 import java.net.Socket
+import java.util.logging.Level
+import java.util.logging.Logger
 
 /**
  *
  */
-class Server {
+object Server {
+
+    var nextRoom = 0L
 
     val serverSocket = ServerSocket(Constants.SERVER_PORT)
 
@@ -26,7 +29,7 @@ class Server {
             pendingSockets.add(sock)
 
             if (pendingSockets.size >= 2) {
-                val room = Room(pendingSockets.toList())
+                val room = Room(pendingSockets.toList(), nextRoom++)
                 room.start()
                 rooms.add(room)
             }
@@ -37,7 +40,8 @@ class Server {
 
 fun main(args: Array<String>) {
 
-    Thread(Runnable {Server().acceptSockets()}).start()
+    Thread(Runnable {Server.acceptSockets()}).start()
+    Logger.getGlobal().level = Level.ALL
 
     for (client in 0..1) {
         Thread(Runnable {
@@ -47,7 +51,7 @@ fun main(args: Array<String>) {
             val output = ObjectOutputStream(sock.getOutputStream())
             Thread.sleep(1000)
             println("client $client writing shit")
-            output.writeObject(DataAction(ClientActions.TALK, "MEMES"))
+            output.writeObject(DataClientAction(ClientActions.TALK, "MEMES"))
         }).start()
     }
 

@@ -1,48 +1,55 @@
 package io.github.plenglin.questofcon.server
 
-import com.beust.klaxon.JSON
-import com.beust.klaxon.JsonObject
 import com.beust.klaxon.Parser
-import com.beust.klaxon.string
+import io.github.plenglin.questofcon.game.grid.World
 import io.github.plenglin.questofcon.server.data.ClientActions
-import io.github.plenglin.questofcon.server.data.DataAction
-import java.io.BufferedInputStream
+import io.github.plenglin.questofcon.server.data.DataClientAction
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
-import java.io.PrintStream
 import java.net.Socket
-import java.util.*
+import java.util.logging.Logger
 
 
-class Room(val sockets: List<Socket>) : Thread() {
+class Room(val sockets: List<Socket>, val roomId: Long) : Thread("Room-$roomId") {
 
-    val clients = sockets.map { SocketManager(it) }
+    val world = World(32, 32)
+
+    val logger = Logger.getLogger(javaClass.name)
+
+    val clients = sockets.map { SocketManager(it, this) }
 
     override fun run() {
-        println("room of $sockets")
+        logger.info("starting")
+        logger.info("generating world")
+
         clients.forEach { it.start() }
     }
 
 }
 
-class SocketManager(val socket: Socket) : Thread() {
+class SocketManager(val socket: Socket, val parent: Room) : Thread("SocketManager-${parent.roomId}-${socket.inetAddress}") {
+
+    val logger = Logger.getLogger(this.name)
 
     var parser = Parser()
 
     override fun run() {
-        println("starting socket manager for $socket")
+        logger.info("starting ${this.name}")
         val input = ObjectInputStream(socket.getInputStream())
         val output = ObjectOutputStream(socket.getOutputStream())
 
         input.use { output.use {
-            println("we are in the beeme")
             while (true) {
-                val data = input.readObject() as DataAction
-                val rawString = println("rcv $data")
+                val data = input.readObject() as DataClientAction
+                logger.fine("rcv $data")
 
                 when (data.action) {
+                    ClientActions.READY -> {
+
+                    }
                     ClientActions.TALK -> {
-                        println(data.data as String)
+                        val msg = data.data as String
+                        logger.info("TALK -> $msg")
                     }
                     ClientActions.MOVE -> TODO()
                     ClientActions.ATTACK -> TODO()
