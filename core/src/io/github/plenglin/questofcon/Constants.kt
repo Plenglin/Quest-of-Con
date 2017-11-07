@@ -16,7 +16,6 @@ object Constants {
 
     val camSpeed = 7f
 
-
     val selectionColor = Color(1f, 1f, 1f, 0.5f)
     val hoveringColor = Color(1f, 1f, 1f, 0.75f)
     val movementColor: Color = Color(0f, 0f, 1f, 0.25f)
@@ -26,5 +25,7 @@ object Constants {
     val BASE_ECO: Int = 100
     val HQ_HEALTH = 500
     val ELEVATION_LEVELS = 6
+
+    val SERVER_PORT = 51337
 
 }
