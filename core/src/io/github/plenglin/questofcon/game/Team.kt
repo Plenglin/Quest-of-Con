@@ -8,7 +8,11 @@ import io.github.plenglin.questofcon.game.grid.World
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 
 
+private var nextTeamId = 0L
+
 class Team(val name: String, val color: Color) {
+
+    val id = nextTeamId++
 
     var money: Int = Constants.STARTING_MONEY
     var hasBuiltHQ = false
@@ -45,7 +49,7 @@ class Team(val name: String, val color: Color) {
     }
 
     override fun toString(): String {
-        return "Team($name)"
+        return "Team($id, $name)"
     }
 
 }

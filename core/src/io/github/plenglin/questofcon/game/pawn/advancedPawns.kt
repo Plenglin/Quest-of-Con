@@ -33,6 +33,7 @@ class PawnArtillery(team: Team, pos: WorldCoords) : Pawn("Artillery", team, pos,
 
         override fun createPawnAt(team: Team, worldCoords: WorldCoords): Pawn {
             val pawn = PawnArtillery(team, worldCoords)
+            pawn.type = id
             worldCoords.tile!!.pawn = pawn
             return pawn
         }
@@ -86,6 +87,7 @@ class PawnKnight(team: Team, pos: WorldCoords) : Pawn("KangarooBot", team, pos, 
 
         override fun createPawnAt(team: Team, worldCoords: WorldCoords): Pawn {
             val pawn = PawnKnight(team, worldCoords)
+            pawn.type = id
             worldCoords.tile!!.pawn = pawn
             return pawn
         }

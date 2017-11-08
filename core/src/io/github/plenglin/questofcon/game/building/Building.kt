@@ -13,7 +13,11 @@ abstract class BuildingCreator(val name: String, val cost: Int) {
 
 }
 
+var nextBuildingId = 0L
+
 abstract class Building(val name: String, var team: Team, var pos: WorldCoords, val maxHealth: Int) {
+
+    val id = nextBuildingId++
 
     abstract val texture: Texture
 

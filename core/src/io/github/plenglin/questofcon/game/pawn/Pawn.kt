@@ -4,16 +4,25 @@ import com.badlogic.gdx.graphics.Texture
 import io.github.plenglin.questofcon.Assets
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
+import io.github.plenglin.questofcon.server.DataPawn
 import io.github.plenglin.questofcon.ui.*
 
+private var nextCreatorId = 0L
 
 abstract class PawnCreator(val title: String, val cost: Int) {
+
+    val id = nextCreatorId++
 
     abstract fun createPawnAt(team: Team, worldCoords: WorldCoords): Pawn
 
 }
 
+private var nextPawnId = 0L
+
 abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val maxHealth: Int, val actionPoints: Int, val texture: () -> Texture) {
+
+    var type = -1L
+    val id = nextPawnId++
 
     open val maxAttacks = 1
     var attacksRemaining = 0
@@ -136,6 +145,14 @@ abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val 
         return actions
     }
 
+    fun serialized(): DataPawn {
+        return DataPawn(id, team.id, type, pos.serialized())
+    }
+
+    override fun toString(): String {
+        return "Pawn($id, ${javaClass.simpleName})"
+    }
+
     companion object {
         fun elevationDamageMultiplier(from: Int, to: Int): Double {
             val elevationChange = maxOf(to - from, 0)
@@ -145,7 +162,6 @@ abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val 
     }
 
 }
-
 
 class SimplePawnCreator(name: String, cost: Int) : PawnCreator(name, cost) {
 
@@ -159,6 +175,7 @@ class SimplePawnCreator(name: String, cost: Int) : PawnCreator(name, cost) {
     override fun createPawnAt(team: Team, worldCoords: WorldCoords): Pawn {
         val pawn = SimplePawn(team, worldCoords)
         worldCoords.tile!!.pawn = pawn
+        pawn.type = id
         return pawn
     }
 
@@ -200,6 +217,10 @@ class SimplePawnCreator(name: String, cost: Int) : PawnCreator(name, cost) {
                 props["range"] = range
             }
             return props
+        }
+
+        override fun toString(): String {
+            return "SimplePawn($id, $name)"
         }
 
     }

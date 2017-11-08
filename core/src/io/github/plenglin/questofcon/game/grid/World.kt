@@ -1,5 +1,7 @@
 package io.github.plenglin.questofcon.game.grid
 
+import io.github.plenglin.questofcon.server.DataPosition
+
 /**
  *
  */
@@ -79,6 +81,8 @@ data class WorldCoords(val world: World, val i: Int, val j: Int) {
                 WorldCoords(world, i, j - 1)
         ).filter { includeNonexistent || it.exists }
     }
+
+    fun serialized(): DataPosition = DataPosition(i, j)
 
 }
 
