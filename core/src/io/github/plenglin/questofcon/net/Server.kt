@@ -31,6 +31,7 @@ object Server {
                 val room = Room(pendingSockets.toList(), nextRoom++)
                 room.start()
                 rooms.add(room)
+                pendingSockets.clear()
                 println("created room $room")
             }
         }
