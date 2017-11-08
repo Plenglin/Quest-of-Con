@@ -1,12 +1,7 @@
 package io.github.plenglin.questofcon
 
-import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.Color
-import io.github.plenglin.questofcon.screen.GameScreen
-import ktx.app.KtxGame
 
-
-object QuestOfCon : KtxGame<Screen>(GameScreen)
 
 object Constants {
 
