@@ -66,7 +66,8 @@ class SocketManager(val socket: Socket, val parent: Room) : Thread("SocketManage
 
     fun onRequest(msgId: Long, request: ClientRequest): ServerResponse {
         return when (request.type) {
-            ClientRequestType.BUILDING -> ServerResponse(request.type, "someone asked for building with id ${request.key}", msgId)
+            ClientRequestType.BUILDING -> ServerResponse(request.type, DataBuilding(0, 0, 0, DataPosition(0, 0)), msgId)
+            ClientRequestType.PAWN -> ServerResponse(request.type, DataPawn(0, 0, 0, DataPosition(0, 0)), msgId)
             else -> ServerResponse(request.type, request.key, msgId, ServerResponseError.DATA_ERROR)
         }
     }

@@ -57,9 +57,32 @@ class Client(val socket: Socket) : Thread("Client-$socket") {
         return id
     }
 
+    /**
+     * Request something.
+     */
     fun request(type: ClientRequestType, key: Long, onResponse: (ServerResponse) -> Unit = {}) {
         val id = send(ClientRequest(type, key))
         responseListeners[id] = onResponse
+    }
+
+    /**
+     * Request something, but block the thread until that something is received.
+     */
+    fun requestBlocking(type: ClientRequestType, key: Long): ServerResponse {
+        var received: ServerResponse? = null
+        request(type, key, {
+            received = it
+        })
+        while (received == null) {Thread.sleep(10)}
+        return received!!
+    }
+
+    fun getBuildingWithId(key: Long): DataBuilding? {
+        return requestBlocking(ClientRequestType.BUILDING, key).data as DataBuilding
+    }
+
+    fun getPawnWithId(key: Long): DataPawn? {
+        return requestBlocking(ClientRequestType.PAWN, key).data as DataPawn
     }
 
     fun getNextId(): Long {

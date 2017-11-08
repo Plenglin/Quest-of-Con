@@ -27,7 +27,7 @@ data class ClientAction(val action: ClientActions, val data: Serializable? = nul
 data class ServerAction(val action: ServerActions, val data: Serializable? = null) : Serializable
 
 data class ClientRequest(val type: ClientRequestType, val key: Long) : Serializable
-data class ServerResponse(val type: ClientRequestType, val data: Serializable, val responseTo: Long, val error: Int = ServerResponseError.OK) : Serializable
+data class ServerResponse(val type: ClientRequestType, val data: Serializable?, val responseTo: Long, val error: Int = ServerResponseError.OK) : Serializable
 
 data class DataInitial(val teams: List<DataTeam>) : Serializable
 

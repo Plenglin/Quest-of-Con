@@ -1,10 +1,8 @@
 package io.github.plenglin.questofcon.server
 
 import io.github.plenglin.questofcon.Constants
-import java.io.ObjectOutputStream
 import java.net.ServerSocket
 import java.net.Socket
-import java.net.SocketAddress
 import java.util.logging.Level
 import java.util.logging.Logger
 
@@ -60,7 +58,7 @@ fun main(args: Array<String>) {
     println("requesting from clients")
     clients.forEach {
         println("requesting")
-        it.request(ClientRequestType.BUILDING, 1L, { println(it) })
+        println(it.getPawnWithId(0))
     }
 
 }
