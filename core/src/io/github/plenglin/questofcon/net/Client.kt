@@ -1,4 +1,4 @@
-package io.github.plenglin.questofcon.server
+package io.github.plenglin.questofcon.net
 
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream

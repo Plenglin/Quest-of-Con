@@ -1,6 +1,6 @@
 package io.github.plenglin.questofcon.game.grid
 
-import io.github.plenglin.questofcon.server.DataPosition
+import io.github.plenglin.questofcon.net.DataPosition
 
 /**
  *

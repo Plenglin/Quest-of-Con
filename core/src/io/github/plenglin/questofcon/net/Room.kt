@@ -1,4 +1,4 @@
-package io.github.plenglin.questofcon.server
+package io.github.plenglin.questofcon.net
 
 import com.beust.klaxon.Parser
 import io.github.plenglin.questofcon.game.grid.World

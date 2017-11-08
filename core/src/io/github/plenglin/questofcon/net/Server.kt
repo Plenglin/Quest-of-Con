@@ -1,4 +1,4 @@
-package io.github.plenglin.questofcon.server
+package io.github.plenglin.questofcon.net
 
 import io.github.plenglin.questofcon.Constants
 import java.net.ServerSocket

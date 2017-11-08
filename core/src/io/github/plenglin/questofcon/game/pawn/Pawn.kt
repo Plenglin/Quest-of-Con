@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Texture
 import io.github.plenglin.questofcon.Assets
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
-import io.github.plenglin.questofcon.server.DataPawn
+import io.github.plenglin.questofcon.net.DataPawn
 import io.github.plenglin.questofcon.ui.*
 
 private var nextCreatorId = 0L
