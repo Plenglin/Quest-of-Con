@@ -1,4 +1,4 @@
-package io.github.plenglin.questofcon.server.data
+package io.github.plenglin.questofcon.server
 
 import java.io.Serializable
 
@@ -21,13 +21,13 @@ object ServerResponseError {
     val DATA_ERROR = 2
 }
 
-data class Transmission(val id: Long, val toSend: Serializable) : Serializable
+data class Transmission(val id: Long, val payload: Serializable) : Serializable
 
-data class DataClientAction(val action: ClientActions, val data: Serializable? = null) : Serializable
-data class DataServerAction(val action: ServerActions, val data: Serializable? = null) : Serializable
+data class ClientAction(val action: ClientActions, val data: Serializable? = null) : Serializable
+data class ServerAction(val action: ServerActions, val data: Serializable? = null) : Serializable
 
-data class DataClientRequest(val type: ClientRequestType, val id: Long)
-data class DataServerResponse(val type: ClientRequestType, val data: Serializable, val error: Int = ServerResponseError.OK) : Serializable
+data class ClientRequest(val type: ClientRequestType, val key: Long) : Serializable
+data class ServerResponse(val type: ClientRequestType, val data: Serializable, val responseTo: Long, val error: Int = ServerResponseError.OK) : Serializable
 
 data class DataInitial(val teams: List<DataTeam>) : Serializable
 

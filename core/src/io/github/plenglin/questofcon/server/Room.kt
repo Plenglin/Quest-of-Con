@@ -2,10 +2,9 @@ package io.github.plenglin.questofcon.server
 
 import com.beust.klaxon.Parser
 import io.github.plenglin.questofcon.game.grid.World
-import io.github.plenglin.questofcon.server.data.ClientActions
-import io.github.plenglin.questofcon.server.data.DataClientAction
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
+import java.io.Serializable
 import java.net.Socket
 import java.util.logging.Logger
 
@@ -33,29 +32,47 @@ class SocketManager(val socket: Socket, val parent: Room) : Thread("SocketManage
 
     var parser = Parser()
 
+    lateinit var input: ObjectInputStream
+    lateinit var output: ObjectOutputStream
+
     override fun run() {
         logger.info("starting ${this.name}")
-        val input = ObjectInputStream(socket.getInputStream())
-        val output = ObjectOutputStream(socket.getOutputStream())
 
-        input.use { output.use {
-            while (true) {
-                val data = input.readObject() as DataClientAction
-                logger.fine("rcv $data")
+        output = ObjectOutputStream(socket.getOutputStream())
+        input = ObjectInputStream(socket.getInputStream())
 
-                when (data.action) {
-                    ClientActions.READY -> {
-
-                    }
-                    ClientActions.TALK -> {
-                        val msg = data.data as String
-                        logger.info("TALK -> $msg")
-                    }
-                    ClientActions.MOVE -> TODO()
-                    ClientActions.ATTACK -> TODO()
-                }
+        logger.info("listening to ${this.name}")
+        while (true) {
+            val transmission = input.readObject() as Transmission
+            val data = transmission.payload
+            logger.info("rcv $transmission")
+            when (data) {
+                is ClientRequest -> send(onRequest(transmission.id, data))
+                is ClientAction -> onAction(data)
             }
-        } }
+
+        }
+    }
+
+    private fun send(data: Serializable) {
+        output.writeObject(Transmission(getNextId(), data))
+    }
+
+    private var nextTransmissionId = 0L
+
+    private fun getNextId(): Long {
+        return nextTransmissionId++
+    }
+
+    fun onRequest(msgId: Long, request: ClientRequest): ServerResponse {
+        return when (request.type) {
+            ClientRequestType.BUILDING -> ServerResponse(request.type, "someone asked for building with id ${request.key}", msgId)
+            else -> ServerResponse(request.type, request.key, msgId, ServerResponseError.DATA_ERROR)
+        }
+    }
+
+    fun onAction(clientAction: ClientAction) {
+
     }
 
 }
