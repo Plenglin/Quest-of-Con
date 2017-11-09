@@ -17,7 +17,7 @@ object MPGameScreen : KtxScreen {
 
     override fun show() {
         client.start()
-        client.onInitialize = {
+        client.initialization.addListener {
             it.sendInitialData(System.getenv("title"))
         }
     }

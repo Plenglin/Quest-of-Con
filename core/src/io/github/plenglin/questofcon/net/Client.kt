@@ -1,5 +1,6 @@
 package io.github.plenglin.questofcon.net
 
+import io.github.plenglin.questofcon.ListenerManager
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.io.Serializable
@@ -18,8 +19,8 @@ class Client(val socket: Socket) : Thread("Client-$socket") {
     lateinit var input: ObjectInputStream
     lateinit var output: ObjectOutputStream
 
-    var onChangeTurn: (DataTeam) -> Unit = {}
-    var onInitialize: (Client) -> Unit = {}
+    var onTurnChanged = ListenerManager<DataTeam>()
+    var initialization = ListenerManager<Client>()
 
     private var nextTransmissionId = 0L
     //private val transmissionQueue = Queue<Transmission>()
@@ -31,7 +32,7 @@ class Client(val socket: Socket) : Thread("Client-$socket") {
         input = ObjectInputStream(socket.getInputStream())
         output = ObjectOutputStream(socket.getOutputStream())
 
-        onInitialize(this)
+        initialization.fire(this)
         while (true) {
             val trans = input.readObject() as Transmission
             val data = trans.payload
