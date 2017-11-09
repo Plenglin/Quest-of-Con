@@ -1,6 +1,8 @@
 package io.github.plenglin.questofcon.net
 
+import io.github.plenglin.questofcon.game.grid.Biome
 import java.io.Serializable
+import java.util.*
 
 
 enum class ClientActions : Serializable {
@@ -29,7 +31,26 @@ data class ServerAction(val action: ServerActions, val data: Serializable? = nul
 data class ClientRequest(val type: ClientRequestType, val key: Long) : Serializable
 data class ServerResponse(val type: ClientRequestType, val data: Serializable?, val responseTo: Long, val error: Int = ServerResponseError.OK) : Serializable
 
-data class DataInitial(val teams: List<DataTeam>) : Serializable
+data class DataInitialClientData(val name: String) : Serializable
+data class DataInitialResponse(val yourId: Long, val teams: List<DataTeam>, val world: DataWorldState) : Serializable
+
+data class DataWorldState(val grid: Array<Array<DataTile>>) : Serializable {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as DataWorldState
+
+        if (!Arrays.equals(grid, other.grid)) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return Arrays.hashCode(grid)
+    }
+}
+data class DataTile(val biome: Long, val elevation: Int) : Serializable
 
 data class DataPosition(val i: Int, val j: Int) : Serializable
 data class DataTeam(val name: String, val id: Long, val color: Int) : Serializable

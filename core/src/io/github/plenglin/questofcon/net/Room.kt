@@ -1,29 +1,85 @@
 package io.github.plenglin.questofcon.net
 
+import com.badlogic.gdx.graphics.Color
 import com.beust.klaxon.Parser
-import io.github.plenglin.questofcon.game.grid.World
+import io.github.plenglin.questofcon.game.GameState
+import io.github.plenglin.questofcon.game.Team
+import io.github.plenglin.questofcon.game.grid.*
+import io.github.plenglin.questofcon.screen.GameScreen
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.io.Serializable
 import java.net.Socket
+import java.util.concurrent.CyclicBarrier
 import java.util.logging.Logger
 
 
 class Room(val sockets: List<Socket>, val roomId: Long) : Thread("Room-$roomId") {
 
-    val world = World(32, 32)
+    lateinit var gameState: GameState
+
+    val colors = mutableListOf<Color>(Color.RED, Color.GREEN, Color.BLUE)
+
+    val barrier = CyclicBarrier(sockets.size + 1)
 
     val logger = Logger.getLogger(javaClass.name)
 
-    val clients = sockets.map { SocketManager(it, this) }
+    val clientsById = mutableMapOf<Long, SocketManager>()
 
     override fun run() {
-        logger.info("starting")
+        logger.info("${name} starting")
+
+        logger.info("$name connecting to clients")
+
+        barrier.reset()
+
+        val clients = sockets.map { SocketManager(it, this) }
+        clients.forEach { it.start() }
+
+        logger.info("$name waiting for clients to send initial message")
+        barrier.await()
+
+        logger.info("$name all clients sent info, now creating teams")
+
+        gameState = GameState(clients.map {
+            val data = it.initialTransmission
+            val team = Team(data.name, colors.removeAt(0))
+            logger.info("$name made team $team")
+            clientsById.put(team.id, it)
+            it.team = DataTeam(data.name, team.id, team.color.toIntBits())
+            team
+        })
+
         logger.info("generating world")
 
-        clients.forEach { it.start() }
+        generateWorld()
+
+        logger.info("sending back data")
+        sendInitialServerResponse()
+
     }
 
+    fun sendInitialServerResponse() {
+        clientsById.forEach { _, sock ->
+            sock.send(DataInitialResponse(
+                    sock.id,
+                    clientsById.values.map { it.team },
+                    gameState.world.serialized()
+            ))
+        }
+    }
+
+    fun generateWorld() {
+        val heightData = HeightMap(DiamondSquareHeightGenerator(3, initialOffsets = 2.0, iterativeRescale = 0.8).generate().grid).normalized
+        val rainfallData = HeightMap(DiamondSquareHeightGenerator(3, initialOffsets = 2.0, iterativeRescale = 0.8).generate().grid).normalized
+
+        println("Mapping height data to world...")
+        MapToHeight(gameState.world, heightData).doHeightMap()
+
+        println("Adding biomes...")
+        BiomeGenerator(gameState.world, heightData, rainfallData).applyBiomes()
+
+    }
 }
 
 class SocketManager(val socket: Socket, val parent: Room) : Thread("SocketManager-${parent.roomId}-${socket.inetAddress}") {
@@ -34,6 +90,9 @@ class SocketManager(val socket: Socket, val parent: Room) : Thread("SocketManage
 
     lateinit var input: ObjectInputStream
     lateinit var output: ObjectOutputStream
+
+    lateinit var initialTransmission: DataInitialClientData
+    lateinit var team: DataTeam
 
     override fun run() {
         logger.info("starting ${this.name}")
@@ -47,6 +106,10 @@ class SocketManager(val socket: Socket, val parent: Room) : Thread("SocketManage
             val data = transmission.payload
             logger.info("rcv $transmission")
             when (data) {
+                is DataInitialClientData -> {
+                    initialTransmission = data
+                    parent.barrier.await()
+                }
                 is ClientRequest -> send(onRequest(transmission.id, data))
                 is ClientAction -> onAction(data)
             }
@@ -54,7 +117,7 @@ class SocketManager(val socket: Socket, val parent: Room) : Thread("SocketManage
         }
     }
 
-    private fun send(data: Serializable) {
+    fun send(data: Serializable) {
         output.writeObject(Transmission(getNextId(), data))
     }
 

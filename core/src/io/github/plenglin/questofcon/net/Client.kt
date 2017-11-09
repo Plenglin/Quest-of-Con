@@ -7,7 +7,7 @@ import java.net.Socket
 import java.util.logging.Logger
 
 /**
- *
+ * Client-side view of the server.
  */
 class Client(val socket: Socket) : Thread("Client-$socket") {
 
@@ -19,6 +19,7 @@ class Client(val socket: Socket) : Thread("Client-$socket") {
     lateinit var output: ObjectOutputStream
 
     var onChangeTurn: (DataTeam) -> Unit = {}
+    var onInitialize: (Client) -> Unit = {}
 
     private var nextTransmissionId = 0L
     //private val transmissionQueue = Queue<Transmission>()
@@ -30,11 +31,14 @@ class Client(val socket: Socket) : Thread("Client-$socket") {
         input = ObjectInputStream(socket.getInputStream())
         output = ObjectOutputStream(socket.getOutputStream())
 
-        println("beginning")
+        onInitialize(this)
         while (true) {
             val trans = input.readObject() as Transmission
             val data = trans.payload
             when (data) {
+                is DataInitialResponse -> {
+                    println(data)
+                }
                 is ServerAction -> onActionReceived(data)
                 is ServerResponse -> onResponseReceived(data)
             }
@@ -55,6 +59,10 @@ class Client(val socket: Socket) : Thread("Client-$socket") {
         logger.info("sending $id, $data")
         output.writeObject(Transmission(id, data))
         return id
+    }
+
+    fun sendInitialData(name: String) {
+        send(DataInitialClientData(name))
     }
 
     /**

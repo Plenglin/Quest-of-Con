@@ -1,6 +1,7 @@
 package io.github.plenglin.questofcon.game.grid
 
 import io.github.plenglin.questofcon.net.DataPosition
+import io.github.plenglin.questofcon.net.DataWorldState
 
 /**
  *
@@ -35,6 +36,14 @@ class World(val width: Int, val height: Int) : Sequence<WorldCoords> {
 
     operator fun contains(coords: WorldCoords): Boolean {
         return coords.world == this && contains(coords.i, coords.j)
+    }
+
+    fun serialized(): DataWorldState {
+        return DataWorldState(
+                grid.map { col ->
+                    col.map { it.serialized() }.toTypedArray()
+                }.toTypedArray()
+        )
     }
 
 }
