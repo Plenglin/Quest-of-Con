@@ -18,9 +18,10 @@ abstract class PlayerInterface {
     abstract val teams: MutableMap<Long, Team>
     abstract val thisTeam: Long
 
-    val onTurnChange: ListenerManager<Team> = ListenerManager()
-    val onPawnUpdate: ListenerManager<Pawn> = ListenerManager()
-    val onBuildingUpdate: ListenerManager<DataBuilding> = ListenerManager()
+    val turnChange: ListenerManager<Team> = ListenerManager()
+    val pawnUpdate: ListenerManager<Pawn> = ListenerManager()
+    val buildingUpdate: ListenerManager<Building> = ListenerManager()
+    val worldUpdate: ListenerManager<Unit> = ListenerManager()
 
     // Actions
     abstract fun makePawn(at: WorldCoords, type: PawnCreator, onResult: (Pawn?) -> Unit = {})

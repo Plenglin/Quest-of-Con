@@ -12,6 +12,18 @@ import io.github.plenglin.questofcon.game.pawn.PawnCreator
 
 class PassAndPlayManager(val state: GameState) {
     val interfaces = mutableListOf<PassAndPlayInterface>()
+
+    init {
+        state.pawnChange.addListener { p ->
+            interfaces.forEach { it.pawnUpdate.fire(p) }
+        }
+        state.buildingChange.addListener { b ->
+            interfaces.forEach { it.buildingUpdate.fire(b) }
+        }
+        state.worldChange.addListener { p ->
+            interfaces.forEach { it.worldUpdate.fire(Unit) }
+        }
+    }
 }
 
 class PassAndPlayInterface(override val thisTeam: Long, val parent: PassAndPlayManager) : PlayerInterface() {
@@ -56,11 +68,11 @@ class PassAndPlayInterface(override val thisTeam: Long, val parent: PassAndPlayM
     }
 
     override fun getAllPawns(): Sequence<Pawn> {
-        return world.map { it.tile!!.pawn }.filterNotNull()
+        return gameState.getAllPawns()
     }
 
     override fun getAllBuildings(): Sequence<Building> {
-        return world.map { it.tile!!.building }.filterNotNull()
+        return gameState.getAllBuildings()
     }
 
 
