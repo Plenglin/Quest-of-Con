@@ -36,7 +36,7 @@ class PassAndPlayInterface(override val thisTeam: Long, val parent: PassAndPlayM
 
     override fun makePawn(at: WorldCoords, type: PawnCreator, onResult: (Pawn?) -> Unit) {
         team.money -= type.cost
-        val newPawn = type.createPawnAt(team, at)
+        val newPawn = type.createPawnAt(team, at, gameState)
         newPawn.apRemaining = 0
         onResult(newPawn)
     }

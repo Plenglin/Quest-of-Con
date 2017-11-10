@@ -2,6 +2,7 @@ package io.github.plenglin.questofcon.game.pawn
 
 import com.badlogic.gdx.graphics.Texture
 import io.github.plenglin.questofcon.Assets
+import io.github.plenglin.questofcon.game.GameState
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 import io.github.plenglin.questofcon.net.DataPawn
@@ -13,13 +14,13 @@ abstract class PawnCreator(val title: String, val cost: Int) {
 
     val id = nextCreatorId++
 
-    abstract fun createPawnAt(team: Team, worldCoords: WorldCoords): Pawn
+    abstract fun createPawnAt(team: Team, worldCoords: WorldCoords, state: GameState): Pawn
 
 }
 
 private var nextPawnId = 0L
 
-abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val maxHealth: Int, val actionPoints: Int, val texture: () -> Texture) {
+abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val maxHealth: Int, val actionPoints: Int, val texture: () -> Texture, val state: GameState) {
 
     var type = -1L
     val id = nextPawnId++
@@ -33,6 +34,7 @@ abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val 
             if (health <= 0) {
                 pos.tile!!.pawn = null
             }
+            state.pawnChange.fire(this)
         }
     var apRemaining: Int = actionPoints
 
@@ -103,6 +105,7 @@ abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val 
             pos.tile!!.pawn = null  // clear old tile
             coords.tile!!.pawn = this  // set new tile to this
             pos = coords  // set this pawn's reference
+            state.pawnChange.fire(this)
             return true
         }
         return false
@@ -117,6 +120,7 @@ abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val 
         val result = onAttack(coords)
         if (result) {
             attacksRemaining -= 1
+            state.pawnChange.fire(this)
         }
         return result
     }
@@ -172,17 +176,18 @@ class SimplePawnCreator(name: String, cost: Int) : PawnCreator(name, cost) {
     var range: Int = 1
     var maxAttacks: Int = 1
 
-    override fun createPawnAt(team: Team, worldCoords: WorldCoords): Pawn {
-        val pawn = SimplePawn(team, worldCoords)
+    override fun createPawnAt(team: Team, worldCoords: WorldCoords, state: GameState): Pawn {
+        val pawn = SimplePawn(team, worldCoords, state)
         worldCoords.tile!!.pawn = pawn
         pawn.type = id
+        state.pawnChange.fire(pawn)
         return pawn
     }
 
     /**
      * A simple pawn that can be melee or ranged.
      */
-    inner class SimplePawn(team: Team, pos: WorldCoords) : Pawn(title, team, pos, maxHealth, actionPoints, texture) {
+    inner class SimplePawn(team: Team, pos: WorldCoords, state: GameState) : Pawn(title, team, pos, maxHealth, actionPoints, texture, state) {
 
         override fun damageTo(coords: WorldCoords): Int {
             val mult = Pawn.elevationDamageMultiplier(pos.tile!!.elevation, coords.tile!!.elevation)
