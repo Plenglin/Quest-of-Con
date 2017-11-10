@@ -34,7 +34,6 @@ object GameScreen : KtxScreen {
     override fun show() {
         batch = SpriteBatch()
         gameState = GameState(listOf(teamA, teamB, teamC))
-        UI.targetGameState = gameState
         println("Generating terrain...")
 
         println("Generating height data...")

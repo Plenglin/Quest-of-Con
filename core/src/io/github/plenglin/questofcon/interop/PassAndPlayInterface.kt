@@ -26,19 +26,17 @@ class PassAndPlayManager(val state: GameState) {
     }
 }
 
-class PassAndPlayInterface(override val thisTeam: Long, val parent: PassAndPlayManager) : PlayerInterface() {
+class PassAndPlayInterface(override val thisTeamId: Long, val parent: PassAndPlayManager) : PlayerInterface() {
 
     val gameState: GameState = parent.state
     override val world: World = gameState.world
     override val teams: MutableMap<Long, Team> = mutableMapOf(*gameState.teams.map { it.id to it }.toTypedArray())
 
-    val team = teams[thisTeam]!!
-
     override fun makePawn(at: WorldCoords, type: PawnCreator, onResult: (Pawn?) -> Unit) {
         val building = at.tile!!.building
-        if (team.money >= type.cost && building?.canCreate(type) == true && building.team == team) {
-            team.money -= type.cost
-            val newPawn = type.createPawnAt(team, at, gameState)
+        if (thisTeam.money >= type.cost && building?.canCreate(type) == true && building.team == thisTeam) {
+            thisTeam.money -= type.cost
+            val newPawn = type.createPawnAt(thisTeam, at, gameState)
             newPawn.apRemaining = 0
             onResult(newPawn)
         } else {
@@ -48,25 +46,25 @@ class PassAndPlayInterface(override val thisTeam: Long, val parent: PassAndPlayM
 
     override fun movePawn(id: Long, to: WorldCoords, onResult: (Boolean) -> Unit) {
         val pawn = getPawnData(id)!!
-        if (pawn.team == this.team) {
+        if (pawn.team == this.thisTeam) {
             onResult(pawn.moveTo(to, pawn.getMovableSquares()))
         }
     }
 
     override fun attackPawn(id: Long, target: WorldCoords, onResult: (Boolean) -> Unit) {
         val pawn = getPawnData(id)!!
-        if (pawn.team == this.team) {
+        if (pawn.team == this.thisTeam) {
             onResult(pawn.getAttackableSquares().contains(target) && pawn.attemptAttack(target))
         }
     }
 
     override fun makeBuilding(at: WorldCoords, type: BuildingCreator, onResult: (Building?) -> Unit) {
-        if (team.money < type.cost) {
+        if (thisTeam.money < type.cost) {
             onResult(null)
             return
         }
-        team.money -= type.cost
-        val building = type.createBuildingAt(team, at, gameState)
+        thisTeam.money -= type.cost
+        val building = type.createBuildingAt(thisTeam, at, gameState)
         building.enabled = false
         gameState.buildingChange.fire(building)
         onResult(building)
@@ -74,7 +72,7 @@ class PassAndPlayInterface(override val thisTeam: Long, val parent: PassAndPlayM
 
     override fun demolishBuilding(id: Long, onResult: (Boolean) -> Unit) {
         val building = getBuildingData(id)!!
-        if (building.team == team) {
+        if (building.team == thisTeam) {
             building.health = 0
             onResult(true)
         }

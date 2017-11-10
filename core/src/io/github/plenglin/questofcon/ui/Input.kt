@@ -104,7 +104,7 @@ object MapControlInputManager : KtxInputAdapter {
 object GridSelectionInputManager : KtxInputAdapter {
 
     val cam: OrthographicCamera = UI.gridCam
-    val world: World = UI.targetGameState.world
+    val world: World = UI.targetPlayerInterface.world
     val selectionListeners = mutableListOf<(WorldCoords?, Int, Int) -> Unit>()
 
     var selectedShadeSet: ShadeSet? = null
@@ -229,7 +229,7 @@ object RadialMenuInputManager : KtxInputAdapter {
     }
 
     private fun getSelectables(): List<Selectable> {
-        val currentTeam = UI.targetGameState.getCurrentTeam()
+        val currentTeam = UI.targetPlayerInterface.thisTeam
         val selection = GridSelectionInputManager.hovering ?: return emptyList()
 
         if (currentTeam.hasBuiltHQ) {
@@ -252,7 +252,6 @@ object RadialMenuInputManager : KtxInputAdapter {
             if (selection.tile.canBuildOn(currentTeam)) {
                 actions.add(Selectable("Build", {
                     BuildingSpawningDialog(
-                            UI.targetGameState.getCurrentTeam(),
                             UI.skin,
                             it
                     ).show(UI.stage)
@@ -264,7 +263,7 @@ object RadialMenuInputManager : KtxInputAdapter {
         } else {
             return if (selection.tile?.canBuildOn(currentTeam) == true)
                 listOf(Selectable("Build HQ", {
-                    BuildingHQ.createBuildingAt(currentTeam, selection)
+                    UI.targetPlayerInterface.makeBuilding(selectedCoord, BuildingHQ)
                 }))
             else emptyList()
         }

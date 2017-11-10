@@ -166,9 +166,7 @@ class UnitSpawningDialog(val units: List<PawnCreator>, skin: Skin, val worldCoor
 
                     addListener(object : ChangeListener() {
                         override fun changed(event: ChangeEvent?, actor: Actor?) {
-                            team.money -= pawn.cost
-                            val newPawn = pawn.createPawnAt(team, worldCoords)
-                            newPawn.apRemaining = 0
+                            UI.targetPlayerInterface.makePawn(worldCoords, pawn)
                             UI.updateData()
                             this@UnitSpawningDialog.hide()
                         }
@@ -185,7 +183,9 @@ class UnitSpawningDialog(val units: List<PawnCreator>, skin: Skin, val worldCoor
 
 }
 
-class BuildingSpawningDialog(val team: Team, skin: Skin, val worldCoords: WorldCoords) : Dialog("Spawn", skin) {
+class BuildingSpawningDialog(skin: Skin, val worldCoords: WorldCoords) : Dialog("Spawn", skin) {
+
+    val team = UI.targetPlayerInterface.thisTeam
 
     init {
         val buildings = team.getBuildable()
@@ -201,9 +201,7 @@ class BuildingSpawningDialog(val team: Team, skin: Skin, val worldCoords: WorldC
 
                     addListener(object : ChangeListener() {
                         override fun changed(event: ChangeEvent?, actor: Actor?) {
-                            team.money -= bldg.cost
-                            val building = bldg.createBuildingAt(team, worldCoords)
-                            building.enabled = false
+                            UI.targetPlayerInterface.makeBuilding(worldCoords, bldg, {})
                             UI.updateData()
                             this@BuildingSpawningDialog.hide()
                         }

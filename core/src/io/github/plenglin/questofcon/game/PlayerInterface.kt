@@ -16,7 +16,8 @@ abstract class PlayerInterface {
     
     abstract val world: World
     abstract val teams: MutableMap<Long, Team>
-    abstract val thisTeam: Long
+    abstract val thisTeamId: Long
+    val thisTeam get() = teams[thisTeamId]!!
 
     val turnChange: ListenerManager<Team> = ListenerManager()
     val pawnUpdate: ListenerManager<Pawn> = ListenerManager()
@@ -27,9 +28,9 @@ abstract class PlayerInterface {
     abstract fun makePawn(at: WorldCoords, type: PawnCreator, onResult: (Pawn?) -> Unit = {})
     abstract fun movePawn(id: Long, to: WorldCoords, onResult: (Boolean) -> Unit = {})
     abstract fun attackPawn(id: Long, target: WorldCoords, onResult: (Boolean) -> Unit = {})
-    abstract fun makeBuilding(at: WorldCoords, type: BuildingCreator, onResult: (Building?) -> Unit)
-    abstract fun demolishBuilding(id: Long, onResult: (Boolean) -> Unit)
-    abstract fun sendEndTurn(onResult: (Team) -> Unit)
+    abstract fun makeBuilding(at: WorldCoords, type: BuildingCreator, onResult: (Building?) -> Unit = {})
+    abstract fun demolishBuilding(id: Long, onResult: (Boolean) -> Unit = {})
+    abstract fun sendEndTurn(onResult: (Team) -> Unit = {})
 
     // Data
     fun getPawnData(id: Long): Pawn? {

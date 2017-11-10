@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.utils.viewport.ScreenViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 import io.github.plenglin.questofcon.game.GameState
+import io.github.plenglin.questofcon.game.PlayerInterface
 import io.github.plenglin.questofcon.render.ShadeSet
 import io.github.plenglin.questofcon.screen.GameScreen
 import ktx.scene2d.Scene2DSkin
@@ -23,7 +24,8 @@ object UI {
 
     val shadeSets = mutableListOf<ShadeSet>()
 
-    lateinit var targetGameState: GameState
+    //lateinit var targetGameState: GameState
+    lateinit var targetPlayerInterface: PlayerInterface
 
     lateinit var infoPanel: GameStateInfoController
     lateinit var tileInfo: TileInfoPanel
