@@ -4,17 +4,13 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
-import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import io.github.plenglin.questofcon.Assets
-import io.github.plenglin.questofcon.TerrainTextures
-import io.github.plenglin.questofcon.Textures
 import io.github.plenglin.questofcon.game.GameData
 import io.github.plenglin.questofcon.game.GameState
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.building.BuildingFactory
 import io.github.plenglin.questofcon.game.grid.*
-import io.github.plenglin.questofcon.render.ShadeSet
 import io.github.plenglin.questofcon.render.WorldRenderer
 import io.github.plenglin.questofcon.ui.*
 import ktx.app.KtxScreen
@@ -25,14 +21,11 @@ import ktx.assets.disposeSafely
  */
 object GameScreen : KtxScreen {
 
-    val gridCam = OrthographicCamera()
     lateinit var batch: SpriteBatch
 
     lateinit var worldRenderer: WorldRenderer
 
     lateinit var gameState: GameState
-
-    val shadeSets = mutableListOf<ShadeSet>()
 
     val teamA = Team("escargot", Color.BLUE)
     val teamB = Team("parfait", Color.WHITE)
@@ -41,6 +34,7 @@ object GameScreen : KtxScreen {
     override fun show() {
         batch = SpriteBatch()
         gameState = GameState(listOf(teamA, teamB, teamC))
+        UI.targetGameState = gameState
         println("Generating terrain...")
 
         println("Generating height data...")
@@ -68,8 +62,8 @@ object GameScreen : KtxScreen {
 
         worldRenderer = WorldRenderer(gameState.world)
 
-        gridCam.zoom = 1/48f
-        gridCam.position.set(0f, 0f, 0f)
+        UI.gridCam.zoom = 1/48f
+        UI.gridCam.position.set(0f, 0f, 0f)
 
         UI.generateUI()
 
@@ -80,15 +74,15 @@ object GameScreen : KtxScreen {
 
         UI.update(delta)
         MapControlInputManager.update(delta)
-        gridCam.update()
+        UI.gridCam.update()
 
         Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
         Gdx.gl20.glClearColor(0f, 0f, 0f ,1f)
 
-        worldRenderer.shape.projectionMatrix = gridCam.combined
-        worldRenderer.batch.projectionMatrix = gridCam.combined
+        worldRenderer.shape.projectionMatrix = UI.gridCam.combined
+        worldRenderer.batch.projectionMatrix = UI.gridCam.combined
 
-        worldRenderer.render(false, *shadeSets.toTypedArray())
+        worldRenderer.render(false, *UI.shadeSets.toTypedArray())
 
         UI.draw()
 
@@ -101,7 +95,7 @@ object GameScreen : KtxScreen {
     }
 
     override fun resize(width: Int, height: Int) {
-        gridCam.setToOrtho(false, width.toFloat(), height.toFloat())
+        UI.gridCam.setToOrtho(false, width.toFloat(), height.toFloat())
         UI.viewport.update(width, height, true)
     }
 

@@ -5,9 +5,7 @@ import io.github.plenglin.questofcon.Constants
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 import io.github.plenglin.questofcon.game.pawn.Pawn
 import io.github.plenglin.questofcon.render.ShadeSet
-import io.github.plenglin.questofcon.screen.GameScreen
 import ktx.app.KtxInputAdapter
-import ktx.app.color
 
 
 object PawnActionManager {
@@ -32,7 +30,7 @@ object PawnActionManager {
                     mode = ShadeSet.SHADE,
                     shading = Constants.movementColor
             )
-            GameScreen.shadeSets.add(primaryShadeSet)
+            UI.shadeSets.add(primaryShadeSet)
             state = PawnActionState.MOVE
         }
     }
@@ -58,7 +56,7 @@ object PawnActionManager {
                     mode = ShadeSet.SHADE or ShadeSet.OUTLINE,
                     shading = Constants.attackColor
             )
-            GameScreen.shadeSets.add(primaryShadeSet)
+            UI.shadeSets.add(primaryShadeSet)
             state = PawnActionState.ATTACK
         }
     }
@@ -74,21 +72,21 @@ object PawnActionManager {
     }
 
     fun setTargetingRadius(coords: WorldCoords) {
-        GameScreen.shadeSets.remove(hoveringShadeSet)
+        UI.shadeSets.remove(hoveringShadeSet)
         hoveringShadeSet = ShadeSet(
                 PawnActionManager.pawn!!.getTargetingRadius(coords),
                 mode = ShadeSet.INNER_LINES,
                 shading = Constants.attackColor,
                 lines = Constants.attackColor
         )
-        GameScreen.shadeSets.add(hoveringShadeSet)
+        UI.shadeSets.add(hoveringShadeSet)
     }
 
     fun cleanAction() {
         this.pawn = null
         state = PawnActionState.NONE
-        GameScreen.shadeSets.remove(hoveringShadeSet)
-        GameScreen.shadeSets.remove(primaryShadeSet)
+        UI.shadeSets.remove(hoveringShadeSet)
+        UI.shadeSets.remove(primaryShadeSet)
         UI.pawnTooltip.isVisible = false
     }
 
@@ -103,7 +101,7 @@ object PawnActionInputProcessor : KtxInputAdapter {
 
     override fun keyDown(keycode: Int): Boolean {
         val pawn = GridSelectionInputManager.selection?.tile?.pawn ?: return false
-        if (pawn.team != GameScreen.gameState.getCurrentTeam() || pawn.apRemaining <= 0) {
+        if (pawn.team != UI.targetGameState.getCurrentTeam() || pawn.apRemaining <= 0) {
             return false
         }
         when (keycode) {
