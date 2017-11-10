@@ -8,9 +8,12 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import io.github.plenglin.questofcon.Assets
 import io.github.plenglin.questofcon.game.GameData
 import io.github.plenglin.questofcon.game.GameState
+import io.github.plenglin.questofcon.game.PlayerInterface
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.building.BuildingFactory
 import io.github.plenglin.questofcon.game.grid.*
+import io.github.plenglin.questofcon.interop.PassAndPlayInterface
+import io.github.plenglin.questofcon.interop.PassAndPlayManager
 import io.github.plenglin.questofcon.render.WorldRenderer
 import io.github.plenglin.questofcon.ui.*
 import ktx.app.KtxScreen
@@ -31,9 +34,20 @@ object GameScreen : KtxScreen {
     val teamB = Team("parfait", Color.WHITE)
     val teamC = Team("le baguette", Color.RED)
 
+    lateinit var currentPlayerInterface: PlayerInterface
+    lateinit var ifMan: PassAndPlayManager
+
     override fun show() {
         batch = SpriteBatch()
         gameState = GameState(listOf(teamA, teamB, teamC))
+        ifMan = PassAndPlayManager(gameState)
+        gameState.turnChange.addListener { newTeam ->
+            println(newTeam)
+            println(ifMan.interfaces)
+            currentPlayerInterface = ifMan.interfaces.find { it.thisTeam == newTeam }!!
+            UI.targetPlayerInterface = currentPlayerInterface
+        }
+
         println("Generating terrain...")
 
         println("Generating height data...")
@@ -65,6 +79,7 @@ object GameScreen : KtxScreen {
         UI.gridCam.position.set(0f, 0f, 0f)
 
         UI.generateUI()
+        gameState.nextTurn()
 
         Gdx.input.inputProcessor = InputMultiplexer(UI.stage, MapControlInputManager, PawnActionInputProcessor, RadialMenuInputManager, GridSelectionInputManager)
     }

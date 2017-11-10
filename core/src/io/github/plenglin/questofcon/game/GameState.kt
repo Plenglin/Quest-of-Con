@@ -14,6 +14,7 @@ class GameState(val teams: List<Team>) {
     private var teamIndex = 0
     private var events = mutableListOf<Event>()
 
+    val turnChange = ListenerManager<Team>()
     val pawnChange = ListenerManager<Pawn>()
     val buildingChange = ListenerManager<Building>()
     val worldChange = ListenerManager<World>()
@@ -33,6 +34,7 @@ class GameState(val teams: List<Team>) {
         getCurrentTeam().endTurn()
         teamIndex = (teamIndex + 1) % teams.size
         getCurrentTeam().startTurn()
+        turnChange.fire(getCurrentTeam())
     }
 
     fun queueEvent(event: Event) {

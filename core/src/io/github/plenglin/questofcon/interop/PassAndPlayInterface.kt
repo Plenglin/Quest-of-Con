@@ -11,7 +11,7 @@ import io.github.plenglin.questofcon.game.pawn.Pawn
 import io.github.plenglin.questofcon.game.pawn.PawnCreator
 
 class PassAndPlayManager(val state: GameState) {
-    val interfaces = mutableListOf<PassAndPlayInterface>()
+    val interfaces = state.teams.map { PassAndPlayInterface(it.id, this) }
 
     init {
         state.pawnChange.addListener { p ->
