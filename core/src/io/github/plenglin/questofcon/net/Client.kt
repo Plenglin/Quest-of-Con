@@ -1,6 +1,7 @@
 package io.github.plenglin.questofcon.net
 
 import io.github.plenglin.questofcon.ListenerManager
+import io.github.plenglin.questofcon.game.DummyGameState
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.io.Serializable
@@ -12,6 +13,7 @@ import java.util.logging.Logger
  */
 class Client(val socket: Socket, val playerName: String) : Thread("Client-$playerName-$socket") {
 
+    val dummy = DummyGameState()
     val logger = Logger.getLogger(this.name)
 
     //CHRIS WAS HERE
@@ -27,6 +29,8 @@ class Client(val socket: Socket, val playerName: String) : Thread("Client-$playe
      * Called when the server has responded to our initial request.
      */
     var initialization = ListenerManager<Client>()
+
+    val onServerEvent = ListenerManager<ServerEvent>()
 
     private var nextTransmissionId = 0L
     //private val transmissionQueue = Queue<Transmission>()
@@ -85,6 +89,15 @@ class Client(val socket: Socket, val playerName: String) : Thread("Client-$playe
     }
 
     /**
+     * Request something.
+     */
+    fun action(type: ClientActions, data: Serializable? = null, onResponse: (ServerResponse) -> Unit = {}) {
+        val id = send(ClientAction(type, data))
+        responseListeners[id] = onResponse
+    }
+
+    /*
+    /**
      * Request something, but block the thread until that something is received.
      */
     fun requestBlocking(type: ClientRequestType, key: Long): ServerResponse {
@@ -102,9 +115,9 @@ class Client(val socket: Socket, val playerName: String) : Thread("Client-$playe
 
     fun getPawnWithId(key: Long): DataPawn? {
         return requestBlocking(ClientRequestType.PAWN, key).data as DataPawn
-    }
+    }*/
 
-    fun getNextId(): Long {
+    private fun getNextId(): Long {
         synchronized (nextTransmissionId) {
             return nextTransmissionId++
         }

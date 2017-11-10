@@ -5,11 +5,11 @@ import java.util.*
 
 
 enum class ClientActions : Serializable {
-    READY, TALK, MOVE, ATTACK
+    MAKE_PAWN, MAKE_BUILDING, DEMOLISH_BUILDING, TALK, MOVE, ATTACK
 }
 
 enum class ServerEventTypes : Serializable {
-    WORLD_STATE, PAWN_MOVEMENT, PAWN_ATTACK, PAWN_DEATH, TERRAIN_CHANGE
+    TALK, BUILDING_CHANGE, PAWN_CHANGE, TERRAIN_CHANGE
 }
 
 enum class ClientRequestType {
@@ -20,6 +20,7 @@ object ServerResponseError {
     val OK = 0
     val ID_DOES_NOT_EXIST = 1
     val DATA_ERROR = 2
+    val FORBIDDEN = 3
 }
 
 data class Transmission(val id: Long, val payload: Serializable) : Serializable
@@ -53,8 +54,13 @@ data class DataTile(val biome: Long, val elevation: Int) : Serializable
 
 data class DataPosition(val i: Int, val j: Int) : Serializable
 data class DataTeam(val name: String, val id: Long, val color: Int) : Serializable
-data class DataPawn(val id: Long, val team: Long, val type: Long, val pos: DataPosition) : Serializable
-data class DataBuilding(val id: Long, val team: Long, val type: Long, val pos: DataPosition) : Serializable
+data class DataPawn(val id: Long, val team: Long, val type: Long, val health: Int, val pos: DataPosition) : Serializable
 
+data class DataBuilding(val id: Long, val team: Long, val type: Long, val health: Int, val pos: DataPosition) : Serializable
+
+data class DataPawnCreation(val type: Long, val at: DataPosition) : Serializable
+data class DataBuildingCreation(val type: Long, val at: DataPosition) : Serializable
 data class DataPawnMovement(val unit: Long, val to: DataPosition) : Serializable
 data class DataPawnAttack(val unit: Long, val pos: DataPosition) : Serializable
+
+data class DataChat(val from: Long, val text: String) : Serializable

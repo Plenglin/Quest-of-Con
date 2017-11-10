@@ -9,7 +9,11 @@ import io.github.plenglin.questofcon.ui.ConfirmationDialog
 import io.github.plenglin.questofcon.ui.Selectable
 import io.github.plenglin.questofcon.ui.UI
 
+var nextBuildingCreatorId = 0L
+
 abstract class BuildingCreator(val name: String, val cost: Int) {
+
+    val id = nextBuildingCreatorId++
 
     abstract fun createBuildingAt(team: Team, worldCoords: WorldCoords, gameState: GameState): Building
 

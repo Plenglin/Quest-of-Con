@@ -10,9 +10,7 @@ import io.github.plenglin.questofcon.game.grid.WorldCoords
 
 private var nextTeamId = 0L
 
-class Team(val name: String, val color: Color) {
-
-    val id = nextTeamId++
+class Team(val name: String, val color: Color, val id: Long = nextTeamId++) {
 
     var money: Int = Constants.STARTING_MONEY
     var hasBuiltHQ = false

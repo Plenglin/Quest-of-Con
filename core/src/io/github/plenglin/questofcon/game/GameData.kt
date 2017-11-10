@@ -63,4 +63,11 @@ object GameData {
             BuildingFactory, BuildingMine
     ).sortedBy { it.name }
 
+    fun buildingByType(type: Long): BuildingCreator {
+        return spawnableBuildings.find { it.id == type }!!
+    }
+
+    fun pawnByType(type: Long): PawnCreator {
+        return spawnableUnits.find { it.id == type }!!
+    }
 }

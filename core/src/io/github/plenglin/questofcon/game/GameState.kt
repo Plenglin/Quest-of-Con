@@ -8,7 +8,7 @@ import io.github.plenglin.questofcon.game.pawn.Pawn
 /**
  *
  */
-class GameState(val teams: List<Team>) {
+open class GameState(val teams: List<Team>) {
 
     val world = World(32, 32)
     private var teamIndex = 0
@@ -59,5 +59,9 @@ class GameState(val teams: List<Team>) {
     fun getAllBuildings(): Sequence<Building> {
         return world.map { it.tile!!.building }.filterNotNull()
     }
+
+}
+
+class DummyGameState() : GameState(listOf()) {
 
 }
