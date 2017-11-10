@@ -39,11 +39,6 @@ object GameScreen : KtxScreen {
     val teamC = Team("le baguette", Color.RED)
 
     override fun show() {
-        Textures.values().forEach { it.load() }
-        TerrainTextures.values().forEach { it.load() }
-        Assets.load()
-        Assets.manager.finishLoading()
-
         batch = SpriteBatch()
         gameState = GameState(listOf(teamA, teamB, teamC))
         println("Generating terrain...")

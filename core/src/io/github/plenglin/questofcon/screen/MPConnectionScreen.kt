@@ -1,14 +1,17 @@
 package io.github.plenglin.questofcon.screen
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
 import com.badlogic.gdx.utils.viewport.ScreenViewport
 import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const
+import io.github.plenglin.questofcon.Assets
 import io.github.plenglin.questofcon.Constants
 import io.github.plenglin.questofcon.QuestOfCon
+import io.github.plenglin.questofcon.TerrainTextures
 import io.github.plenglin.questofcon.net.Client
 import io.github.plenglin.questofcon.ui.UI
 import ktx.app.KtxScreen
@@ -24,7 +27,11 @@ object MPConnectionScreen : KtxScreen {
     val viewport = ScreenViewport()
     val stage = Stage()
 
+    var screenToSet: Screen? = null
+
     override fun show() {
+        screenToSet = null
+
         Scene2DSkin.defaultSkin = UI.skin
         stage.addActor(table {
             button {
@@ -37,7 +44,7 @@ object MPConnectionScreen : KtxScreen {
                     client.initialization.addListener {
                         println("asdf")
                         MPGameScreen.initializeWith(client)
-                        QuestOfCon.screen = MPGameScreen
+                        screenToSet = MPGameScreen
                     }
                     client.start()
                 }
@@ -49,6 +56,9 @@ object MPConnectionScreen : KtxScreen {
     }
 
     override fun render(delta: Float) {
+        if (screenToSet != null) {
+            QuestOfCon.screen = screenToSet
+        }
         Gdx.gl20.glClearColor(0f, 0.5f, 0.5f, 1f)
         Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
         stage.draw()

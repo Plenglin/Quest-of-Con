@@ -11,6 +11,11 @@ import io.github.plenglin.questofcon.screen.MPGameScreen
 object QuestOfCon : Game() {
 
     override fun create() {
+        Textures.values().forEach { it.load() }
+        TerrainTextures.values().forEach { it.load() }
+        Assets.load()
+        Assets.manager.finishLoading()
+
         if (System.getenv("mp") == "1") {
             setScreen(MPConnectionScreen)
         } else {
