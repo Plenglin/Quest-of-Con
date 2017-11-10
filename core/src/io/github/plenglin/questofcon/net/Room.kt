@@ -5,7 +5,6 @@ import com.beust.klaxon.Parser
 import io.github.plenglin.questofcon.game.GameState
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.*
-import io.github.plenglin.questofcon.screen.GameScreen
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.io.Serializable
@@ -14,7 +13,10 @@ import java.util.concurrent.CyclicBarrier
 import java.util.logging.Logger
 
 
-class Room(val sockets: List<Socket>, val roomId: Long) : Thread("Room-$roomId") {
+class Room(val sockets: List<Socket>, val roomId: Long) : Thread("Room-$roomId"), Iterable<SocketManager> {
+    override fun iterator(): Iterator<SocketManager> {
+        return clientsById.values.iterator()
+    }
 
     lateinit var gameState: GameState
 
@@ -57,6 +59,10 @@ class Room(val sockets: List<Socket>, val roomId: Long) : Thread("Room-$roomId")
         logger.info("sending back data")
         sendInitialServerResponse()
 
+    }
+
+    fun broadcastEvent(eventType: ServerEventTypes, data: Serializable) {
+        forEach { it.send(ServerEvent(eventType, data)) }
     }
 
     fun sendInitialServerResponse() {

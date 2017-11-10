@@ -40,13 +40,13 @@ class Client(val socket: Socket) : Thread("Client-$socket") {
                 is DataInitialResponse -> {
                     println(data)
                 }
-                is ServerAction -> onActionReceived(data)
+                is ServerEvent -> onEventReceived(data)
                 is ServerResponse -> onResponseReceived(data)
             }
         }
     }
 
-    private fun onActionReceived(action: ServerAction) {
+    private fun onEventReceived(action: ServerEvent) {
         logger.fine("received action $action")
     }
 

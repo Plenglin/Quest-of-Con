@@ -1,6 +1,5 @@
 package io.github.plenglin.questofcon.net
 
-import io.github.plenglin.questofcon.game.grid.Biome
 import java.io.Serializable
 import java.util.*
 
@@ -9,7 +8,7 @@ enum class ClientActions : Serializable {
     READY, TALK, MOVE, ATTACK
 }
 
-enum class ServerActions : Serializable {
+enum class ServerEventTypes : Serializable {
     WORLD_STATE, PAWN_MOVEMENT, PAWN_ATTACK, PAWN_DEATH, TERRAIN_CHANGE
 }
 
@@ -26,7 +25,7 @@ object ServerResponseError {
 data class Transmission(val id: Long, val payload: Serializable) : Serializable
 
 data class ClientAction(val action: ClientActions, val data: Serializable? = null) : Serializable
-data class ServerAction(val action: ServerActions, val data: Serializable? = null) : Serializable
+data class ServerEvent(val action: ServerEventTypes, val data: Serializable? = null) : Serializable
 
 data class ClientRequest(val type: ClientRequestType, val key: Long) : Serializable
 data class ServerResponse(val type: ClientRequestType, val data: Serializable?, val responseTo: Long, val error: Int = ServerResponseError.OK) : Serializable
