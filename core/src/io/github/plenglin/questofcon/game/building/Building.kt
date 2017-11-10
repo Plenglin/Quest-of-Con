@@ -42,7 +42,7 @@ abstract class Building(val name: String, var team: Team, var pos: WorldCoords, 
 
     open fun getRadialActions() = listOf(Selectable("Demolish $name", {
         ConfirmationDialog("Demolish $name", UI.skin, {
-            health = 0
+            UI.targetPlayerInterface.demolishBuilding(this.id)
         }).show(UI.stage)
     }))
 

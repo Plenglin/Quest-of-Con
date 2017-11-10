@@ -35,14 +35,11 @@ object PawnActionManager {
         }
     }
 
-    fun attemptFinishMoving(coords: WorldCoords): Boolean {
+    fun attemptFinishMoving(coords: WorldCoords) {
         val pawn = pawn!!
-        if (pawn.moveTo(coords, movementSquares)) {
-            cleanAction()
-            return true
-        } else {
-            return false
-        }
+        UI.targetPlayerInterface.movePawn(pawn.id, coords, {
+            if (it) cleanAction()
+        })
     }
 
     fun beginAttacking(pawn: Pawn) {
@@ -61,14 +58,13 @@ object PawnActionManager {
         }
     }
 
-    fun attemptFinishAttacking(coords: WorldCoords): Boolean {
+    fun attemptFinishAttacking(coords: WorldCoords) {
         val pawn = pawn!!
-        if (attackSquares.contains(coords) && pawn.attemptAttack(coords)) {
-            cleanAction()
-            return true
-        } else {
-            return false
-        }
+        UI.targetPlayerInterface.attackPawn(pawn.id, coords, {
+            if (it) {
+                cleanAction()
+            }
+        })
     }
 
     fun setTargetingRadius(coords: WorldCoords) {
