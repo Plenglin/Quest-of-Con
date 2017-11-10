@@ -8,7 +8,7 @@ import java.net.Socket
 import java.util.logging.Logger
 
 /**
- * Client-side view of the server.
+ * Client-side server data sender.
  */
 class Client(val socket: Socket, val playerName: String) : Thread("Client-$playerName-$socket") {
 
