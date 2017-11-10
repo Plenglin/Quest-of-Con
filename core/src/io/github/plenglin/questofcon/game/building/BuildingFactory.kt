@@ -3,13 +3,15 @@ package io.github.plenglin.questofcon.game.building
 import com.badlogic.gdx.graphics.Texture
 import io.github.plenglin.questofcon.Textures
 import io.github.plenglin.questofcon.game.GameData
+import io.github.plenglin.questofcon.game.GameState
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
+import io.github.plenglin.questofcon.game.pawn.PawnCreator
 import io.github.plenglin.questofcon.ui.Selectable
 import io.github.plenglin.questofcon.ui.UI
 import io.github.plenglin.questofcon.ui.UnitSpawningDialog
 
-class BuildingFactory(team: Team, pos: WorldCoords) : Building("factory", team, pos, 100) {
+class BuildingFactory(team: Team, pos: WorldCoords, gameState: GameState) : Building("factory", team, pos, 100, gameState) {
 
     override val texture: Texture = Textures.FACTORY()
 
@@ -23,11 +25,15 @@ class BuildingFactory(team: Team, pos: WorldCoords) : Building("factory", team, 
 
     companion object : BuildingCreator("factory", 200) {
 
-        override fun createBuildingAt(team: Team, worldCoords: WorldCoords): Building {
-            val building = BuildingFactory(team, worldCoords)
+        override fun createBuildingAt(team: Team, worldCoords: WorldCoords, gameState: GameState): Building {
+            val building = BuildingFactory(team, worldCoords, gameState)
             worldCoords.tile!!.building = building
             return building
         }
 
+    }
+
+    override fun canCreate(type: PawnCreator): Boolean {
+        return true
     }
 }

@@ -35,31 +35,50 @@ class PassAndPlayInterface(override val thisTeam: Long, val parent: PassAndPlayM
     val team = teams[thisTeam]!!
 
     override fun makePawn(at: WorldCoords, type: PawnCreator, onResult: (Pawn?) -> Unit) {
-        team.money -= type.cost
-        val newPawn = type.createPawnAt(team, at, gameState)
-        newPawn.apRemaining = 0
-        onResult(newPawn)
+        val building = at.tile!!.building
+        if (team.money >= type.cost && building?.canCreate(type) == true && building.team == team) {
+            team.money -= type.cost
+            val newPawn = type.createPawnAt(team, at, gameState)
+            newPawn.apRemaining = 0
+            onResult(newPawn)
+        } else {
+            onResult(null)
+        }
     }
 
     override fun movePawn(id: Long, to: WorldCoords, onResult: (Boolean) -> Unit) {
         val pawn = getPawnData(id)!!
-        onResult(pawn.moveTo(to, pawn.getMovableSquares()))
+        if (pawn.team == this.team) {
+            onResult(pawn.moveTo(to, pawn.getMovableSquares()))
+        }
     }
 
     override fun attackPawn(id: Long, target: WorldCoords, onResult: (Boolean) -> Unit) {
         val pawn = getPawnData(id)!!
-        onResult(pawn.getAttackableSquares().contains(target) && pawn.attemptAttack(target))
+        if (pawn.team == this.team) {
+            onResult(pawn.getAttackableSquares().contains(target) && pawn.attemptAttack(target))
+        }
     }
 
     override fun makeBuilding(at: WorldCoords, type: BuildingCreator, onResult: (Building?) -> Unit) {
+        if (team.money < type.cost) {
+            onResult(null)
+            return
+        }
         team.money -= type.cost
-        val building = type.createBuildingAt(team, at)
+        val building = type.createBuildingAt(team, at, gameState)
         building.enabled = false
+        gameState.buildingChange.fire(building)
         onResult(building)
     }
 
     override fun demolishBuilding(id: Long, onResult: (Boolean) -> Unit) {
-
+        val building = getBuildingData(id)!!
+        if (building.team == team) {
+            building.health = 0
+            onResult(true)
+        }
+        onResult(false)
     }
 
     override fun sendEndTurn(onResult: (Team) -> Unit) {

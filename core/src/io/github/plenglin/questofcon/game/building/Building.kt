@@ -1,21 +1,23 @@
 package io.github.plenglin.questofcon.game.building
 
 import com.badlogic.gdx.graphics.Texture
+import io.github.plenglin.questofcon.game.GameState
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
+import io.github.plenglin.questofcon.game.pawn.PawnCreator
 import io.github.plenglin.questofcon.ui.ConfirmationDialog
 import io.github.plenglin.questofcon.ui.Selectable
 import io.github.plenglin.questofcon.ui.UI
 
 abstract class BuildingCreator(val name: String, val cost: Int) {
 
-    abstract fun createBuildingAt(team: Team, worldCoords: WorldCoords): Building
+    abstract fun createBuildingAt(team: Team, worldCoords: WorldCoords, gameState: GameState): Building
 
 }
 
 var nextBuildingId = 0L
 
-abstract class Building(val name: String, var team: Team, var pos: WorldCoords, val maxHealth: Int) {
+abstract class Building(val name: String, var team: Team, var pos: WorldCoords, val maxHealth: Int, val gameState: GameState) {
 
     val id = nextBuildingId++
 
@@ -29,6 +31,7 @@ abstract class Building(val name: String, var team: Team, var pos: WorldCoords, 
             if (health <= 0) {
                 pos.tile!!.building = null
             }
+            gameState.buildingChange.fire(this)
         }
 
     open fun getMoneyPerTurn() = 0
@@ -51,5 +54,7 @@ abstract class Building(val name: String, var team: Team, var pos: WorldCoords, 
         }
         return map
     }
+
+    open fun canCreate(type: PawnCreator): Boolean = false
 
 }
