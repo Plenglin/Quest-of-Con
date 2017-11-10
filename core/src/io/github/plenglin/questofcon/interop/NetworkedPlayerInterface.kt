@@ -71,31 +71,35 @@ class NetworkedPlayerInterface(val client: Client) : PlayerInterface() {
     }
 
     override fun movePawn(id: Long, to: WorldCoords, onResult: (Boolean) -> Unit) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        client.action(ClientActions.MOVE_PAWN, DataPawnMovement(id, to.serialized()), respOk(onResult))
     }
 
     override fun attackPawn(id: Long, target: WorldCoords, onResult: (Boolean) -> Unit) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        client.action(ClientActions.ATTACK_PAWN, target.serialized(), respOk(onResult))
     }
 
     override fun makeBuilding(at: WorldCoords, type: BuildingCreator, onResult: (Building?) -> Unit) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        client.action(ClientActions.MAKE_BUILDING, DataBuildingCreation(type.id, at.serialized()))
     }
 
     override fun demolishBuilding(id: Long, onResult: (Boolean) -> Unit) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        client.action(ClientActions.DEMOLISH_BUILDING, id, respOk(onResult))
     }
 
     override fun sendEndTurn(onResult: (Team) -> Unit) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        client.action(ClientActions.END_TURN)
     }
 
     override fun getAllPawns(): Sequence<Pawn> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return world.map { it.tile!!.pawn }.filterNotNull()
     }
 
     override fun getAllBuildings(): Sequence<Building> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        return world.map { it.tile!!.building }.filterNotNull()
+    }
+
+    fun respOk(onResult: (Boolean) -> Unit): (ServerResponse) -> Unit {
+        return { onResult(it.error == ServerResponseError.OK) }
     }
 
 }
