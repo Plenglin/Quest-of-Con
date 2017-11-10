@@ -10,7 +10,7 @@ import java.util.logging.Logger
 /**
  * Client-side view of the server.
  */
-class Client(val socket: Socket) : Thread("Client-$socket") {
+class Client(val socket: Socket, val playerName: String) : Thread("Client-$playerName-$socket") {
 
     val logger = Logger.getLogger(this.name)
 
@@ -19,7 +19,13 @@ class Client(val socket: Socket) : Thread("Client-$socket") {
     lateinit var input: ObjectInputStream
     lateinit var output: ObjectOutputStream
 
+    lateinit var initialResponse: DataInitialResponse
+
     var onTurnChanged = ListenerManager<DataTeam>()
+
+    /**
+     * Called when the server has responded to our initial request.
+     */
     var initialization = ListenerManager<Client>()
 
     private var nextTransmissionId = 0L
@@ -32,13 +38,17 @@ class Client(val socket: Socket) : Thread("Client-$socket") {
         input = ObjectInputStream(socket.getInputStream())
         output = ObjectOutputStream(socket.getOutputStream())
 
-        initialization.fire(this)
+        println("$name sending initial data")
+        sendInitialData()
+
         while (true) {
             val trans = input.readObject() as Transmission
             val data = trans.payload
             when (data) {
                 is DataInitialResponse -> {
                     println(data)
+                    initialResponse = data
+                    initialization.fire(this)
                 }
                 is ServerEvent -> onEventReceived(data)
                 is ServerResponse -> onResponseReceived(data)
@@ -62,8 +72,8 @@ class Client(val socket: Socket) : Thread("Client-$socket") {
         return id
     }
 
-    fun sendInitialData(name: String) {
-        send(DataInitialClientData(name))
+    private fun sendInitialData() {
+        send(DataInitialClientData(playerName))
     }
 
     /**

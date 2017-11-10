@@ -50,7 +50,7 @@ fun main(args: Array<String>) {
     val clients = mutableListOf<Client>()
     for (clientId in 0..1) {
         val socket = Socket("localhost", Constants.SERVER_PORT)
-        val client = Client(socket)
+        val client = Client(socket, "asdf")
         client.start()
         println("client $clientId started")
         clients.add(client)

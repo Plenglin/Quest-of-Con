@@ -19,18 +19,14 @@ class Room(val sockets: List<Socket>, val roomId: Long) : Thread("Room-$roomId")
     }
 
     lateinit var gameState: GameState
-
     val colors = mutableListOf<Color>(Color.RED, Color.GREEN, Color.BLUE)
-
     val barrier = CyclicBarrier(sockets.size + 1)
-
     val logger = Logger.getLogger(javaClass.name)
 
     val clientsById = mutableMapOf<Long, SocketManager>()
 
     override fun run() {
         logger.info("${name} starting")
-
         logger.info("$name connecting to clients")
 
         barrier.reset()
@@ -65,7 +61,7 @@ class Room(val sockets: List<Socket>, val roomId: Long) : Thread("Room-$roomId")
         forEach { it.send(ServerEvent(eventType, data)) }
     }
 
-    fun sendInitialServerResponse() {
+    private fun sendInitialServerResponse() {
         clientsById.forEach { _, sock ->
             sock.send(DataInitialResponse(
                     sock.id,
@@ -91,8 +87,6 @@ class Room(val sockets: List<Socket>, val roomId: Long) : Thread("Room-$roomId")
 class SocketManager(val socket: Socket, val parent: Room) : Thread("SocketManager-${parent.roomId}-${socket.inetAddress}") {
 
     val logger = Logger.getLogger(this.name)
-
-    var parser = Parser()
 
     lateinit var input: ObjectInputStream
     lateinit var output: ObjectOutputStream

@@ -1,6 +1,9 @@
 package io.github.plenglin.questofcon.screen
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.GL20
+import com.badlogic.gdx.graphics.GL30
 import io.github.plenglin.questofcon.net.Client
 import ktx.app.KtxScreen
 
@@ -16,10 +19,11 @@ object MPGameScreen : KtxScreen {
     }
 
     override fun show() {
-        client.start()
-        client.initialization.addListener {
-            it.sendInitialData(System.getenv("title"))
-        }
+    }
+
+    override fun render(delta: Float) {
+        Gdx.gl30.glClearColor(0f, 0f, 0f ,1f)
+        Gdx.gl30.glClear(GL30.GL_COLOR_BUFFER_BIT or GL30.GL_DEPTH_BUFFER_BIT)
     }
 
 }

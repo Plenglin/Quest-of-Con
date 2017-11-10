@@ -33,9 +33,13 @@ object MPConnectionScreen : KtxScreen {
                 override fun changed(event: ChangeEvent?, actor: Actor?) {
                     println("starting client")
                     val sock = Socket("localhost", Constants.SERVER_PORT)
-                    val client = Client(sock)
-                    MPGameScreen.initializeWith(client)
-                    QuestOfCon.screen = MPGameScreen
+                    val client = Client(sock, System.getenv("title"))
+                    client.initialization.addListener {
+                        println("asdf")
+                        MPGameScreen.initializeWith(client)
+                        QuestOfCon.screen = MPGameScreen
+                    }
+                    client.start()
                 }
             })
         }.apply {
