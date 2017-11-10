@@ -9,6 +9,7 @@ class GameState(val teams: List<Team>) {
 
     val world = World(32, 32)
     private var teamIndex = 0
+    private var events = mutableListOf<Event>()
 
     init {
         teams.forEach {

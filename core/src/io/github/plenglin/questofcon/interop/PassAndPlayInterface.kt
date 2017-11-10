@@ -4,63 +4,63 @@ import io.github.plenglin.questofcon.game.GameState
 import io.github.plenglin.questofcon.game.PlayerInterface
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.building.Building
+import io.github.plenglin.questofcon.game.building.BuildingCreator
 import io.github.plenglin.questofcon.game.grid.World
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 import io.github.plenglin.questofcon.game.pawn.Pawn
-import io.github.plenglin.questofcon.net.DataPawn
+import io.github.plenglin.questofcon.game.pawn.PawnCreator
 
+class PassAndPlayManager(val state: GameState) {
+    val interfaces = mutableListOf<PassAndPlayInterface>()
+}
 
-class PassAndPlayInterface(override val thisTeam: Long, val gameState: GameState) : PlayerInterface() {
+class PassAndPlayInterface(override val thisTeam: Long, val parent: PassAndPlayManager) : PlayerInterface() {
 
+    val gameState: GameState = parent.state
     override val world: World = gameState.world
     override val teams: MutableMap<Long, Team> = mutableMapOf(*gameState.teams.map { it.id to it }.toTypedArray())
 
-    override fun makePawn(at: WorldCoords, onResult: (DataPawn?) -> Unit) {
+    val team = teams[thisTeam]!!
 
+    override fun makePawn(at: WorldCoords, type: PawnCreator, onResult: (Pawn?) -> Unit) {
+        team.money -= type.cost
+        val newPawn = type.createPawnAt(team, at)
+        newPawn.apRemaining = 0
+        onResult(newPawn)
     }
 
     override fun movePawn(id: Long, to: WorldCoords, onResult: (Boolean) -> Unit) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val pawn = getPawnData(id)!!
+        onResult(pawn.moveTo(to, pawn.getMovableSquares()))
     }
 
     override fun attackPawn(id: Long, target: WorldCoords, onResult: (Boolean) -> Unit) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val pawn = getPawnData(id)!!
+        onResult(pawn.getAttackableSquares().contains(target) && pawn.attemptAttack(target))
     }
 
-    override fun makeBuilding(at: WorldCoords, onResult: (Long?) -> Unit) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun makeBuilding(at: WorldCoords, type: BuildingCreator, onResult: (Building?) -> Unit) {
+        team.money -= type.cost
+        val building = type.createBuildingAt(team, at)
+        building.enabled = false
+        onResult(building)
     }
 
     override fun demolishBuilding(id: Long, onResult: (Boolean) -> Unit) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
     }
 
     override fun sendEndTurn(onResult: (Team) -> Unit) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        gameState.nextTurn()
+        onResult(gameState.getCurrentTeam())
     }
 
-    override fun getMovableSquares(id: Long): Set<WorldCoords> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun getAllPawns(): Sequence<Pawn> {
+        return world.map { it.tile!!.pawn }.filterNotNull()
     }
 
-    override fun getAttackableSquares(id: Long): Set<WorldCoords> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun getTargetingRadius(id: Long, pos: WorldCoords): Set<WorldCoords> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun getPawnData(id: Long): Pawn {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun getAllPawns(): List<Pawn> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun getAllBuildings(): List<Building> {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun getAllBuildings(): Sequence<Building> {
+        return world.map { it.tile!!.building }.filterNotNull()
     }
 
 
