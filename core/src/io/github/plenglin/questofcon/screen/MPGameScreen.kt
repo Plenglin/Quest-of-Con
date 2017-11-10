@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.GL30
 import com.badlogic.gdx.graphics.OrthographicCamera
 import io.github.plenglin.questofcon.game.GameState
 import io.github.plenglin.questofcon.game.Team
+import io.github.plenglin.questofcon.game.grid.Biomes
 import io.github.plenglin.questofcon.net.Client
 import io.github.plenglin.questofcon.render.WorldRenderer
 import ktx.app.KtxScreen
@@ -27,8 +28,17 @@ object MPGameScreen : KtxScreen {
     }
 
     override fun show() {
-        gameState = GameState(client.initialResponse.teams.map { Team(it.name, Color(it.color)) })
+        val iData = client.initialResponse
+        gameState = GameState(iData.teams.map { Team(it.name, Color(it.color)) })
+        gameState.world.apply { forEach {
+            val dataTile = iData.world.grid[it.i][it.j]
+            val thisTile = this[it.i, it.j]!!
+            thisTile.biome = Biomes.getById(dataTile.biome)!!
+            thisTile.elevation = dataTile.elevation
+        }}
         renderer = WorldRenderer(gameState.world)
+        gridCam.position.set(16f, 16f, 0f)
+        gridCam.zoom = 1/64f
     }
 
     override fun render(delta: Float) {

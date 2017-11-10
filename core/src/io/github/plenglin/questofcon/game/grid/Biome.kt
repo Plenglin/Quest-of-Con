@@ -25,4 +25,15 @@ object Biomes {
     val water       = Biome("water", TerrainTextures.WATER, false, false)
     val mountains   = Biome("mountains", TerrainTextures.MOUNTAIN, false, false)
 
+    val types = listOf(beach, desert, grass, highlands, water, mountains)
+
+    fun getById(id: Long): Biome? {
+        for (i in types) {
+            if (i.id == id) {
+                return i
+            }
+        }
+        return null
+    }
+
 }
