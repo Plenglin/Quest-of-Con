@@ -118,7 +118,7 @@ class NetworkedPlayerInterface(val client: Client) : PlayerInterface() {
     }
 
     override fun attackPawn(id: Long, target: WorldCoords, onResult: (Boolean) -> Unit) {
-        client.action(ClientActions.ATTACK_PAWN, target.serialized(), respOk(onResult))
+        client.action(ClientActions.ATTACK_PAWN, DataPawnAttack(id, target.serialized()), respOk(onResult))
     }
 
     override fun makeBuilding(at: WorldCoords, type: BuildingCreator, onResult: (Building?) -> Unit) {

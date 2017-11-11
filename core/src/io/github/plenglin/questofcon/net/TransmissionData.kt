@@ -63,6 +63,6 @@ data class DataBuilding(val id: Long, val team: Long, val type: Long, val health
 data class DataPawnCreation(val type: Long, val at: DataPosition) : Serializable
 data class DataBuildingCreation(val type: Long, val at: DataPosition) : Serializable
 data class DataPawnMovement(val id: Long, val to: DataPosition) : Serializable
-data class DataPawnAttack(val unit: Long, val pos: DataPosition) : Serializable
+data class DataPawnAttack(val id: Long, val pos: DataPosition) : Serializable
 
 data class DataChat(val from: Long, val text: String) : Serializable

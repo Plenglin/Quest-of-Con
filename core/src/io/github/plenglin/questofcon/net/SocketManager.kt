@@ -107,8 +107,12 @@ class SocketManager(val socket: Socket, val parent: GameRoom) : Thread("SocketMa
                     val success = pawn.attemptMoveTo(WorldCoords(parent.gameState.world, data.to), pawn.getMovableSquares())
                     return ServerResponse(msgId, success)
                 }
-                ClientActions.ATTACK_PAWN -> TODO()
-                ClientActions.TALK -> TODO()
+                ClientActions.ATTACK_PAWN -> {
+                    data as DataPawnAttack
+                    val pawn = parent.gameState.getAllPawns().find { it.id == data.id }!!
+                    val success = pawn.attemptAttack(WorldCoords(parent.gameState.world, data.pos))
+                    return ServerResponse(msgId, success)
+                }
                 ClientActions.END_TURN -> {
                     logger.info("ending le turn")
                     parent.changeTurn()
@@ -119,6 +123,7 @@ class SocketManager(val socket: Socket, val parent: GameRoom) : Thread("SocketMa
                     parent.gameState.getAllPawns().find { it.id == id }!!.health = 0
                     return ServerResponse(msgId, true)
                 }
+                ClientActions.TALK -> TODO()
             }
         } else {
             return ServerResponse(msgId, error = ServerResponseError.FORBIDDEN)
