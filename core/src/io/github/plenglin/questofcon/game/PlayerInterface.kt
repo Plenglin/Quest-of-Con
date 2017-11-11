@@ -17,7 +17,7 @@ abstract class PlayerInterface {
     abstract val world: World
     abstract val teams: MutableMap<Long, Team>
     abstract val thisTeamId: Long
-    val thisTeam get() = teams[thisTeamId]!!
+    abstract val thisTeam: Team
 
     val turnChange: ListenerManager<Team> = ListenerManager()
     val pawnUpdate: ListenerManager<Pawn> = ListenerManager()

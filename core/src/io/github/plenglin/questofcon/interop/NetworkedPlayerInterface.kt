@@ -19,6 +19,7 @@ class NetworkedPlayerInterface(val client: Client) : PlayerInterface() {
     override val world: World
     override val teams: MutableMap<Long, Team>
     override val thisTeamId: Long
+    override val thisTeam: Team
 
     val onTalk = ListenerManager<DataChat>()
 
@@ -26,9 +27,13 @@ class NetworkedPlayerInterface(val client: Client) : PlayerInterface() {
         val resp = client.initialResponse
         val grid = resp.world.grid
         world = World(grid.size, grid[0].size)
-        teams = mutableMapOf(*resp.teams.map { it.id to Team(it.name, Color(it.color), it.id) }.toTypedArray())
+        teams = mutableMapOf(*resp.teams.map {
+            println("${it.id} -> ${it.name}")
+            it.id to Team(it.name, Color(it.color), it.id) }.toTypedArray())
         teams.values.forEach { it.world = world }
         thisTeamId = resp.yourId
+        println(thisTeamId)
+        thisTeam = teams[thisTeamId]!!
 
         client.onTurnChanged.addListener {
             currentTeam = it.id

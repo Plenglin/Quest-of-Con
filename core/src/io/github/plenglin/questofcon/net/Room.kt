@@ -75,9 +75,9 @@ class Room(val sockets: List<Socket>, val roomId: Long) : Thread("Room-$roomId")
     }
 
     private fun sendInitialServerResponse() {
-        clientsById.forEach { _, sock ->
-            sock.send(DataInitialResponse(
-                    sock.id,
+        clientsById.forEach { _, sockMan ->
+            sockMan.send(DataInitialResponse(
+                    sockMan.team.id,
                     clientsById.values.map { it.team.serialized() },
                     gameState.world.serialized()
             ))

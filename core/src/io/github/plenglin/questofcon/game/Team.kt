@@ -11,8 +11,9 @@ import io.github.plenglin.questofcon.net.DataTeam
 
 private var nextTeamId = 0L
 
-class Team(val name: String, val color: Color, val id: Long = nextTeamId++) {
+class Team(val name: String, val color: Color, _id: Long = -1) {
 
+    val id = if (_id >= 0) _id else nextTeamId++
     var money: Int = Constants.STARTING_MONEY
     var hasBuiltHQ = false
     lateinit var world: World

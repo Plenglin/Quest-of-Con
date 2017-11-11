@@ -31,6 +31,7 @@ class PassAndPlayInterface(override val thisTeamId: Long, val parent: PassAndPla
     val gameState: GameState = parent.state
     override val world: World = gameState.world
     override val teams: MutableMap<Long, Team> = mutableMapOf(*gameState.teams.map { it.id to it }.toTypedArray())
+    override val thisTeam: Team = teams[thisTeamId]!!
 
     override fun makePawn(at: WorldCoords, type: PawnCreator, onResult: (Pawn?) -> Unit) {
         val building = at.tile!!.building
