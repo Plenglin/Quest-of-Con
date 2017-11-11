@@ -1,15 +1,15 @@
-package io.github.plenglin.questofcon.ui
+package io.github.plenglin.questofcon.ui.elements
 
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.scenes.scene2d.Actor
-import com.badlogic.gdx.scenes.scene2d.Group
 import com.badlogic.gdx.scenes.scene2d.ui.*
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
 import io.github.plenglin.questofcon.game.PlayerInterface
-import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
-import io.github.plenglin.questofcon.game.pawn.PawnCreator
-
+import io.github.plenglin.questofcon.ui.GridSelectionInputManager
+import io.github.plenglin.questofcon.ui.PawnActionManager
+import io.github.plenglin.questofcon.ui.PawnActionState
+import io.github.plenglin.questofcon.ui.UI
 
 class TileInfoPanel(skin: Skin) : Table(skin) {
 
@@ -83,142 +83,9 @@ class PropertiesTable(skin: Skin) : Table(skin) {
 
 }
 
-class RadialMenu(val skin: Skin, var radiusX: Float, var radiusY: Float) : Group() {
+class GameStateInfoController(skin: Skin) : Window("Status", skin) {
 
-    var active = false
-    var items = listOf<Selectable>()
-    var deadzoneX = 0f
-    var deadzoneY = 0f
-
-    fun updateUI() {
-        clearChildren()
-        for (i in 0 until items.size) {
-            val sel = items[i]
-
-            val angle = i.toFloat() / items.size * 2 * Math.PI
-
-            val button = Label(sel.title, skin, "radial-menu-item")
-            //button.pad(-5f)
-            button.setPosition(
-                    radiusX * Math.sin(angle).toFloat() - button.width / 2,
-                    radiusY * Math.cos(angle).toFloat() - button.height / 2)
-
-            button.isVisible = true
-            button.debug = true
-            addActor(button)
-        }
-    }
-
-    fun getSelected(xOff: Double, yOff: Double): Selectable? {
-        if (items.isEmpty() || xOff * xOff / deadzoneX / deadzoneX + yOff * yOff / deadzoneY / deadzoneY < 1) {  // In deadzone ellipse?
-            return null
-        }
-        val bearing = (450 - Math.toDegrees(Math.atan2(yOff, xOff))) % 360
-        for (i in items.indices) {
-            val rot = 360 * (i + 0.5) / items.size
-            if (bearing <= rot) {
-                return items[i]
-            }
-        }
-        return items[0]
-    }
-
-}
-
-data class Selectable(val title: String, val onSelected: (WorldCoords) -> Unit) {
-
-    override fun toString(): String {
-        return "Selectable($title)"
-    }
-}
-
-class ConfirmationDialog(title: String, skin: Skin, val onConfirm: () -> Unit) : Dialog(title, skin) {
-
-    init {
-        text("Are you sure?")
-        button("OK", 1)
-        button("Cancel", 2)
-        setPosition((UI.viewport.screenWidth / 2).toFloat(), (UI.viewport.screenHeight / 2).toFloat())
-        pack()
-    }
-
-    override fun result(obj: Any?) {
-        when (obj) {
-            1 -> onConfirm()
-        }
-    }
-
-}
-
-class UnitSpawningDialog(val units: List<PawnCreator>, skin: Skin, val worldCoords: WorldCoords, val team: Team) : Dialog("Spawn", skin) {
-
-    init {
-        contentTable.apply {
-            add(Label("Type", skin))
-            add(Label("Cost", skin))
-            row()
-            units.forEach { pawn ->
-                add(Label(pawn.title.capitalize(), skin))
-                add(Label("$${pawn.cost}", skin))
-                add(TextButton("Spawn", skin).apply {
-
-                    this.isDisabled = pawn.cost > team.money
-
-                    addListener(object : ChangeListener() {
-                        override fun changed(event: ChangeEvent?, actor: Actor?) {
-                            UI.targetPlayerInterface.makePawn(worldCoords, pawn)
-                            UI.updateData()
-                            this@UnitSpawningDialog.hide()
-                        }
-                    })
-
-                })
-                row()
-            }
-        }
-        button("Cancel")
-        pack()
-        setPosition((UI.viewport.screenWidth / 2).toFloat(), (UI.viewport.screenHeight / 2).toFloat())
-    }
-
-}
-
-class BuildingSpawningDialog(skin: Skin, val worldCoords: WorldCoords) : Dialog("Spawn", skin) {
-
-    val team = UI.targetPlayerInterface.thisTeam
-
-    init {
-        val buildings = team.getBuildable()
-        contentTable.apply {
-            add(Label("Type", skin))
-            add(Label("Cost", skin))
-            row()
-            buildings.forEach { bldg ->
-                add(Label(bldg.name.capitalize(), skin))
-                add(Label("$${bldg.cost}", skin))
-                add(TextButton("Build", skin).apply {
-                    isDisabled = bldg.cost > team.money
-
-                    addListener(object : ChangeListener() {
-                        override fun changed(event: ChangeEvent?, actor: Actor?) {
-                            UI.targetPlayerInterface.makeBuilding(worldCoords, bldg, {})
-                            UI.updateData()
-                            this@BuildingSpawningDialog.hide()
-                        }
-                    })
-                })
-                row()
-            }
-        }
-        button("Cancel")
-        pack()
-        setPosition((UI.viewport.screenWidth / 2).toFloat(), (UI.viewport.screenHeight / 2).toFloat())
-    }
-
-}
-
-class GameStateInfoController(val playerInterface: PlayerInterface, skin: Skin) : Window("Status", skin) {
-
+    val playerInterface get(): PlayerInterface = UI.targetPlayerInterface
     val currentTeamLabel: Label
     val moneyLabel: Label
     val ecoLabel: Label
@@ -230,12 +97,12 @@ class GameStateInfoController(val playerInterface: PlayerInterface, skin: Skin) 
         ecoLabel = Label("", skin)
         nextTurnButton = TextButton("Next Turn", skin)
         nextTurnButton.addListener(
-            object : ChangeListener() {
-                override fun changed(event: ChangeEvent?, actor: Actor?) {
-                    playerInterface.sendEndTurn()
-                    updateData()
+                object : ChangeListener() {
+                    override fun changed(event: ChangeEvent?, actor: Actor?) {
+                        playerInterface.sendEndTurn()
+                        updateData()
+                    }
                 }
-            }
         )
 
         add(currentTeamLabel)
@@ -249,6 +116,7 @@ class GameStateInfoController(val playerInterface: PlayerInterface, skin: Skin) 
     fun updateData() {
         val team = playerInterface.getCurrentTeam()
         val isCurrentTeam = (team == playerInterface.thisTeam)
+
         currentTeamLabel.setText("${team.name}'s turn")
         moneyLabel.setText("$${team.money}")
         ecoLabel.setText("+$${team.getMoneyPerTurn()}")

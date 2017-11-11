@@ -6,8 +6,8 @@ import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 import io.github.plenglin.questofcon.game.pawn.PawnCreator
 import io.github.plenglin.questofcon.net.DataBuilding
-import io.github.plenglin.questofcon.ui.ConfirmationDialog
-import io.github.plenglin.questofcon.ui.Selectable
+import io.github.plenglin.questofcon.ui.elements.ConfirmationDialog
+import io.github.plenglin.questofcon.ui.elements.Selectable
 import io.github.plenglin.questofcon.ui.UI
 import java.io.Serializable
 

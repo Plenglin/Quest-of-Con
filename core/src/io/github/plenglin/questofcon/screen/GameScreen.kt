@@ -34,7 +34,6 @@ object GameScreen : KtxScreen {
     val teamB = Team("parfait", Color.WHITE)
     val teamC = Team("le baguette", Color.RED)
 
-    lateinit var currentPlayerInterface: PlayerInterface
     lateinit var ifMan: PassAndPlayManager
 
     override fun show() {
@@ -42,10 +41,8 @@ object GameScreen : KtxScreen {
         gameState = GameState(listOf(teamA, teamB, teamC))
         ifMan = PassAndPlayManager(gameState)
         gameState.turnChange.addListener { newTeam ->
-            println(newTeam)
-            println(ifMan.interfaces)
-            currentPlayerInterface = ifMan.interfaces.find { it.thisTeam == newTeam }!!
-            UI.targetPlayerInterface = currentPlayerInterface
+            UI.targetPlayerInterface = ifMan.currentInterface()
+            UI.updateData()
         }
 
         println("Generating terrain...")
@@ -75,11 +72,11 @@ object GameScreen : KtxScreen {
 
         worldRenderer = WorldRenderer(gameState.world)
 
+        UI.targetPlayerInterface = ifMan.currentInterface()
         UI.gridCam.zoom = 1/48f
         UI.gridCam.position.set(0f, 0f, 0f)
 
         UI.generateUI()
-        gameState.nextTurn()
 
         Gdx.input.inputProcessor = InputMultiplexer(UI.stage, MapControlInputManager, PawnActionInputProcessor, RadialMenuInputManager, GridSelectionInputManager)
     }

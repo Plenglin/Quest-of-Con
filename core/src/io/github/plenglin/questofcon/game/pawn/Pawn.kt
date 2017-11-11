@@ -7,6 +7,8 @@ import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 import io.github.plenglin.questofcon.net.DataPawn
 import io.github.plenglin.questofcon.ui.*
+import io.github.plenglin.questofcon.ui.elements.ConfirmationDialog
+import io.github.plenglin.questofcon.ui.elements.Selectable
 
 private var nextCreatorId = 0L
 

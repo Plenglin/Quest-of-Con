@@ -6,10 +6,12 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.utils.viewport.ScreenViewport
 import com.badlogic.gdx.utils.viewport.Viewport
-import io.github.plenglin.questofcon.game.GameState
 import io.github.plenglin.questofcon.game.PlayerInterface
 import io.github.plenglin.questofcon.render.ShadeSet
-import io.github.plenglin.questofcon.screen.GameScreen
+import io.github.plenglin.questofcon.ui.elements.ActionTooltip
+import io.github.plenglin.questofcon.ui.elements.GameStateInfoController
+import io.github.plenglin.questofcon.ui.elements.RadialMenu
+import io.github.plenglin.questofcon.ui.elements.TileInfoPanel
 import ktx.scene2d.Scene2DSkin
 
 
@@ -51,7 +53,7 @@ object UI {
         pawnTooltip = ActionTooltip(skin)
         stage.addActor(pawnTooltip)
 
-        infoPanel = GameStateInfoController(targetPlayerInterface, skin)
+        infoPanel = GameStateInfoController(skin)
         stage.addActor(infoPanel)
         infoPanel.updateData()
     }

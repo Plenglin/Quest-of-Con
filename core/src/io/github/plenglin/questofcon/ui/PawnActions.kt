@@ -121,7 +121,6 @@ object PawnActionInputProcessor : KtxInputAdapter {
     }
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        println("asdf")
         if (button != Input.Buttons.LEFT || PawnActionManager.state == PawnActionState.NONE) {
             return false
         }
