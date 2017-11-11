@@ -222,23 +222,24 @@ class GameStateInfoController(val playerInterface: PlayerInterface, skin: Skin) 
     val currentTeamLabel: Label
     val moneyLabel: Label
     val ecoLabel: Label
+    val nextTurnButton: TextButton
 
     init {
         currentTeamLabel = Label("", skin)
         moneyLabel = Label("", skin)
         ecoLabel = Label("", skin)
+        nextTurnButton = TextButton("Next Turn", skin)
+        nextTurnButton.addListener(
+            object : ChangeListener() {
+                override fun changed(event: ChangeEvent?, actor: Actor?) {
+                    playerInterface.sendEndTurn()
+                    updateData()
+                }
+            }
+        )
 
         add(currentTeamLabel)
-        add(TextButton("Next Turn", skin).apply {
-            addListener(
-                    object : ChangeListener() {
-                        override fun changed(event: ChangeEvent?, actor: Actor?) {
-                            playerInterface.sendEndTurn()
-                            updateData()
-                        }
-                    }
-            )
-        })
+        add(nextTurnButton)
         row()
         add(moneyLabel)
         add(ecoLabel)
@@ -247,9 +248,14 @@ class GameStateInfoController(val playerInterface: PlayerInterface, skin: Skin) 
 
     fun updateData() {
         val team = playerInterface.getCurrentTeam()
+        val isCurrentTeam = (team == playerInterface.thisTeam)
         currentTeamLabel.setText("${team.name}'s turn")
         moneyLabel.setText("$${team.money}")
         ecoLabel.setText("+$${team.getMoneyPerTurn()}")
+
+        moneyLabel.isVisible = isCurrentTeam
+        ecoLabel.isVisible = isCurrentTeam
+        nextTurnButton.isVisible = isCurrentTeam
         pack()
     }
 

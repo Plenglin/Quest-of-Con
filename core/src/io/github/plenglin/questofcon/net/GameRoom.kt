@@ -1,12 +1,10 @@
 package io.github.plenglin.questofcon.net
 
 import com.badlogic.gdx.graphics.Color
-import io.github.plenglin.questofcon.game.GameData
+import io.github.plenglin.questofcon.ListenerManager
 import io.github.plenglin.questofcon.game.GameState
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.*
-import java.io.ObjectInputStream
-import java.io.ObjectOutputStream
 import java.io.Serializable
 import java.net.Socket
 import java.util.concurrent.CyclicBarrier
@@ -17,6 +15,8 @@ class GameRoom(val sockets: List<Socket>, val roomId: Long) : Thread("GameRoom-$
     override fun iterator(): Iterator<SocketManager> {
         return clientsById.values.iterator()
     }
+
+    val initializationFinished = ListenerManager<Unit>()
 
     lateinit var gameState: GameState
     val colors = mutableListOf<Color>(Color.RED, Color.GREEN, Color.BLUE)
@@ -50,6 +50,7 @@ class GameRoom(val sockets: List<Socket>, val roomId: Long) : Thread("GameRoom-$
 
         gameState.turnChange.addListener {
             broadcastEvent(ServerEventTypes.CHANGE_TURN, it.id)
+            clientsById[it.id]!!.send(DataTeamBalance(gameState.getCurrentTeam().money))
         }
         gameState.pawnChange.addListener {
             broadcastEvent(ServerEventTypes.PAWN_CHANGE, it.serialized())
@@ -68,6 +69,7 @@ class GameRoom(val sockets: List<Socket>, val roomId: Long) : Thread("GameRoom-$
         logger.info("sending back data")
         sendInitialServerResponse()
 
+        initializationFinished.fire(Unit)
     }
 
     fun broadcastEvent(eventType: ServerEventTypes, data: Serializable? = null) {

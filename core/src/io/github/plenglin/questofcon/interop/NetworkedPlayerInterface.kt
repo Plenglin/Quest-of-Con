@@ -47,6 +47,9 @@ class NetworkedPlayerInterface(val client: Client) : PlayerInterface() {
         println(thisTeamId)
         thisTeam = teams[thisTeamId]!!
 
+        client.onBalanceChanged.addListener {
+            thisTeam.money = it
+        }
         client.onTurnChanged.addListener {
             currentTeam = it.id
         }

@@ -31,6 +31,7 @@ class Client(val socket: Socket, val playerName: String) : Thread("Client-$playe
     var initialization = ListenerManager<Client>()
 
     val onServerEvent = ListenerManager<ServerEvent>()
+    val onBalanceChanged = ListenerManager<Int>()
 
     private var nextTransmissionId = 0L
     //private val transmissionQueue = Queue<Transmission>()
@@ -56,8 +57,13 @@ class Client(val socket: Socket, val playerName: String) : Thread("Client-$playe
                 }
                 is ServerEvent -> onEventReceived(data)
                 is ServerResponse -> onResponseReceived(data)
+                is DataTeamBalance -> onBalanceChanged(data.money)
             }
         }
+    }
+
+    private fun onBalanceChanged(newValue: Int) {
+        onBalanceChanged.fire(newValue)
     }
 
     private fun onEventReceived(event: ServerEvent) {

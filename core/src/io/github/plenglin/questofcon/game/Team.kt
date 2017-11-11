@@ -2,6 +2,7 @@ package io.github.plenglin.questofcon.game
 
 import com.badlogic.gdx.graphics.Color
 import io.github.plenglin.questofcon.Constants
+import io.github.plenglin.questofcon.ListenerManager
 import io.github.plenglin.questofcon.game.building.BuildingCreator
 import io.github.plenglin.questofcon.game.building.BuildingHQ
 import io.github.plenglin.questofcon.game.grid.World
@@ -13,8 +14,13 @@ private var nextTeamId = 0L
 
 class Team(val name: String, val color: Color, _id: Long = -1) {
 
+    val moneyChangeEvent = ListenerManager<Int>()
     val id = if (_id >= 0) _id else nextTeamId++
     var money: Int = Constants.STARTING_MONEY
+        set(value) {
+            field = value
+            moneyChangeEvent.fire(field)
+        }
     var hasBuiltHQ = false
     lateinit var world: World
 

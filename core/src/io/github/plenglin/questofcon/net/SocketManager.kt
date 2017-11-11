@@ -26,6 +26,11 @@ class SocketManager(val socket: Socket, val parent: GameRoom) : Thread("SocketMa
         output = ObjectOutputStream(socket.getOutputStream())
         input = ObjectInputStream(socket.getInputStream())
 
+        parent.initializationFinished.addListener {
+            team.moneyChangeEvent.addListener {
+                send(DataTeamBalance(it))
+            }
+        }
         logger.info("listening to ${this.name}")
         while (true) {
             val transmission = input.readObject() as Transmission
@@ -73,14 +78,18 @@ class SocketManager(val socket: Socket, val parent: GameRoom) : Thread("SocketMa
                 ClientActions.MAKE_PAWN -> {
                     //if (parent.gameState)
                     data as DataPawnCreation
-                    val pawn = GameData.pawnByType(data.type).createPawnAt(team, WorldCoords(parent.gameState.world, data.at), parent.gameState)
+                    val creator = GameData.pawnByType(data.type)
+                    team.money -= creator.cost
+                    val pawn = creator.createPawnAt(team, WorldCoords(parent.gameState.world, data.at), parent.gameState)
                     val ser = pawn.serialized()
                     //parent.broadcastEvent(ServerEventTypes.PAWN_CHANGE, ser)
                     return ServerResponse(msgId, ser)
                 }
                 ClientActions.MAKE_BUILDING -> {
                     data as DataBuildingCreation
-                    val building = GameData.buildingByType(data.type).createBuildingAt(team, WorldCoords(parent.gameState.world, data.at), parent.gameState)
+                    val creator = GameData.buildingByType(data.type)
+                    team.money -= creator.cost
+                    val building = creator.createBuildingAt(team, WorldCoords(parent.gameState.world, data.at), parent.gameState)
                     val ser = building.serialized()
                     //parent.broadcastEvent(ServerEventTypes.BUILDING_CHANGE, ser)
                     return ServerResponse(msgId, ser)
