@@ -1,23 +1,33 @@
 package io.github.plenglin.questofcon.ui
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.utils.viewport.ScreenViewport
 import com.badlogic.gdx.utils.viewport.Viewport
+import io.github.plenglin.questofcon.game.GameState
+import io.github.plenglin.questofcon.game.PlayerInterface
+import io.github.plenglin.questofcon.render.ShadeSet
 import io.github.plenglin.questofcon.screen.GameScreen
 import ktx.scene2d.Scene2DSkin
 
 
 object UI {
 
+    val gridCam = OrthographicCamera()
     val skin = Skin(Gdx.files.internal("skin/default/skin/uiskin.skin"))
 
     val viewport: Viewport = ScreenViewport()
 
     val stage: Stage = Stage(viewport)
 
-    lateinit var gameState: GameStateInfoController
+    val shadeSets = mutableListOf<ShadeSet>()
+
+    //lateinit var targetGameState: GameState
+    lateinit var targetPlayerInterface: PlayerInterface
+
+    lateinit var infoPanel: GameStateInfoController
     lateinit var tileInfo: TileInfoPanel
     lateinit var radialMenu: RadialMenu
     lateinit var pawnTooltip: ActionTooltip
@@ -41,13 +51,13 @@ object UI {
         pawnTooltip = ActionTooltip(skin)
         stage.addActor(pawnTooltip)
 
-        gameState = GameStateInfoController(GameScreen.gameState, skin)
-        stage.addActor(gameState)
-        gameState.updateData()
+        infoPanel = GameStateInfoController(targetPlayerInterface, skin)
+        stage.addActor(infoPanel)
+        infoPanel.updateData()
     }
 
     fun updateData() {
-        gameState.updateData()
+        infoPanel.updateData()
         tileInfo.updateData()
         pawnTooltip.updateData()
 
@@ -60,7 +70,7 @@ object UI {
 
     fun draw() {
         tileInfo.setPosition(10f, UI.viewport.screenHeight - tileInfo.height - 10)
-        gameState.setPosition(Gdx.graphics.width - gameState.width, 0f)
+        infoPanel.setPosition(Gdx.graphics.width - infoPanel.width, 0f)
 
         stage.draw()
     }

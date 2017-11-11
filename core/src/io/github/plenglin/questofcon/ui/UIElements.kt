@@ -5,7 +5,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.Group
 import com.badlogic.gdx.scenes.scene2d.ui.*
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
-import io.github.plenglin.questofcon.game.GameState
+import io.github.plenglin.questofcon.game.PlayerInterface
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 import io.github.plenglin.questofcon.game.pawn.PawnCreator
@@ -166,9 +166,7 @@ class UnitSpawningDialog(val units: List<PawnCreator>, skin: Skin, val worldCoor
 
                     addListener(object : ChangeListener() {
                         override fun changed(event: ChangeEvent?, actor: Actor?) {
-                            team.money -= pawn.cost
-                            val newPawn = pawn.createPawnAt(team, worldCoords)
-                            newPawn.apRemaining = 0
+                            UI.targetPlayerInterface.makePawn(worldCoords, pawn)
                             UI.updateData()
                             this@UnitSpawningDialog.hide()
                         }
@@ -185,7 +183,9 @@ class UnitSpawningDialog(val units: List<PawnCreator>, skin: Skin, val worldCoor
 
 }
 
-class BuildingSpawningDialog(val team: Team, skin: Skin, val worldCoords: WorldCoords) : Dialog("Spawn", skin) {
+class BuildingSpawningDialog(skin: Skin, val worldCoords: WorldCoords) : Dialog("Spawn", skin) {
+
+    val team = UI.targetPlayerInterface.thisTeam
 
     init {
         val buildings = team.getBuildable()
@@ -201,9 +201,7 @@ class BuildingSpawningDialog(val team: Team, skin: Skin, val worldCoords: WorldC
 
                     addListener(object : ChangeListener() {
                         override fun changed(event: ChangeEvent?, actor: Actor?) {
-                            team.money -= bldg.cost
-                            val building = bldg.createBuildingAt(team, worldCoords)
-                            building.enabled = false
+                            UI.targetPlayerInterface.makeBuilding(worldCoords, bldg, {})
                             UI.updateData()
                             this@BuildingSpawningDialog.hide()
                         }
@@ -219,28 +217,29 @@ class BuildingSpawningDialog(val team: Team, skin: Skin, val worldCoords: WorldC
 
 }
 
-class GameStateInfoController(val gameState: GameState, skin: Skin) : Window("Status", skin) {
+class GameStateInfoController(val playerInterface: PlayerInterface, skin: Skin) : Window("Status", skin) {
 
     val currentTeamLabel: Label
     val moneyLabel: Label
     val ecoLabel: Label
+    val nextTurnButton: TextButton
 
     init {
         currentTeamLabel = Label("", skin)
         moneyLabel = Label("", skin)
         ecoLabel = Label("", skin)
+        nextTurnButton = TextButton("Next Turn", skin)
+        nextTurnButton.addListener(
+            object : ChangeListener() {
+                override fun changed(event: ChangeEvent?, actor: Actor?) {
+                    playerInterface.sendEndTurn()
+                    updateData()
+                }
+            }
+        )
 
         add(currentTeamLabel)
-        add(TextButton("Next Turn", skin).apply {
-            addListener(
-                    object : ChangeListener() {
-                        override fun changed(event: ChangeEvent?, actor: Actor?) {
-                            gameState.nextTurn()
-                            updateData()
-                        }
-                    }
-            )
-        })
+        add(nextTurnButton)
         row()
         add(moneyLabel)
         add(ecoLabel)
@@ -248,10 +247,15 @@ class GameStateInfoController(val gameState: GameState, skin: Skin) : Window("St
     }
 
     fun updateData() {
-        val team = gameState.getCurrentTeam()
+        val team = playerInterface.getCurrentTeam()
+        val isCurrentTeam = (team == playerInterface.thisTeam)
         currentTeamLabel.setText("${team.name}'s turn")
         moneyLabel.setText("$${team.money}")
         ecoLabel.setText("+$${team.getMoneyPerTurn()}")
+
+        moneyLabel.isVisible = isCurrentTeam
+        ecoLabel.isVisible = isCurrentTeam
+        nextTurnButton.isVisible = isCurrentTeam
         pack()
     }
 
@@ -285,7 +289,7 @@ class ActionTooltip(skin: Skin) : Table(skin) {
                         a.setText(hov.tile!!.biome.name.capitalize())
                         b.setText("$cost")
                         c.setText("Actions")
-                        d.setText("${thePawn.apRemaining} -> ${thePawn.apRemaining - cost}")
+                        d.setText("${thePawn.ap} -> ${thePawn.ap - cost}")
                     } else {
                         this.isVisible = false
                     }

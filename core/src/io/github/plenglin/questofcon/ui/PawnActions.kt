@@ -5,9 +5,7 @@ import io.github.plenglin.questofcon.Constants
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 import io.github.plenglin.questofcon.game.pawn.Pawn
 import io.github.plenglin.questofcon.render.ShadeSet
-import io.github.plenglin.questofcon.screen.GameScreen
 import ktx.app.KtxInputAdapter
-import ktx.app.color
 
 
 object PawnActionManager {
@@ -32,19 +30,16 @@ object PawnActionManager {
                     mode = ShadeSet.SHADE,
                     shading = Constants.movementColor
             )
-            GameScreen.shadeSets.add(primaryShadeSet)
+            UI.shadeSets.add(primaryShadeSet)
             state = PawnActionState.MOVE
         }
     }
 
-    fun attemptFinishMoving(coords: WorldCoords): Boolean {
+    fun attemptFinishMoving(coords: WorldCoords) {
         val pawn = pawn!!
-        if (pawn.moveTo(coords, movementSquares)) {
-            cleanAction()
-            return true
-        } else {
-            return false
-        }
+        UI.targetPlayerInterface.movePawn(pawn.id, coords, {
+            if (it) cleanAction()
+        })
     }
 
     fun beginAttacking(pawn: Pawn) {
@@ -58,37 +53,36 @@ object PawnActionManager {
                     mode = ShadeSet.SHADE or ShadeSet.OUTLINE,
                     shading = Constants.attackColor
             )
-            GameScreen.shadeSets.add(primaryShadeSet)
+            UI.shadeSets.add(primaryShadeSet)
             state = PawnActionState.ATTACK
         }
     }
 
-    fun attemptFinishAttacking(coords: WorldCoords): Boolean {
+    fun attemptFinishAttacking(coords: WorldCoords) {
         val pawn = pawn!!
-        if (attackSquares.contains(coords) && pawn.attemptAttack(coords)) {
-            cleanAction()
-            return true
-        } else {
-            return false
-        }
+        UI.targetPlayerInterface.attackPawn(pawn.id, coords, {
+            if (it) {
+                cleanAction()
+            }
+        })
     }
 
     fun setTargetingRadius(coords: WorldCoords) {
-        GameScreen.shadeSets.remove(hoveringShadeSet)
+        UI.shadeSets.remove(hoveringShadeSet)
         hoveringShadeSet = ShadeSet(
                 PawnActionManager.pawn!!.getTargetingRadius(coords),
                 mode = ShadeSet.INNER_LINES,
                 shading = Constants.attackColor,
                 lines = Constants.attackColor
         )
-        GameScreen.shadeSets.add(hoveringShadeSet)
+        UI.shadeSets.add(hoveringShadeSet)
     }
 
     fun cleanAction() {
         this.pawn = null
         state = PawnActionState.NONE
-        GameScreen.shadeSets.remove(hoveringShadeSet)
-        GameScreen.shadeSets.remove(primaryShadeSet)
+        UI.shadeSets.remove(hoveringShadeSet)
+        UI.shadeSets.remove(primaryShadeSet)
         UI.pawnTooltip.isVisible = false
     }
 
@@ -103,17 +97,17 @@ object PawnActionInputProcessor : KtxInputAdapter {
 
     override fun keyDown(keycode: Int): Boolean {
         val pawn = GridSelectionInputManager.selection?.tile?.pawn ?: return false
-        if (pawn.team != GameScreen.gameState.getCurrentTeam() || pawn.apRemaining <= 0) {
+        if (pawn.team != UI.targetPlayerInterface.thisTeam || pawn.ap <= 0) {
             return false
         }
         when (keycode) {
             Input.Keys.Q -> {  // Attack
-                if (pawn.attacksRemaining > 0 && pawn.actionPoints > 0) {
+                if (pawn.attacksRemaining > 0 && pawn.maxAp > 0) {
                     PawnActionManager.beginAttacking(pawn)
                 }
             }
             Input.Keys.E -> {  // Move
-                if (pawn.actionPoints > 0) {
+                if (pawn.maxAp > 0) {
                     PawnActionManager.beginMoving(pawn)
                 }
             }
@@ -126,7 +120,8 @@ object PawnActionInputProcessor : KtxInputAdapter {
         return true
     }
 
-    override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+    override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        println("asdf")
         if (button != Input.Buttons.LEFT || PawnActionManager.state == PawnActionState.NONE) {
             return false
         }

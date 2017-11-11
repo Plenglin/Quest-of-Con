@@ -3,6 +3,7 @@ package io.github.plenglin.questofcon.game
 import io.github.plenglin.questofcon.Assets
 import io.github.plenglin.questofcon.game.building.BuildingCreator
 import io.github.plenglin.questofcon.game.building.BuildingFactory
+import io.github.plenglin.questofcon.game.building.BuildingHQ
 import io.github.plenglin.questofcon.game.building.BuildingMine
 import io.github.plenglin.questofcon.game.pawn.PawnArtillery
 import io.github.plenglin.questofcon.game.pawn.PawnCreator
@@ -60,7 +61,14 @@ object GameData {
     ).sortedBy { it.cost }
 
     val spawnableBuildings = listOf<BuildingCreator>(
-            BuildingFactory, BuildingMine
+            BuildingFactory, BuildingMine, BuildingHQ
     ).sortedBy { it.name }
 
+    fun buildingByType(type: Long): BuildingCreator {
+        return spawnableBuildings.find { it.id == type }!!
+    }
+
+    fun pawnByType(type: Long): PawnCreator {
+        return spawnableUnits.find { it.id == type }!!
+    }
 }

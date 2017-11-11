@@ -1,11 +1,12 @@
 package io.github.plenglin.questofcon.game.pawn
 
 import io.github.plenglin.questofcon.Assets
+import io.github.plenglin.questofcon.game.GameState
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 
 
-class PawnArtillery(team: Team, pos: WorldCoords) : Pawn("Artillery", team, pos, 30, 1, { Assets[Assets.artillery] }) {
+class PawnArtillery(team: Team, pos: WorldCoords, state: GameState) : Pawn("Artillery", team, pos, 30, 1, { Assets[Assets.artillery] }, state) {
 
     override fun damageTo(coords: WorldCoords): Int = damage
 
@@ -31,16 +32,18 @@ class PawnArtillery(team: Team, pos: WorldCoords) : Pawn("Artillery", team, pos,
         val maxRange = 5
         val minRange = 3
 
-        override fun createPawnAt(team: Team, worldCoords: WorldCoords): Pawn {
-            val pawn = PawnArtillery(team, worldCoords)
+        override fun createPawnAt(team: Team, worldCoords: WorldCoords, state: GameState): Pawn {
+            val pawn = PawnArtillery(team, worldCoords, state)
+            pawn.type = id
             worldCoords.tile!!.pawn = pawn
+            state.pawnChange.fire(pawn)
             return pawn
         }
 
     }
 }
 
-class PawnKnight(team: Team, pos: WorldCoords) : Pawn("KangarooBot", team, pos, 50, 1, { Assets[Assets.kangaroobot] }) {
+class PawnKnight(team: Team, pos: WorldCoords, state: GameState) : Pawn("KangarooBot", team, pos, 50, 1, { Assets[Assets.kangaroobot] }, state) {
 
     override fun damageTo(coords: WorldCoords): Int = damage
 
@@ -73,7 +76,7 @@ class PawnKnight(team: Team, pos: WorldCoords) : Pawn("KangarooBot", team, pos, 
         coords.floodfill(dmgRadius).forEach {
             it.tile!!.doDamage(damage)
         }
-        moveTo(coords, apCost = actionPoints)
+        attemptMoveTo(coords, apCost = maxAp)
         return true
     }
 
@@ -84,9 +87,11 @@ class PawnKnight(team: Team, pos: WorldCoords) : Pawn("KangarooBot", team, pos, 
         val damage = 50
         val dmgRadius = 1
 
-        override fun createPawnAt(team: Team, worldCoords: WorldCoords): Pawn {
-            val pawn = PawnKnight(team, worldCoords)
+        override fun createPawnAt(team: Team, worldCoords: WorldCoords, state: GameState): Pawn {
+            val pawn = PawnKnight(team, worldCoords, state)
+            pawn.type = id
             worldCoords.tile!!.pawn = pawn
+            state.pawnChange.fire(pawn)
             return pawn
         }
 
