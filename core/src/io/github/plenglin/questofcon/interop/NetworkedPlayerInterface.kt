@@ -135,6 +135,10 @@ class NetworkedPlayerInterface(val client: Client) : PlayerInterface() {
         return world.map { it.tile!!.pawn }.filterNotNull()
     }
 
+    override fun disbandPawn(id: Long, onResult: (Boolean) -> Unit) {
+        client.action(ClientActions.DISBAND_PAWN, id)
+    }
+
     override fun getAllBuildings(): Sequence<Building> {
         return world.map { it.tile!!.building }.filterNotNull()
     }

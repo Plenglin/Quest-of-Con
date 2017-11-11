@@ -28,6 +28,8 @@ abstract class PlayerInterface {
     abstract fun makePawn(at: WorldCoords, type: PawnCreator, onResult: (Pawn?) -> Unit = {})
     abstract fun movePawn(id: Long, to: WorldCoords, onResult: (Boolean) -> Unit = {})
     abstract fun attackPawn(id: Long, target: WorldCoords, onResult: (Boolean) -> Unit = {})
+    abstract fun disbandPawn(id: Long, onResult: (Boolean) -> Unit = {})
+
     abstract fun makeBuilding(at: WorldCoords, type: BuildingCreator, onResult: (Building?) -> Unit = {})
     abstract fun demolishBuilding(id: Long, onResult: (Boolean) -> Unit = {})
     abstract fun sendEndTurn(onResult: (Team) -> Unit = {})

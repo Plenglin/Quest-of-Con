@@ -97,4 +97,8 @@ class PassAndPlayInterface(override val thisTeamId: Long, val parent: PassAndPla
         return gameState.getCurrentTeam()
     }
 
+    override fun disbandPawn(id: Long, onResult: (Boolean) -> Unit) {
+        getPawnData(id)!!.health = 0
+    }
+
 }

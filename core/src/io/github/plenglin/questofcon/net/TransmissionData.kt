@@ -5,7 +5,7 @@ import java.util.*
 
 
 enum class ClientActions : Serializable {
-    MAKE_PAWN, MAKE_BUILDING, DEMOLISH_BUILDING, TALK, MOVE_PAWN, ATTACK_PAWN, END_TURN
+    MAKE_PAWN, MAKE_BUILDING, DEMOLISH_BUILDING, TALK, MOVE_PAWN, ATTACK_PAWN, END_TURN, DISBAND_PAWN
 }
 
 enum class ServerEventTypes : Serializable {

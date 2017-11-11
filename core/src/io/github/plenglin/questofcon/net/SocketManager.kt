@@ -95,6 +95,9 @@ class SocketManager(val socket: Socket, val parent: GameRoom) : Thread("SocketMa
                     return ServerResponse(msgId, ser)
                 }
                 ClientActions.DEMOLISH_BUILDING -> {
+                    val id = data as Long
+                    parent.gameState.getAllBuildings().find { it.id == id }!!.health = 0
+                    return ServerResponse(msgId, true)
                 }
                 ClientActions.MOVE_PAWN -> {
                     data as DataPawnMovement
@@ -106,6 +109,11 @@ class SocketManager(val socket: Socket, val parent: GameRoom) : Thread("SocketMa
                 ClientActions.TALK -> TODO()
                 ClientActions.END_TURN -> {
                     parent.gameState.nextTurn()
+                }
+                ClientActions.DISBAND_PAWN -> {
+                    val id = data as Long
+                    parent.gameState.getAllPawns().find { it.id == id }!!.health = 0
+                    return ServerResponse(msgId, true)
                 }
             }
             return ServerResponse(msgId)

@@ -134,7 +134,7 @@ abstract class Pawn(val name: String, var team: Team, _pos: WorldCoords, val max
 
         val actions = mutableListOf<Selectable>(Selectable("Disband $name", {
             ConfirmationDialog("Disband $name", UI.skin, {
-                health = 0
+                UI.targetPlayerInterface.disbandPawn(this.id)
             }).show(UI.stage)
         }))
 
