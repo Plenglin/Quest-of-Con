@@ -58,7 +58,7 @@ abstract class Pawn(val name: String, var team: Team, _pos: WorldCoords, val max
             val tile = coord.tile!!
             val terrain = tile.biome
             val cost = terrain.movementCost
-            println("$terrain, ${cost}, ${tile.passableBy(team)}")
+            //println("$terrain, ${cost}, ${tile.passableBy(team)}")
             val fullDist = dist[coord]!!
 
             if (tile.passableBy(team) && fullDist + cost <= apRemaining) {  // Can we even get past this tile?
@@ -66,7 +66,7 @@ abstract class Pawn(val name: String, var team: Team, _pos: WorldCoords, val max
                     val totalCost = fullDist + cost + maxOf(neighbor.tile!!.elevation - tile.elevation, 1)
                     val neighborDist = dist[neighbor]
                     val passable = neighbor.tile.passableBy(team)
-                    println("neigh: ${neighbor.tile.biome}, ${tile.building}, ${tile.passableBy(team)}")
+                    //println("neigh: ${neighbor.tile.biome}, ${tile.building}, ${tile.passableBy(team)}")
                     if (passable) {
                         if (neighborDist == null) {  // If we haven't added the neighbor, add it now
                             unvisited.add(neighbor)
@@ -97,16 +97,16 @@ abstract class Pawn(val name: String, var team: Team, _pos: WorldCoords, val max
      */
     abstract fun onAttack(coords: WorldCoords): Boolean
 
-    fun moveTo(coords: WorldCoords, movementData: Map<WorldCoords, Int>): Boolean {
+    fun attemptMoveTo(coords: WorldCoords, movementData: Map<WorldCoords, Int>): Boolean {
         val cost = movementData[coords]
         if (cost != null) {
-            return moveTo(coords, cost)
+            return attemptMoveTo(coords, cost)
         } else {
             return false
         }
     }
 
-    fun moveTo(coords: WorldCoords, apCost: Int): Boolean {
+    fun attemptMoveTo(coords: WorldCoords, apCost: Int): Boolean {
         if (apRemaining - apCost >= 0) {
             apRemaining -= apCost
             pos = coords
@@ -155,7 +155,7 @@ abstract class Pawn(val name: String, var team: Team, _pos: WorldCoords, val max
     }
 
     fun serialized(): DataPawn {
-        return DataPawn(id, team.id, type, health, pos.serialized())
+        return DataPawn(id, team.id, type, health, apRemaining, pos.serialized())
     }
 
     override fun toString(): String {
@@ -165,7 +165,6 @@ abstract class Pawn(val name: String, var team: Team, _pos: WorldCoords, val max
     companion object {
         fun elevationDamageMultiplier(from: Int, to: Int): Double {
             val elevationChange = maxOf(to - from, 0)
-            println(elevationChange)
             return minOf(Math.pow(1.125, -elevationChange.toDouble()), 1.0)
         }
     }

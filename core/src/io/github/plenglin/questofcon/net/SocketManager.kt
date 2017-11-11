@@ -87,7 +87,12 @@ class SocketManager(val socket: Socket, val parent: GameRoom) : Thread("SocketMa
                 }
                 ClientActions.DEMOLISH_BUILDING -> {
                 }
-                ClientActions.MOVE_PAWN -> TODO()
+                ClientActions.MOVE_PAWN -> {
+                    data as DataPawnMovement
+                    val pawn = parent.gameState.getAllPawns().find { it.id == data.id }!!
+                    val success = pawn.attemptMoveTo(WorldCoords(parent.gameState.world, data.to), pawn.getMovableSquares())
+                    return ServerResponse(msgId, success)
+                }
                 ClientActions.ATTACK_PAWN -> TODO()
                 ClientActions.TALK -> TODO()
                 ClientActions.END_TURN -> {

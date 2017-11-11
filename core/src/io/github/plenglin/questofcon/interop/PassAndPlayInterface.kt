@@ -48,7 +48,7 @@ class PassAndPlayInterface(override val thisTeamId: Long, val parent: PassAndPla
     override fun movePawn(id: Long, to: WorldCoords, onResult: (Boolean) -> Unit) {
         val pawn = getPawnData(id)!!
         if (pawn.team == this.thisTeam) {
-            onResult(pawn.moveTo(to, pawn.getMovableSquares()))
+            onResult(pawn.attemptMoveTo(to, pawn.getMovableSquares()))
         }
     }
 
