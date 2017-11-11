@@ -1,6 +1,5 @@
 package io.github.plenglin.questofcon.net
 
-import io.github.plenglin.questofcon.Assets
 import io.github.plenglin.questofcon.game.GameData
 
 
@@ -9,5 +8,5 @@ fun main(args: Array<String>) {
     GameData.spawnableBuildings.forEach {
         println("${it.id}: ${it.name}")
     }
-    Server.acceptSockets()
+    Matchmaker.acceptSockets()
 }

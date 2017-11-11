@@ -9,7 +9,7 @@ import java.util.logging.Logger
 /**
  *
  */
-object Server {
+object Matchmaker {
 
     val port = Constants.SERVER_PORT
 
@@ -18,7 +18,7 @@ object Server {
     val serverSocket = ServerSocket(port)
 
     val pendingSockets = mutableListOf<Socket>()
-    val rooms = mutableListOf<Room>()
+    val rooms = mutableListOf<GameRoom>()
 
     fun acceptSockets() {
         println("accepting sockets on port $port")
@@ -28,7 +28,7 @@ object Server {
             println("A dude at ${sock.inetAddress} connected, ${pendingSockets.size} dudes now")
 
             if (pendingSockets.size >= 2) {
-                val room = Room(pendingSockets.toList(), nextRoom++)
+                val room = GameRoom(pendingSockets.toList(), nextRoom++)
                 room.start()
                 rooms.add(room)
                 pendingSockets.clear()
@@ -41,7 +41,7 @@ object Server {
 
 fun main(args: Array<String>) {
 
-    Thread(Runnable {Server.acceptSockets()}).start()
+    Thread(Runnable { Matchmaker.acceptSockets()}).start()
     Logger.getGlobal().level = Level.ALL
 
     Thread.sleep(2000)
