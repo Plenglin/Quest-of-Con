@@ -7,6 +7,7 @@ import io.github.plenglin.questofcon.game.PlayerInterface
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.building.Building
 import io.github.plenglin.questofcon.game.building.BuildingCreator
+import io.github.plenglin.questofcon.game.grid.Biomes
 import io.github.plenglin.questofcon.game.grid.World
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 import io.github.plenglin.questofcon.game.pawn.Pawn
@@ -27,6 +28,17 @@ class NetworkedPlayerInterface(val client: Client) : PlayerInterface() {
         val resp = client.initialResponse
         val grid = resp.world.grid
         world = World(grid.size, grid[0].size)
+
+        world.forEach {
+            val i = it.i
+            val j = it.j
+            val data = grid[i][j]
+            it.tile!!.let {
+                it.elevation = data.elevation
+                it.biome = Biomes.getById(data.biome)!!
+            }
+        }
+
         teams = mutableMapOf(*resp.teams.map {
             println("${it.id} -> ${it.name}")
             it.id to Team(it.name, Color(it.color), it.id) }.toTypedArray())
