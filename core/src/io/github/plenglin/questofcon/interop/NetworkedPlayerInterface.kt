@@ -87,7 +87,12 @@ class NetworkedPlayerInterface(val client: Client) : PlayerInterface() {
 
                 ServerEventTypes.TERRAIN_CHANGE -> TODO()
 
-                ServerEventTypes.CHANGE_TURN -> TODO()
+                ServerEventTypes.CHANGE_TURN -> {
+                    val id = it.data as Long
+                    currentTeam = id
+                    val team = teams[id]!!
+                    turnChange.fire(team)
+                }
                 ServerEventTypes.TALK -> onTalk.fire(it.data as DataChat)
             }
         }
