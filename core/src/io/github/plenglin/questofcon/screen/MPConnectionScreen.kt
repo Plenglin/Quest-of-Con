@@ -12,6 +12,7 @@ import io.github.plenglin.questofcon.Assets
 import io.github.plenglin.questofcon.Constants
 import io.github.plenglin.questofcon.QuestOfCon
 import io.github.plenglin.questofcon.TerrainTextures
+import io.github.plenglin.questofcon.game.GameData
 import io.github.plenglin.questofcon.net.Client
 import io.github.plenglin.questofcon.ui.UI
 import ktx.app.KtxScreen
@@ -32,6 +33,9 @@ object MPConnectionScreen : KtxScreen {
     override fun show() {
         screenToSet = null
 
+        GameData.spawnableBuildings.forEach {
+            println("${it.id}: ${it.name}")
+        }
         Scene2DSkin.defaultSkin = UI.skin
         stage.addActor(table {
             button {
