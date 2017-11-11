@@ -27,7 +27,9 @@ class SocketManager(val socket: Socket, val parent: GameRoom) : Thread("SocketMa
         input = ObjectInputStream(socket.getInputStream())
 
         parent.initializationFinished.addListener {
+            println("meme start meme")
             team.moneyChangeEvent.addListener {
+                logger.info("$name money is $it")
                 send(DataTeamBalance(it))
             }
         }
@@ -108,7 +110,9 @@ class SocketManager(val socket: Socket, val parent: GameRoom) : Thread("SocketMa
                 ClientActions.ATTACK_PAWN -> TODO()
                 ClientActions.TALK -> TODO()
                 ClientActions.END_TURN -> {
-                    parent.gameState.nextTurn()
+                    logger.info("ending le turn")
+                    parent.changeTurn()
+                    return ServerResponse(msgId, true)
                 }
                 ClientActions.DISBAND_PAWN -> {
                     val id = data as Long
@@ -116,7 +120,6 @@ class SocketManager(val socket: Socket, val parent: GameRoom) : Thread("SocketMa
                     return ServerResponse(msgId, true)
                 }
             }
-            return ServerResponse(msgId)
         } else {
             return ServerResponse(msgId, error = ServerResponseError.FORBIDDEN)
         }

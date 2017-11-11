@@ -63,6 +63,7 @@ class Client(val socket: Socket, val playerName: String) : Thread("Client-$playe
     }
 
     private fun onBalanceChanged(newValue: Int) {
+        logger.info("money change $newValue")
         onBalanceChanged.fire(newValue)
     }
 

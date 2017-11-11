@@ -3,6 +3,7 @@ package io.github.plenglin.questofcon.net
 import com.badlogic.gdx.graphics.Color
 import io.github.plenglin.questofcon.ListenerManager
 import io.github.plenglin.questofcon.game.GameState
+import io.github.plenglin.questofcon.game.PawnChangeEvent
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.*
 import java.io.Serializable
@@ -97,5 +98,11 @@ class GameRoom(val sockets: List<Socket>, val roomId: Long) : Thread("GameRoom-$
         println("Adding biomes...")
         BiomeGenerator(gameState.world, heightData, rainfallData).applyBiomes()
 
+    }
+
+    fun changeTurn() {
+        gameState.nextTurn()
+        gameState.getAllPawns().forEach { gameState.pawnChange.fire(it) }
+        gameState.getAllBuildings().forEach { gameState.buildingChange.fire(it) }
     }
 }
