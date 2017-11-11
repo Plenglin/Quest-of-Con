@@ -18,6 +18,7 @@ class BuildingMine(team: Team, pos: WorldCoords, gameState: GameState, type: Lon
         override fun createBuildingAt(team: Team, worldCoords: WorldCoords, gameState: GameState): Building {
             val building = BuildingMine(team, worldCoords, gameState, id)
             worldCoords.tile!!.building = building
+            gameState.buildingChange.fire(building)
             return building
         }
 

@@ -26,6 +26,7 @@ class BuildingHQ(team: Team, pos: WorldCoords, gameState: GameState, type: Long)
             val building = BuildingHQ(team, worldCoords, gameState, id)
             worldCoords.tile!!.building = building
             team.hasBuiltHQ = true
+            gameState.buildingChange.fire(building)
             return building
         }
 

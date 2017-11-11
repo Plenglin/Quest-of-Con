@@ -52,10 +52,10 @@ class Room(val sockets: List<Socket>, val roomId: Long) : Thread("Room-$roomId")
             broadcastEvent(ServerEventTypes.CHANGE_TURN, it.id)
         }
         gameState.pawnChange.addListener {
-            broadcastEvent(ServerEventTypes.PAWN_CHANGE, it.id)
+            broadcastEvent(ServerEventTypes.PAWN_CHANGE, it.serialized())
         }
         gameState.buildingChange.addListener {
-            broadcastEvent(ServerEventTypes.BUILDING_CHANGE, it.id)
+            broadcastEvent(ServerEventTypes.BUILDING_CHANGE, it.serialized())
         }
         gameState.worldChange.addListener {
             broadcastEvent(ServerEventTypes.TERRAIN_CHANGE, gameState.world.serialized())
@@ -71,6 +71,7 @@ class Room(val sockets: List<Socket>, val roomId: Long) : Thread("Room-$roomId")
     }
 
     fun broadcastEvent(eventType: ServerEventTypes, data: Serializable? = null) {
+        logger.info("bcast $eventType: $data")
         forEach { it.send(ServerEvent(eventType, data)) }
     }
 
@@ -162,14 +163,14 @@ class SocketManager(val socket: Socket, val parent: Room) : Thread("SocketManage
                     data as DataPawnCreation
                     val pawn = GameData.pawnByType(data.type).createPawnAt(team, WorldCoords(parent.gameState.world, data.at), parent.gameState)
                     val ser = pawn.serialized()
-                    parent.broadcastEvent(ServerEventTypes.PAWN_CHANGE, ser)
+                    //parent.broadcastEvent(ServerEventTypes.PAWN_CHANGE, ser)
                     return ServerResponse(msgId, ser)
                 }
                 ClientActions.MAKE_BUILDING -> {
                     data as DataBuildingCreation
                     val building = GameData.buildingByType(data.type).createBuildingAt(team, WorldCoords(parent.gameState.world, data.at), parent.gameState)
                     val ser = building.serialized()
-                    parent.broadcastEvent(ServerEventTypes.BUILDING_CHANGE, ser)
+                    //parent.broadcastEvent(ServerEventTypes.BUILDING_CHANGE, ser)
                     return ServerResponse(msgId, ser)
                 }
                 ClientActions.DEMOLISH_BUILDING -> {

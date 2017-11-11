@@ -29,6 +29,7 @@ class BuildingFactory(team: Team, pos: WorldCoords, gameState: GameState, type: 
         override fun createBuildingAt(team: Team, worldCoords: WorldCoords, gameState: GameState): Building {
             val building = BuildingFactory(team, worldCoords, gameState, id)
             worldCoords.tile!!.building = building
+            gameState.buildingChange.fire(building)
             return building
         }
 
