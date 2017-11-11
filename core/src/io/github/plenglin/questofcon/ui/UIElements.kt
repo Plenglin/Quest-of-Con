@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.Group
 import com.badlogic.gdx.scenes.scene2d.ui.*
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
 import io.github.plenglin.questofcon.game.GameState
+import io.github.plenglin.questofcon.game.PlayerInterface
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 import io.github.plenglin.questofcon.game.pawn.PawnCreator
@@ -217,7 +218,7 @@ class BuildingSpawningDialog(skin: Skin, val worldCoords: WorldCoords) : Dialog(
 
 }
 
-class GameStateInfoController(val gameState: GameState, skin: Skin) : Window("Status", skin) {
+class GameStateInfoController(val playerInterface: PlayerInterface, skin: Skin) : Window("Status", skin) {
 
     val currentTeamLabel: Label
     val moneyLabel: Label
@@ -233,7 +234,7 @@ class GameStateInfoController(val gameState: GameState, skin: Skin) : Window("St
             addListener(
                     object : ChangeListener() {
                         override fun changed(event: ChangeEvent?, actor: Actor?) {
-                            gameState.nextTurn()
+                            playerInterface.sendEndTurn()
                             updateData()
                         }
                     }
@@ -246,7 +247,7 @@ class GameStateInfoController(val gameState: GameState, skin: Skin) : Window("St
     }
 
     fun updateData() {
-        val team = gameState.getCurrentTeam()
+        val team = playerInterface.getCurrentTeam()
         currentTeamLabel.setText("${team.name}'s turn")
         moneyLabel.setText("$${team.money}")
         ecoLabel.setText("+$${team.getMoneyPerTurn()}")

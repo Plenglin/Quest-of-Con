@@ -42,9 +42,8 @@ object MPConnectionScreen : KtxScreen {
                     val sock = Socket("localhost", Constants.SERVER_PORT)
                     val client = Client(sock, System.getenv("title"))
                     client.initialization.addListener {
-                        println("asdf")
-                        MPGameScreen.initializeWith(client)
-                        screenToSet = MPGameScreen
+                        println("Changing screen!")
+                        screenToSet = MPGameScreen(client)
                     }
                     client.start()
                 }

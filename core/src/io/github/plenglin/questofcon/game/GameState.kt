@@ -1,5 +1,6 @@
 package io.github.plenglin.questofcon.game
 
+import com.badlogic.gdx.graphics.Color
 import io.github.plenglin.questofcon.ListenerManager
 import io.github.plenglin.questofcon.game.building.Building
 import io.github.plenglin.questofcon.game.grid.World
@@ -62,6 +63,8 @@ open class GameState(val teams: List<Team>) {
 
 }
 
-class DummyGameState() : GameState(listOf()) {
+class DummyGameState : GameState(listOf(Team("heu", Color.CLEAR))) {
+    init {
 
+    }
 }

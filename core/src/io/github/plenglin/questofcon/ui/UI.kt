@@ -51,7 +51,7 @@ object UI {
         pawnTooltip = ActionTooltip(skin)
         stage.addActor(pawnTooltip)
 
-        infoPanel = GameStateInfoController(GameScreen.gameState, skin)
+        infoPanel = GameStateInfoController(targetPlayerInterface, skin)
         stage.addActor(infoPanel)
         infoPanel.updateData()
     }

@@ -43,5 +43,6 @@ abstract class PlayerInterface {
 
     abstract fun getAllPawns(): Sequence<Pawn>
     abstract fun getAllBuildings(): Sequence<Building>
+    abstract fun getCurrentTeam(): Team
 
 }

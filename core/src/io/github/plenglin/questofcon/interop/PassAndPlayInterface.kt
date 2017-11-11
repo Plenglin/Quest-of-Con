@@ -92,5 +92,8 @@ class PassAndPlayInterface(override val thisTeamId: Long, val parent: PassAndPla
         return gameState.getAllBuildings()
     }
 
+    override fun getCurrentTeam(): Team {
+        return gameState.getCurrentTeam()
+    }
 
 }

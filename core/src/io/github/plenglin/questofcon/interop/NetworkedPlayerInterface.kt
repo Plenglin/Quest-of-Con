@@ -15,6 +15,7 @@ import io.github.plenglin.questofcon.net.*
 
 
 class NetworkedPlayerInterface(val client: Client) : PlayerInterface() {
+
     override val world: World
     override val teams: MutableMap<Long, Team>
     override val thisTeamId: Long
@@ -26,7 +27,12 @@ class NetworkedPlayerInterface(val client: Client) : PlayerInterface() {
         val grid = resp.world.grid
         world = World(grid.size, grid[0].size)
         teams = mutableMapOf(*resp.teams.map { it.id to Team(it.name, Color(it.color), it.id) }.toTypedArray())
+        teams.values.forEach { it.world = world }
         thisTeamId = resp.yourId
+
+        client.onTurnChanged.addListener {
+            currentTeam = it.id
+        }
 
         client.onServerEvent.addListener {
             val data = it.data
@@ -60,10 +66,17 @@ class NetworkedPlayerInterface(val client: Client) : PlayerInterface() {
                 }
 
                 ServerEventTypes.TERRAIN_CHANGE -> TODO()
-                ServerEventTypes.TALK -> onTalk.fire(it.data as DataChat)
 
+                ServerEventTypes.CHANGE_TURN -> TODO()
+                ServerEventTypes.TALK -> onTalk.fire(it.data as DataChat)
             }
         }
+    }
+
+    private var currentTeam: Long = 0
+
+    override fun getCurrentTeam(): Team {
+        return teams[currentTeam]!!
     }
 
     override fun makePawn(at: WorldCoords, type: PawnCreator, onResult: (Pawn?) -> Unit) {
