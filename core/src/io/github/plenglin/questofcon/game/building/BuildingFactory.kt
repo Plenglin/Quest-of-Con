@@ -1,6 +1,7 @@
 package io.github.plenglin.questofcon.game.building
 
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.utils.GdxRuntimeException
 import io.github.plenglin.questofcon.Textures
 import io.github.plenglin.questofcon.game.GameData
 import io.github.plenglin.questofcon.game.GameState
@@ -13,7 +14,7 @@ import io.github.plenglin.questofcon.ui.UnitSpawningDialog
 
 class BuildingFactory(team: Team, pos: WorldCoords, gameState: GameState, type: Long) : Building("factory", team, pos, 100, gameState, type) {
 
-    override val texture: Texture = Textures.FACTORY()
+    override val texture: Texture? = try { Textures.FACTORY() } catch (e: GdxRuntimeException) { null }
 
     override fun getRadialActions(): List<Selectable> {
         return super.getRadialActions() + if (pos.tile!!.pawn == null) listOf(

@@ -1,6 +1,7 @@
 package io.github.plenglin.questofcon.game.building
 
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.utils.GdxRuntimeException
 import io.github.plenglin.questofcon.Textures
 import io.github.plenglin.questofcon.game.GameState
 import io.github.plenglin.questofcon.game.Team
@@ -8,7 +9,7 @@ import io.github.plenglin.questofcon.game.grid.WorldCoords
 
 class BuildingMine(team: Team, pos: WorldCoords, gameState: GameState, type: Long) : Building("Mine", team, pos, 50, gameState, type) {
 
-    override val texture: Texture = Textures.MINE()
+    override val texture: Texture? = try { Textures.MINE() } catch (e: GdxRuntimeException) { null }
 
     override fun getMoneyPerTurn(): Int = 50
 

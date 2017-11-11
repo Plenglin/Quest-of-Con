@@ -1,6 +1,7 @@
 package io.github.plenglin.questofcon.game.building
 
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.utils.GdxRuntimeException
 import io.github.plenglin.questofcon.Constants
 import io.github.plenglin.questofcon.Textures
 import io.github.plenglin.questofcon.game.GameState
@@ -11,7 +12,7 @@ import io.github.plenglin.questofcon.ui.Selectable
 
 class BuildingHQ(team: Team, pos: WorldCoords, gameState: GameState, type: Long) : Building("Headquarters", team, pos, Constants.HQ_HEALTH, gameState, type) {
 
-    override val texture: Texture = Textures.HEADQUARTERS()
+    override val texture: Texture? = try { Textures.HEADQUARTERS() } catch (e: GdxRuntimeException) { null }
 
     override fun getMoneyPerTurn(): Int = Constants.BASE_ECO
 

@@ -27,7 +27,7 @@ abstract class Building(val name: String, var team: Team, var pos: WorldCoords, 
 
     val id = nextBuildingId++
 
-    abstract val texture: Texture
+    abstract val texture: Texture?
 
     var enabled = true
 

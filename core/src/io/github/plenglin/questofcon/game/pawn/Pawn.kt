@@ -20,7 +20,7 @@ abstract class PawnCreator(val title: String, val cost: Int) {
 
 private var nextPawnId = 0L
 
-abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val maxHealth: Int, val actionPoints: Int, val texture: () -> Texture, val state: GameState) {
+abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val maxHealth: Int, val actionPoints: Int, val texture: () -> Texture?, val state: GameState) {
 
     var type = -1L
     val id = nextPawnId++

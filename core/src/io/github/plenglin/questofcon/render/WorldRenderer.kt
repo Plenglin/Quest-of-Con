@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
+import io.github.plenglin.questofcon.Assets
 import io.github.plenglin.questofcon.Constants
 import io.github.plenglin.questofcon.game.grid.World
 import io.github.plenglin.questofcon.game.grid.WorldCoords
@@ -115,11 +116,13 @@ class WorldRenderer(val world: World) {
                     val pawn = this[i, j]!!.pawn
 
                     if (pawn != null) {
+
+                        val tex = pawn.texture() ?: Assets[Assets.missing]
                         val y = j.toFloat()
 
                         // Team outline
                         batch.color = Color.WHITE
-                        batch.draw(pawn.texture(), x, y, 1f, 1f)
+                        batch.draw(tex, x, y, 1f, 1f)
                         val color = pawn.team.color.cpy()
                         color.a = 0.5f
                         batch.color = color
