@@ -35,6 +35,8 @@ open class GameState(val teams: List<Team>) {
         getCurrentTeam().endTurn()
         teamIndex = (teamIndex + 1) % teams.size
         getCurrentTeam().startTurn()
+        getAllPawns().forEach { pawnChange.fire(it) }
+        getAllBuildings().forEach { buildingChange.fire(it) }
         turnChange.fire(getCurrentTeam())
     }
 

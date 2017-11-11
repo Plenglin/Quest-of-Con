@@ -102,7 +102,5 @@ class GameRoom(val sockets: List<Socket>, val roomId: Long) : Thread("GameRoom-$
 
     fun changeTurn() {
         gameState.nextTurn()
-        gameState.getAllPawns().forEach { gameState.pawnChange.fire(it) }
-        gameState.getAllBuildings().forEach { gameState.buildingChange.fire(it) }
     }
 }

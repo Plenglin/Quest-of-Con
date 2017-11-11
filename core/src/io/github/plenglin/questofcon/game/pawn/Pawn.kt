@@ -155,7 +155,7 @@ abstract class Pawn(val name: String, var team: Team, _pos: WorldCoords, val max
     }
 
     fun serialized(): DataPawn {
-        return DataPawn(id, team.id, type, health, ap, pos.serialized())
+        return DataPawn(id, team.id, type, health, ap, attacksRemaining, pos.serialized())
     }
 
     override fun toString(): String {

@@ -82,6 +82,7 @@ class NetworkedPlayerInterface(val client: Client) : PlayerInterface() {
                         pawn.id = pawnData.id
                     }
                     pawn.ap = pawnData.ap
+                    pawn.attacksRemaining = pawnData.attacks
                     pawn.team = teams[pawnData.team]!!
                     pawn.pos = WorldCoords(world, i, j)
                     pawn.health = pawnData.health

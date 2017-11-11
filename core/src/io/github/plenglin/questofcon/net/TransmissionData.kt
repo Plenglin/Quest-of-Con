@@ -54,7 +54,7 @@ data class DataTile(val biome: Long, val elevation: Int) : Serializable
 
 data class DataPosition(val i: Int, val j: Int) : Serializable
 data class DataTeam(val name: String, val id: Long, val color: Int) : Serializable
-data class DataPawn(val id: Long, val team: Long, val type: Long, val health: Int, val ap: Int, val pos: DataPosition) : Serializable
+data class DataPawn(val id: Long, val team: Long, val type: Long, val health: Int, val ap: Int, val attacks: Int, val pos: DataPosition) : Serializable
 
 data class DataTeamBalance(val money: Int) : Serializable
 
