@@ -5,7 +5,6 @@ import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.Group
 import com.badlogic.gdx.scenes.scene2d.ui.*
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
-import io.github.plenglin.questofcon.game.GameState
 import io.github.plenglin.questofcon.game.PlayerInterface
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
@@ -284,7 +283,7 @@ class ActionTooltip(skin: Skin) : Table(skin) {
                         a.setText(hov.tile!!.biome.name.capitalize())
                         b.setText("$cost")
                         c.setText("Actions")
-                        d.setText("${thePawn.apRemaining} -> ${thePawn.apRemaining - cost}")
+                        d.setText("${thePawn.ap} -> ${thePawn.ap - cost}")
                     } else {
                         this.isVisible = false
                     }

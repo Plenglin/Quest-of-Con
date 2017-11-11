@@ -97,17 +97,17 @@ object PawnActionInputProcessor : KtxInputAdapter {
 
     override fun keyDown(keycode: Int): Boolean {
         val pawn = GridSelectionInputManager.selection?.tile?.pawn ?: return false
-        if (pawn.team != UI.targetPlayerInterface.thisTeam || pawn.apRemaining <= 0) {
+        if (pawn.team != UI.targetPlayerInterface.thisTeam || pawn.ap <= 0) {
             return false
         }
         when (keycode) {
             Input.Keys.Q -> {  // Attack
-                if (pawn.attacksRemaining > 0 && pawn.actionPoints > 0) {
+                if (pawn.attacksRemaining > 0 && pawn.maxAp > 0) {
                     PawnActionManager.beginAttacking(pawn)
                 }
             }
             Input.Keys.E -> {  // Move
-                if (pawn.actionPoints > 0) {
+                if (pawn.maxAp > 0) {
                     PawnActionManager.beginMoving(pawn)
                 }
             }

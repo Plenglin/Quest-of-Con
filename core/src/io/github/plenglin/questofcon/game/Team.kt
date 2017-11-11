@@ -36,7 +36,7 @@ class Team(val name: String, val color: Color, _id: Long = -1) {
             }
             val pawn = it.tile.pawn
             if (pawn != null) {
-                pawn.apRemaining = pawn.actionPoints
+                pawn.ap = pawn.maxAp
                 pawn.attacksRemaining = pawn.maxAttacks
             }
         }

@@ -78,7 +78,7 @@ class NetworkedPlayerInterface(val client: Client) : PlayerInterface() {
                         pawn = GameData.pawnByType(pawnData.type).createPawnAt(teams[pawnData.team]!!, WorldCoords(world, i, j), client.dummy)
                         pawn.id = pawnData.id
                     }
-                    pawn.apRemaining = pawnData.ap
+                    pawn.ap = pawnData.ap
                     pawn.team = teams[pawnData.team]!!
                     pawn.pos = WorldCoords(world, i, j)
                     pawn.health = pawnData.health

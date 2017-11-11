@@ -38,7 +38,7 @@ class PassAndPlayInterface(override val thisTeamId: Long, val parent: PassAndPla
         if (thisTeam.money >= type.cost && building?.canCreate(type) == true && building.team == thisTeam) {
             thisTeam.money -= type.cost
             val newPawn = type.createPawnAt(thisTeam, at, gameState)
-            newPawn.apRemaining = 0
+            newPawn.ap = 0
             onResult(newPawn)
         } else {
             onResult(null)

@@ -20,7 +20,7 @@ abstract class PawnCreator(val title: String, val cost: Int) {
 
 private var nextPawnId = 0L
 
-abstract class Pawn(val name: String, var team: Team, _pos: WorldCoords, val maxHealth: Int, val actionPoints: Int, val texture: () -> Texture?, val state: GameState) {
+abstract class Pawn(val name: String, var team: Team, _pos: WorldCoords, val maxHealth: Int, val maxAp: Int, val texture: () -> Texture?, val state: GameState) {
 
     var type = -1L
     var id = nextPawnId++
@@ -43,7 +43,7 @@ abstract class Pawn(val name: String, var team: Team, _pos: WorldCoords, val max
             }
             state.pawnChange.fire(this)
         }
-    var apRemaining: Int = actionPoints
+    var ap: Int = 0
 
     fun getMovableSquares(): Map<WorldCoords, Int> {
         // Dijkstra
@@ -61,7 +61,7 @@ abstract class Pawn(val name: String, var team: Team, _pos: WorldCoords, val max
             //println("$terrain, ${cost}, ${tile.passableBy(team)}")
             val fullDist = dist[coord]!!
 
-            if (tile.passableBy(team) && fullDist + cost <= apRemaining) {  // Can we even get past this tile?
+            if (tile.passableBy(team) && fullDist + cost <= ap) {  // Can we even get past this tile?
                 coord.surrounding().forEach { neighbor ->  // For each neighbor...
                     val totalCost = fullDist + cost + maxOf(neighbor.tile!!.elevation - tile.elevation, 1)
                     val neighborDist = dist[neighbor]
@@ -107,8 +107,8 @@ abstract class Pawn(val name: String, var team: Team, _pos: WorldCoords, val max
     }
 
     fun attemptMoveTo(coords: WorldCoords, apCost: Int): Boolean {
-        if (apRemaining - apCost >= 0) {
-            apRemaining -= apCost
+        if (ap - apCost >= 0) {
+            ap -= apCost
             pos = coords
             state.pawnChange.fire(this)
             return true
@@ -117,11 +117,11 @@ abstract class Pawn(val name: String, var team: Team, _pos: WorldCoords, val max
     }
 
     open fun getProperties(): Map<String, Any> {
-        return mapOf("type" to name, "team" to team.name, "health" to "$health/$maxHealth", "actions" to "$apRemaining/$actionPoints", "attacks" to "$attacksRemaining/$maxAttacks")
+        return mapOf("type" to name, "team" to team.name, "health" to "$health/$maxHealth", "actions" to "$ap/$maxAp", "attacks" to "$attacksRemaining/$maxAttacks")
     }
 
     fun attemptAttack(coords: WorldCoords): Boolean {
-        apRemaining -= 1
+        ap -= 1
         val result = onAttack(coords)
         if (result) {
             attacksRemaining -= 1
@@ -138,7 +138,7 @@ abstract class Pawn(val name: String, var team: Team, _pos: WorldCoords, val max
             }).show(UI.stage)
         }))
 
-        if (apRemaining > 0) {
+        if (ap > 0) {
 
             actions.add(Selectable("Move $name", {
                 PawnActionManager.beginMoving(this)
@@ -155,7 +155,7 @@ abstract class Pawn(val name: String, var team: Team, _pos: WorldCoords, val max
     }
 
     fun serialized(): DataPawn {
-        return DataPawn(id, team.id, type, health, apRemaining, pos.serialized())
+        return DataPawn(id, team.id, type, health, ap, pos.serialized())
     }
 
     override fun toString(): String {
