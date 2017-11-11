@@ -58,7 +58,7 @@ data class DataPawn(val id: Long, val team: Long, val type: Long, val health: In
 
 data class DataTeamBalance(val money: Int) : Serializable
 
-data class DataBuilding(val id: Long, val team: Long, val type: Long, val health: Int, val pos: DataPosition) : Serializable
+data class DataBuilding(val id: Long, val team: Long, val type: Long, val health: Int, val enabled: Boolean, val pos: DataPosition) : Serializable
 
 data class DataPawnCreation(val type: Long, val at: DataPosition) : Serializable
 data class DataBuildingCreation(val type: Long, val at: DataPosition) : Serializable

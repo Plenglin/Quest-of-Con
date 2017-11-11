@@ -64,7 +64,7 @@ abstract class Building(val name: String, var team: Team, var pos: WorldCoords, 
     open fun canCreate(type: PawnCreator): Boolean = false
 
     fun serialized(): Serializable? {
-        return DataBuilding(id, team.id, type, health, pos.serialized())
+        return DataBuilding(id, team.id, type, health, enabled, pos.serialized())
     }
 
 }

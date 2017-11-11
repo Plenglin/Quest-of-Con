@@ -66,7 +66,7 @@ class PassAndPlayInterface(override val thisTeamId: Long, val parent: PassAndPla
         }
         thisTeam.money -= type.cost
         val building = type.createBuildingAt(thisTeam, at, gameState)
-        building.enabled = false
+        //building.enabled = false
         gameState.buildingChange.fire(building)
         onResult(building)
     }

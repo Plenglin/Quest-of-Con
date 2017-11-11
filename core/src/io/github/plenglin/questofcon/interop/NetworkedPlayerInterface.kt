@@ -68,6 +68,7 @@ class NetworkedPlayerInterface(val client: Client) : PlayerInterface() {
                         building.id = bldgData.id
                     }
                     building.team = teams[bldgData.team]!!
+                    building.enabled = bldgData.enabled
                     building.health = bldgData.health
                     buildingUpdate.fire(building)
                 }
