@@ -6,7 +6,7 @@ import io.github.plenglin.questofcon.game.GameState
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 
-class BuildingMine(team: Team, pos: WorldCoords, gameState: GameState) : Building("Mine", team, pos, 50, gameState) {
+class BuildingMine(team: Team, pos: WorldCoords, gameState: GameState, type: Long) : Building("Mine", team, pos, 50, gameState, type) {
 
     override val texture: Texture = Textures.MINE()
 
@@ -15,7 +15,7 @@ class BuildingMine(team: Team, pos: WorldCoords, gameState: GameState) : Buildin
     companion object : BuildingCreator("Mine", 250) {
 
         override fun createBuildingAt(team: Team, worldCoords: WorldCoords, gameState: GameState): Building {
-            val building = BuildingMine(team, worldCoords, gameState)
+            val building = BuildingMine(team, worldCoords, gameState, id)
             worldCoords.tile!!.building = building
             return building
         }

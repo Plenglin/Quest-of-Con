@@ -5,9 +5,11 @@ import io.github.plenglin.questofcon.game.GameState
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 import io.github.plenglin.questofcon.game.pawn.PawnCreator
+import io.github.plenglin.questofcon.net.DataBuilding
 import io.github.plenglin.questofcon.ui.ConfirmationDialog
 import io.github.plenglin.questofcon.ui.Selectable
 import io.github.plenglin.questofcon.ui.UI
+import java.io.Serializable
 
 var nextBuildingCreatorId = 0L
 
@@ -21,7 +23,7 @@ abstract class BuildingCreator(val name: String, val cost: Int) {
 
 var nextBuildingId = 0L
 
-abstract class Building(val name: String, var team: Team, var pos: WorldCoords, val maxHealth: Int, val gameState: GameState) {
+abstract class Building(val name: String, var team: Team, var pos: WorldCoords, val maxHealth: Int, val gameState: GameState, val type: Long) {
 
     val id = nextBuildingId++
 
@@ -60,5 +62,9 @@ abstract class Building(val name: String, var team: Team, var pos: WorldCoords, 
     }
 
     open fun canCreate(type: PawnCreator): Boolean = false
+
+    fun serialized(): Serializable? {
+        return DataBuilding(id, team.id, type, health, pos.serialized())
+    }
 
 }

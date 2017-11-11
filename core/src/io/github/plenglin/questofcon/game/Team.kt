@@ -6,6 +6,7 @@ import io.github.plenglin.questofcon.game.building.BuildingCreator
 import io.github.plenglin.questofcon.game.building.BuildingHQ
 import io.github.plenglin.questofcon.game.grid.World
 import io.github.plenglin.questofcon.game.grid.WorldCoords
+import io.github.plenglin.questofcon.net.DataTeam
 
 
 private var nextTeamId = 0L
@@ -48,6 +49,10 @@ class Team(val name: String, val color: Color, val id: Long = nextTeamId++) {
 
     override fun toString(): String {
         return "Team($id, $name)"
+    }
+
+    fun serialized(): DataTeam {
+        return DataTeam(name, id, color.toIntBits())
     }
 
 }

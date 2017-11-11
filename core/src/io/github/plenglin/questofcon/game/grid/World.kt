@@ -93,6 +93,8 @@ data class WorldCoords(val world: World, val i: Int, val j: Int) {
 
     fun serialized(): DataPosition = DataPosition(i, j)
 
+    constructor(world: World, pos: DataPosition) : this(world, pos.i, pos.j)
+
 }
 
 fun main(args: Array<String>) {

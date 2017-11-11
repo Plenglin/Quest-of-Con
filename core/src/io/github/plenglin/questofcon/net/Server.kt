@@ -59,7 +59,7 @@ fun main(args: Array<String>) {
     println("requesting from clients")
     clients.forEach {
         println("requesting")
-        println(it.getPawnWithId(0))
+        //println(it(0))
     }
 
 }

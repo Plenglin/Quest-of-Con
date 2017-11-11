@@ -9,7 +9,7 @@ import io.github.plenglin.questofcon.game.grid.WorldCoords
 import io.github.plenglin.questofcon.ui.Selectable
 
 
-class BuildingHQ(team: Team, pos: WorldCoords, gameState: GameState) : Building("Headquarters", team, pos, Constants.HQ_HEALTH, gameState) {
+class BuildingHQ(team: Team, pos: WorldCoords, gameState: GameState, type: Long) : Building("Headquarters", team, pos, Constants.HQ_HEALTH, gameState, type) {
 
     override val texture: Texture = Textures.HEADQUARTERS()
 
@@ -22,7 +22,7 @@ class BuildingHQ(team: Team, pos: WorldCoords, gameState: GameState) : Building(
     companion object : BuildingCreator("HQ", 0) {
 
         override fun createBuildingAt(team: Team, worldCoords: WorldCoords, gameState: GameState): Building {
-            val building = BuildingHQ(team, worldCoords, gameState)
+            val building = BuildingHQ(team, worldCoords, gameState, id)
             worldCoords.tile!!.building = building
             team.hasBuiltHQ = true
             return building

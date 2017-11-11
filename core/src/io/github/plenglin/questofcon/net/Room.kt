@@ -1,7 +1,7 @@
 package io.github.plenglin.questofcon.net
 
 import com.badlogic.gdx.graphics.Color
-import com.beust.klaxon.Parser
+import io.github.plenglin.questofcon.game.GameData
 import io.github.plenglin.questofcon.game.GameState
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.*
@@ -44,9 +44,22 @@ class Room(val sockets: List<Socket>, val roomId: Long) : Thread("Room-$roomId")
             val team = Team(data.name, colors.removeAt(0))
             logger.info("$name made team $team")
             clientsById.put(team.id, it)
-            it.team = DataTeam(data.name, team.id, team.color.toIntBits())
+            it.team = team
             team
         })
+
+        gameState.turnChange.addListener {
+            broadcastEvent(ServerEventTypes.CHANGE_TURN, it.id)
+        }
+        gameState.pawnChange.addListener {
+            broadcastEvent(ServerEventTypes.PAWN_CHANGE, it.id)
+        }
+        gameState.buildingChange.addListener {
+            broadcastEvent(ServerEventTypes.BUILDING_CHANGE, it.id)
+        }
+        gameState.worldChange.addListener {
+            broadcastEvent(ServerEventTypes.TERRAIN_CHANGE, gameState.world.serialized())
+        }
 
         logger.info("generating world")
 
@@ -57,7 +70,7 @@ class Room(val sockets: List<Socket>, val roomId: Long) : Thread("Room-$roomId")
 
     }
 
-    fun broadcastEvent(eventType: ServerEventTypes, data: Serializable) {
+    fun broadcastEvent(eventType: ServerEventTypes, data: Serializable? = null) {
         forEach { it.send(ServerEvent(eventType, data)) }
     }
 
@@ -65,7 +78,7 @@ class Room(val sockets: List<Socket>, val roomId: Long) : Thread("Room-$roomId")
         clientsById.forEach { _, sock ->
             sock.send(DataInitialResponse(
                     sock.id,
-                    clientsById.values.map { it.team },
+                    clientsById.values.map { it.team.serialized() },
                     gameState.world.serialized()
             ))
         }
@@ -92,7 +105,7 @@ class SocketManager(val socket: Socket, val parent: Room) : Thread("SocketManage
     lateinit var output: ObjectOutputStream
 
     lateinit var initialTransmission: DataInitialClientData
-    lateinit var team: DataTeam
+    lateinit var team: Team
 
     override fun run() {
         logger.info("starting ${this.name}")
@@ -111,7 +124,7 @@ class SocketManager(val socket: Socket, val parent: Room) : Thread("SocketManage
                     parent.barrier.await()
                 }
                 is ClientRequest -> send(onRequest(transmission.id, data))
-                is ClientAction -> onAction(data)
+                is ClientAction -> send(onAction(transmission.id, data))
             }
 
         }
@@ -128,15 +141,46 @@ class SocketManager(val socket: Socket, val parent: Room) : Thread("SocketManage
     }
 
     fun onRequest(msgId: Long, request: ClientRequest): ServerResponse {
+        /*//val data = request.da
         return when (request.type) {
-            ClientRequestType.BUILDING -> ServerResponse(request.type, DataBuilding(0, 0, 0, DataPosition(0, 0)), msgId)
+            ClientRequestType.BUILDING -> {
+                GameData.buildingByType()parent.gameState
+                ServerResponse(request.type, DataBuilding(0, 0, 0, DataPosition(0, 0)), msgId)
+            }
             ClientRequestType.PAWN -> ServerResponse(request.type, DataPawn(0, 0, 0, DataPosition(0, 0)), msgId)
             else -> ServerResponse(request.type, request.key, msgId, ServerResponseError.DATA_ERROR)
-        }
+        }*/
+        return ServerResponse(msgId, ServerResponseError.ID_DOES_NOT_EXIST)  // TODO: PLACEHOLDER
     }
 
-    fun onAction(clientAction: ClientAction) {
-
+    fun onAction(msgId: Long, action: ClientAction): ServerResponse {
+        val data = action.data
+        if (action.action != ClientActions.TALK && parent.gameState.getCurrentTeam() != team) {
+            when (action.action) {
+                ClientActions.MAKE_PAWN -> {
+                    //if (parent.gameState)
+                    data as DataPawnCreation
+                    val pawn = GameData.pawnByType(data.type).createPawnAt(team, WorldCoords(parent.gameState.world, data.at), parent.gameState)
+                    return ServerResponse(msgId, pawn.serialized())
+                }
+                ClientActions.MAKE_BUILDING -> {
+                    data as DataBuildingCreation
+                    val building = GameData.buildingByType(data.type).createBuildingAt(team, WorldCoords(parent.gameState.world, data.at), parent.gameState)
+                    return ServerResponse(msgId, building.serialized())
+                }
+                ClientActions.DEMOLISH_BUILDING -> {
+                }
+                ClientActions.MOVE_PAWN -> TODO()
+                ClientActions.ATTACK_PAWN -> TODO()
+                ClientActions.TALK -> TODO()
+                ClientActions.END_TURN -> {
+                    parent.gameState.nextTurn()
+                }
+            }
+            return ServerResponse(msgId)
+        } else {
+            return ServerResponse(msgId, error = ServerResponseError.FORBIDDEN)
+        }
     }
 
 }

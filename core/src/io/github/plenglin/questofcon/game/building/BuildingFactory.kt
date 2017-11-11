@@ -11,7 +11,7 @@ import io.github.plenglin.questofcon.ui.Selectable
 import io.github.plenglin.questofcon.ui.UI
 import io.github.plenglin.questofcon.ui.UnitSpawningDialog
 
-class BuildingFactory(team: Team, pos: WorldCoords, gameState: GameState) : Building("factory", team, pos, 100, gameState) {
+class BuildingFactory(team: Team, pos: WorldCoords, gameState: GameState, type: Long) : Building("factory", team, pos, 100, gameState, type) {
 
     override val texture: Texture = Textures.FACTORY()
 
@@ -26,7 +26,7 @@ class BuildingFactory(team: Team, pos: WorldCoords, gameState: GameState) : Buil
     companion object : BuildingCreator("factory", 200) {
 
         override fun createBuildingAt(team: Team, worldCoords: WorldCoords, gameState: GameState): Building {
-            val building = BuildingFactory(team, worldCoords, gameState)
+            val building = BuildingFactory(team, worldCoords, gameState, id)
             worldCoords.tile!!.building = building
             return building
         }

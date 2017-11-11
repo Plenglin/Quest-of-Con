@@ -5,13 +5,11 @@ import java.util.*
 
 
 enum class ClientActions : Serializable {
-    MAKE_PAWN, MAKE_BUILDING, DEMOLISH_BUILDING, TALK, MOVE_PAWN, ATTACK_PAWN,
-
-    END_TURN
+    MAKE_PAWN, MAKE_BUILDING, DEMOLISH_BUILDING, TALK, MOVE_PAWN, ATTACK_PAWN, END_TURN
 }
 
 enum class ServerEventTypes : Serializable {
-    TALK, BUILDING_CHANGE, PAWN_CHANGE, TERRAIN_CHANGE
+    TALK, BUILDING_CHANGE, PAWN_CHANGE, TERRAIN_CHANGE, CHANGE_TURN
 }
 
 enum class ClientRequestType {
@@ -31,7 +29,7 @@ data class ClientAction(val action: ClientActions, val data: Serializable? = nul
 data class ServerEvent(val action: ServerEventTypes, val data: Serializable? = null) : Serializable
 
 data class ClientRequest(val type: ClientRequestType, val key: Long) : Serializable
-data class ServerResponse(val type: ClientRequestType, val data: Serializable?, val responseTo: Long, val error: Int = ServerResponseError.OK) : Serializable
+data class ServerResponse( val responseTo: Long, val data: Serializable? = null, val error: Int = ServerResponseError.OK) : Serializable
 
 data class DataInitialClientData(val name: String) : Serializable
 data class DataInitialResponse(val yourId: Long, val teams: List<DataTeam>, val world: DataWorldState) : Serializable
