@@ -20,13 +20,20 @@ abstract class PawnCreator(val title: String, val cost: Int) {
 
 private var nextPawnId = 0L
 
-abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val maxHealth: Int, val actionPoints: Int, val texture: () -> Texture?, val state: GameState) {
+abstract class Pawn(val name: String, var team: Team, _pos: WorldCoords, val maxHealth: Int, val actionPoints: Int, val texture: () -> Texture?, val state: GameState) {
 
     var type = -1L
-    val id = nextPawnId++
+    var id = nextPawnId++
 
     open val maxAttacks = 1
     var attacksRemaining = 0
+
+    var pos: WorldCoords = _pos
+        set(value) {
+            field.tile!!.pawn = null
+            field = value
+            value.tile!!.pawn = this
+        }
 
     var health: Int = maxHealth
         set(value) {
@@ -102,9 +109,7 @@ abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val 
     fun moveTo(coords: WorldCoords, apCost: Int): Boolean {
         if (apRemaining - apCost >= 0) {
             apRemaining -= apCost
-            pos.tile!!.pawn = null  // clear old tile
-            coords.tile!!.pawn = this  // set new tile to this
-            pos = coords  // set this pawn's reference
+            pos = coords
             state.pawnChange.fire(this)
             return true
         }

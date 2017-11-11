@@ -25,7 +25,7 @@ var nextBuildingId = 0L
 
 abstract class Building(val name: String, var team: Team, var pos: WorldCoords, val maxHealth: Int, val gameState: GameState, val type: Long) {
 
-    val id = nextBuildingId++
+    var id = nextBuildingId++
 
     abstract val texture: Texture?
 

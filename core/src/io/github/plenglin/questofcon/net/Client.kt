@@ -60,8 +60,9 @@ class Client(val socket: Socket, val playerName: String) : Thread("Client-$playe
         }
     }
 
-    private fun onEventReceived(action: ServerEvent) {
-        logger.fine("received action $action")
+    private fun onEventReceived(event: ServerEvent) {
+        logger.info("received event $event")
+        onServerEvent.fire(event)
     }
 
     private fun onResponseReceived(response: ServerResponse) {

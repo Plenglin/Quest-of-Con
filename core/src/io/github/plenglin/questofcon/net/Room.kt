@@ -155,18 +155,22 @@ class SocketManager(val socket: Socket, val parent: Room) : Thread("SocketManage
 
     fun onAction(msgId: Long, action: ClientAction): ServerResponse {
         val data = action.data
-        if (action.action != ClientActions.TALK && parent.gameState.getCurrentTeam() != team) {
+        if (action.action == ClientActions.TALK || parent.gameState.getCurrentTeam() == team) {
             when (action.action) {
                 ClientActions.MAKE_PAWN -> {
                     //if (parent.gameState)
                     data as DataPawnCreation
                     val pawn = GameData.pawnByType(data.type).createPawnAt(team, WorldCoords(parent.gameState.world, data.at), parent.gameState)
-                    return ServerResponse(msgId, pawn.serialized())
+                    val ser = pawn.serialized()
+                    parent.broadcastEvent(ServerEventTypes.PAWN_CHANGE, ser)
+                    return ServerResponse(msgId, ser)
                 }
                 ClientActions.MAKE_BUILDING -> {
                     data as DataBuildingCreation
                     val building = GameData.buildingByType(data.type).createBuildingAt(team, WorldCoords(parent.gameState.world, data.at), parent.gameState)
-                    return ServerResponse(msgId, building.serialized())
+                    val ser = building.serialized()
+                    parent.broadcastEvent(ServerEventTypes.BUILDING_CHANGE, ser)
+                    return ServerResponse(msgId, ser)
                 }
                 ClientActions.DEMOLISH_BUILDING -> {
                 }

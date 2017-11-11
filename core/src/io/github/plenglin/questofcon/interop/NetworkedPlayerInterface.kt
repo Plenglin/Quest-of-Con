@@ -57,11 +57,12 @@ class NetworkedPlayerInterface(val client: Client) : PlayerInterface() {
 
                 ServerEventTypes.BUILDING_CHANGE -> {
                     val bldgData = data as DataBuilding
+                    val i = bldgData.pos.i
+                    val j = bldgData.pos.j
                     var building = getBuildingData(bldgData.id)
                     if (building == null) {
-                        val i = bldgData.pos.i
-                        val j = bldgData.pos.j
                         building = GameData.buildingByType(bldgData.type).createBuildingAt(teams[bldgData.team]!!, WorldCoords(world, i, j), client.dummy)
+                        building.id = bldgData.id
                     }
                     building.team = teams[bldgData.team]!!
                     building.health = bldgData.health
@@ -75,6 +76,7 @@ class NetworkedPlayerInterface(val client: Client) : PlayerInterface() {
                     var pawn = getPawnData(data.id)
                     if (pawn == null) {
                         pawn = GameData.pawnByType(pawnData.type).createPawnAt(teams[pawnData.team]!!, WorldCoords(world, i, j), client.dummy)
+                        pawn.id = pawnData.id
                     }
                     pawn.team = teams[pawnData.team]!!
                     pawn.pos = WorldCoords(world, i, j)
