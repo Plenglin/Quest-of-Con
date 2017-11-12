@@ -48,7 +48,6 @@ public class DesktopLauncher {
         config.title = String.format("QuestOfCon%s", title == null ? "" : (": " + title));
         config.x = x != null ? Integer.parseInt(x) : -1;
         new LwjglApplication(QuestOfCon.INSTANCE, config);
-        System.exit(0);
     }
 
 }

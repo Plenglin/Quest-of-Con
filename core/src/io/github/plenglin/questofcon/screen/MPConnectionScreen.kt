@@ -16,10 +16,7 @@ import io.github.plenglin.questofcon.game.GameData
 import io.github.plenglin.questofcon.net.Client
 import io.github.plenglin.questofcon.ui.UI
 import ktx.app.KtxScreen
-import ktx.scene2d.Scene2DSkin
-import ktx.scene2d.button
-import ktx.scene2d.label
-import ktx.scene2d.table
+import ktx.scene2d.*
 import java.net.Socket
 
 
@@ -38,12 +35,14 @@ object MPConnectionScreen : KtxScreen {
         }
         Scene2DSkin.defaultSkin = UI.skin
         stage.addActor(table {
+            val ip = textField("localhost")
+            //val port = textField("")
             button {
                 label("Connect")
             }.center().addListener(object : ChangeListener() {
                 override fun changed(event: ChangeEvent?, actor: Actor?) {
                     println("starting client")
-                    val sock = Socket("localhost", Constants.SERVER_PORT)
+                    val sock = Socket(ip.text, Constants.SERVER_PORT)
                     val client = Client(sock, System.getenv("title"))
                     client.initialization.addListener {
                         println("Changing screen!")
@@ -52,6 +51,8 @@ object MPConnectionScreen : KtxScreen {
                     client.start()
                 }
             })
+
+            pack()
         }.apply {
             setPosition(400f, 400f)
         })

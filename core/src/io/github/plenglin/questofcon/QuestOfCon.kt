@@ -17,8 +17,10 @@ object QuestOfCon : Game() {
         Assets.manager.finishLoading()
 
         if (System.getenv("mp") == "1") {
+            println("asdf")
             setScreen(MPConnectionScreen)
         } else {
+            println("moo")
             setScreen(GameScreen)
         }
     }
