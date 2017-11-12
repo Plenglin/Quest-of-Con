@@ -2,6 +2,7 @@ package io.github.plenglin.questofcon.ui
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
+import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
@@ -11,13 +12,14 @@ import io.github.plenglin.questofcon.game.grid.World
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 import io.github.plenglin.questofcon.render.CameraTransformBuffer
 import io.github.plenglin.questofcon.render.ShadeSet
-import io.github.plenglin.questofcon.screen.GameScreen
+import io.github.plenglin.questofcon.ui.elements.BuildingSpawningDialog
+import io.github.plenglin.questofcon.ui.elements.Selectable
 import ktx.app.KtxInputAdapter
 
 
 object MapControlInputManager : KtxInputAdapter {
 
-    val cam: OrthographicCamera = GameScreen.gridCam
+    val cam: OrthographicCamera = UI.gridCam
     val buffer = CameraTransformBuffer(cam)
 
     var zoomTarget = Constants.minZoom
@@ -104,8 +106,8 @@ object MapControlInputManager : KtxInputAdapter {
 
 object GridSelectionInputManager : KtxInputAdapter {
 
-    val cam: OrthographicCamera = GameScreen.gridCam
-    val world: World = GameScreen.gameState.world
+    val cam: OrthographicCamera = UI.gridCam
+    val world: World = UI.targetPlayerInterface.world
     val selectionListeners = mutableListOf<(WorldCoords?, Int, Int) -> Unit>()
 
     var selectedShadeSet: ShadeSet? = null
@@ -114,11 +116,11 @@ object GridSelectionInputManager : KtxInputAdapter {
 
     var selection: WorldCoords? = null
         private set(value) {
-            GameScreen.shadeSets.remove(selectedShadeSet)
+            UI.shadeSets.remove(selectedShadeSet)
             if (value != null && value.exists) {
                 field = value
                 selectedShadeSet = ShadeSet(setOf(value), Constants.selectionColor)
-                GameScreen.shadeSets.add(selectedShadeSet!!)
+                UI.shadeSets.add(selectedShadeSet!!)
             } else {
                 field = null
             }
@@ -126,11 +128,11 @@ object GridSelectionInputManager : KtxInputAdapter {
 
     var hovering: WorldCoords? = null
         private set(value) {
-            GameScreen.shadeSets.remove(hoveringShadeSet)
+            UI.shadeSets.remove(hoveringShadeSet)
             if (value != null && value.exists) {
                 field = value
                 hoveringShadeSet = ShadeSet(setOf(value), mode = ShadeSet.OUTLINE, lines = Constants.hoveringColor)
-                GameScreen.shadeSets.add(hoveringShadeSet!!)
+                UI.shadeSets.add(hoveringShadeSet!!)
             } else {
                 field = null
             }
@@ -145,10 +147,10 @@ object GridSelectionInputManager : KtxInputAdapter {
     override fun mouseMoved(screenX: Int, screenY: Int): Boolean {
         hovering = getGridPos(screenX, screenY)
         val pawn = hovering?.tile?.pawn
-        GameScreen.shadeSets.remove(attackableShadeSet)
+        UI.shadeSets.remove(attackableShadeSet)
         if (pawn != null) {
             attackableShadeSet = ShadeSet(pawn.getAttackableSquares(), mode = ShadeSet.OUTLINE, lines = Constants.attackColor)
-            GameScreen.shadeSets.add(attackableShadeSet!!)
+            UI.shadeSets.add(attackableShadeSet!!)
         } else {
             attackableShadeSet = null
         }
@@ -230,7 +232,7 @@ object RadialMenuInputManager : KtxInputAdapter {
     }
 
     private fun getSelectables(): List<Selectable> {
-        val currentTeam = GameScreen.gameState.getCurrentTeam()
+        val currentTeam = UI.targetPlayerInterface.thisTeam
         val selection = GridSelectionInputManager.hovering ?: return emptyList()
 
         if (currentTeam.hasBuiltHQ) {
@@ -253,7 +255,6 @@ object RadialMenuInputManager : KtxInputAdapter {
             if (selection.tile.canBuildOn(currentTeam)) {
                 actions.add(Selectable("Build", {
                     BuildingSpawningDialog(
-                            GameScreen.gameState.getCurrentTeam(),
                             UI.skin,
                             it
                     ).show(UI.stage)
@@ -265,10 +266,31 @@ object RadialMenuInputManager : KtxInputAdapter {
         } else {
             return if (selection.tile?.canBuildOn(currentTeam) == true)
                 listOf(Selectable("Build HQ", {
-                    BuildingHQ.createBuildingAt(currentTeam, selection)
+                    UI.targetPlayerInterface.makeBuilding(selectedCoord, BuildingHQ)
                 }))
             else emptyList()
         }
+    }
+
+}
+
+object GridFocusManager : KtxInputAdapter {
+
+    override fun keyDown(keycode: Int): Boolean {
+        when (keycode) {
+            Input.Keys.ESCAPE -> focusGrid()
+        }
+        return false
+    }
+
+    override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        focusGrid()
+        return false
+    }
+
+    fun focusGrid() {
+        UI.stage.keyboardFocus = null
+        UI.stage.scrollFocus = null
     }
 
 }

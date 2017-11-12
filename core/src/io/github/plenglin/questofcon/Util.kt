@@ -15,3 +15,23 @@ fun logit(x: Double, b: Double): Double {
     val a = (1 + exp) / (exp - 1)
     return logit(x, b, a)
 }
+
+class ListenerManager<T> {
+    private val listeners = mutableMapOf<Long, (T) -> Unit>()
+    private var nextListenerId = 0L
+
+    fun addListener(listener: (T) -> Unit): Long {
+        val id = nextListenerId++
+        listeners.put(id, listener)
+        return id
+    }
+
+    fun fire(data: T) {
+        listeners.forEach { _, l -> l(data) }
+    }
+
+    fun removeListener(id: Long) {
+        listeners.remove(id)
+    }
+
+}

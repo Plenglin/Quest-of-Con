@@ -2,21 +2,40 @@ package io.github.plenglin.questofcon.game.pawn
 
 import com.badlogic.gdx.graphics.Texture
 import io.github.plenglin.questofcon.Assets
+import io.github.plenglin.questofcon.game.GameState
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
+import io.github.plenglin.questofcon.net.DataPawn
 import io.github.plenglin.questofcon.ui.*
+import io.github.plenglin.questofcon.ui.elements.ConfirmationDialog
+import io.github.plenglin.questofcon.ui.elements.Selectable
 
+private var nextCreatorId = 0L
 
 abstract class PawnCreator(val title: String, val cost: Int) {
 
-    abstract fun createPawnAt(team: Team, worldCoords: WorldCoords): Pawn
+    val id = nextCreatorId++
+
+    abstract fun createPawnAt(team: Team, worldCoords: WorldCoords, state: GameState): Pawn
 
 }
 
-abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val maxHealth: Int, val actionPoints: Int, val texture: () -> Texture) {
+private var nextPawnId = 0L
+
+abstract class Pawn(val name: String, var team: Team, _pos: WorldCoords, val maxHealth: Int, val maxAp: Int, val texture: () -> Texture?, val state: GameState) {
+
+    var type = -1L
+    var id = nextPawnId++
 
     open val maxAttacks = 1
     var attacksRemaining = 0
+
+    var pos: WorldCoords = _pos
+        set(value) {
+            field.tile!!.pawn = null
+            field = value
+            value.tile!!.pawn = this
+        }
 
     var health: Int = maxHealth
         set(value) {
@@ -24,8 +43,9 @@ abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val 
             if (health <= 0) {
                 pos.tile!!.pawn = null
             }
+            state.pawnChange.fire(this)
         }
-    var apRemaining: Int = actionPoints
+    var ap: Int = 0
 
     fun getMovableSquares(): Map<WorldCoords, Int> {
         // Dijkstra
@@ -40,15 +60,15 @@ abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val 
             val tile = coord.tile!!
             val terrain = tile.biome
             val cost = terrain.movementCost
-            println("$terrain, ${cost}, ${tile.passableBy(team)}")
+            //println("$terrain, ${cost}, ${tile.passableBy(team)}")
             val fullDist = dist[coord]!!
 
-            if (tile.passableBy(team) && fullDist + cost <= apRemaining) {  // Can we even get past this tile?
+            if (tile.passableBy(team) && fullDist + cost <= ap) {  // Can we even get past this tile?
                 coord.surrounding().forEach { neighbor ->  // For each neighbor...
                     val totalCost = fullDist + cost + maxOf(neighbor.tile!!.elevation - tile.elevation, 1)
                     val neighborDist = dist[neighbor]
                     val passable = neighbor.tile.passableBy(team)
-                    println("neigh: ${neighbor.tile.biome}, ${tile.building}, ${tile.passableBy(team)}")
+                    //println("neigh: ${neighbor.tile.biome}, ${tile.building}, ${tile.passableBy(team)}")
                     if (passable) {
                         if (neighborDist == null) {  // If we haven't added the neighbor, add it now
                             unvisited.add(neighbor)
@@ -79,35 +99,35 @@ abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val 
      */
     abstract fun onAttack(coords: WorldCoords): Boolean
 
-    fun moveTo(coords: WorldCoords, movementData: Map<WorldCoords, Int>): Boolean {
+    fun attemptMoveTo(coords: WorldCoords, movementData: Map<WorldCoords, Int>): Boolean {
         val cost = movementData[coords]
         if (cost != null) {
-            return moveTo(coords, cost)
+            return attemptMoveTo(coords, cost)
         } else {
             return false
         }
     }
 
-    fun moveTo(coords: WorldCoords, apCost: Int): Boolean {
-        if (apRemaining - apCost >= 0) {
-            apRemaining -= apCost
-            pos.tile!!.pawn = null  // clear old tile
-            coords.tile!!.pawn = this  // set new tile to this
-            pos = coords  // set this pawn's reference
+    fun attemptMoveTo(coords: WorldCoords, apCost: Int): Boolean {
+        if (ap - apCost >= 0) {
+            ap -= apCost
+            pos = coords
+            state.pawnChange.fire(this)
             return true
         }
         return false
     }
 
     open fun getProperties(): Map<String, Any> {
-        return mapOf("type" to name, "team" to team.name, "health" to "$health/$maxHealth", "actions" to "$apRemaining/$actionPoints", "attacks" to "$attacksRemaining/$maxAttacks")
+        return mapOf("type" to name, "team" to team.name, "health" to "$health/$maxHealth", "actions" to "$ap/$maxAp", "attacks" to "$attacksRemaining/$maxAttacks")
     }
 
     fun attemptAttack(coords: WorldCoords): Boolean {
-        apRemaining -= 1
+        ap -= 1
         val result = onAttack(coords)
         if (result) {
             attacksRemaining -= 1
+            state.pawnChange.fire(this)
         }
         return result
     }
@@ -116,11 +136,11 @@ abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val 
 
         val actions = mutableListOf<Selectable>(Selectable("Disband $name", {
             ConfirmationDialog("Disband $name", UI.skin, {
-                health = 0
+                UI.targetPlayerInterface.disbandPawn(this.id)
             }).show(UI.stage)
         }))
 
-        if (apRemaining > 0) {
+        if (ap > 0) {
 
             actions.add(Selectable("Move $name", {
                 PawnActionManager.beginMoving(this)
@@ -136,16 +156,22 @@ abstract class Pawn(val name: String, var team: Team, var pos: WorldCoords, val 
         return actions
     }
 
+    fun serialized(): DataPawn {
+        return DataPawn(id, team.id, type, health, ap, attacksRemaining, pos.serialized())
+    }
+
+    override fun toString(): String {
+        return "Pawn($id, ${javaClass.simpleName})"
+    }
+
     companion object {
         fun elevationDamageMultiplier(from: Int, to: Int): Double {
             val elevationChange = maxOf(to - from, 0)
-            println(elevationChange)
             return minOf(Math.pow(1.125, -elevationChange.toDouble()), 1.0)
         }
     }
 
 }
-
 
 class SimplePawnCreator(name: String, cost: Int) : PawnCreator(name, cost) {
 
@@ -156,16 +182,18 @@ class SimplePawnCreator(name: String, cost: Int) : PawnCreator(name, cost) {
     var range: Int = 1
     var maxAttacks: Int = 1
 
-    override fun createPawnAt(team: Team, worldCoords: WorldCoords): Pawn {
-        val pawn = SimplePawn(team, worldCoords)
+    override fun createPawnAt(team: Team, worldCoords: WorldCoords, state: GameState): Pawn {
+        val pawn = SimplePawn(team, worldCoords, state)
         worldCoords.tile!!.pawn = pawn
+        pawn.type = id
+        state.pawnChange.fire(pawn)
         return pawn
     }
 
     /**
      * A simple pawn that can be melee or ranged.
      */
-    inner class SimplePawn(team: Team, pos: WorldCoords) : Pawn(title, team, pos, maxHealth, actionPoints, texture) {
+    inner class SimplePawn(team: Team, pos: WorldCoords, state: GameState) : Pawn(title, team, pos, maxHealth, actionPoints, texture, state) {
 
         override fun damageTo(coords: WorldCoords): Int {
             val mult = Pawn.elevationDamageMultiplier(pos.tile!!.elevation, coords.tile!!.elevation)
@@ -200,6 +228,10 @@ class SimplePawnCreator(name: String, cost: Int) : PawnCreator(name, cost) {
                 props["range"] = range
             }
             return props
+        }
+
+        override fun toString(): String {
+            return "SimplePawn($id, $name)"
         }
 
     }

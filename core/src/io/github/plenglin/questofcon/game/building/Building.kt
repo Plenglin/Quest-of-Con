@@ -1,21 +1,33 @@
 package io.github.plenglin.questofcon.game.building
 
 import com.badlogic.gdx.graphics.Texture
+import io.github.plenglin.questofcon.game.GameState
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
-import io.github.plenglin.questofcon.ui.ConfirmationDialog
-import io.github.plenglin.questofcon.ui.Selectable
+import io.github.plenglin.questofcon.game.pawn.PawnCreator
+import io.github.plenglin.questofcon.net.DataBuilding
+import io.github.plenglin.questofcon.ui.elements.ConfirmationDialog
+import io.github.plenglin.questofcon.ui.elements.Selectable
 import io.github.plenglin.questofcon.ui.UI
+import java.io.Serializable
+
+var nextBuildingCreatorId = 0L
 
 abstract class BuildingCreator(val name: String, val cost: Int) {
 
-    abstract fun createBuildingAt(team: Team, worldCoords: WorldCoords): Building
+    val id = nextBuildingCreatorId++
+
+    abstract fun createBuildingAt(team: Team, worldCoords: WorldCoords, gameState: GameState): Building
 
 }
 
-abstract class Building(val name: String, var team: Team, var pos: WorldCoords, val maxHealth: Int) {
+var nextBuildingId = 0L
 
-    abstract val texture: Texture
+abstract class Building(val name: String, var team: Team, var pos: WorldCoords, val maxHealth: Int, val gameState: GameState, val type: Long) {
+
+    var id = nextBuildingId++
+
+    abstract val texture: Texture?
 
     var enabled = true
 
@@ -25,6 +37,7 @@ abstract class Building(val name: String, var team: Team, var pos: WorldCoords, 
             if (health <= 0) {
                 pos.tile!!.building = null
             }
+            gameState.buildingChange.fire(this)
         }
 
     open fun getMoneyPerTurn() = 0
@@ -35,7 +48,7 @@ abstract class Building(val name: String, var team: Team, var pos: WorldCoords, 
 
     open fun getRadialActions() = listOf(Selectable("Demolish $name", {
         ConfirmationDialog("Demolish $name", UI.skin, {
-            health = 0
+            UI.targetPlayerInterface.demolishBuilding(this.id)
         }).show(UI.stage)
     }))
 
@@ -46,6 +59,12 @@ abstract class Building(val name: String, var team: Team, var pos: WorldCoords, 
             map.put("Income", "$$money")
         }
         return map
+    }
+
+    open fun canCreate(type: PawnCreator): Boolean = false
+
+    fun serialized(): Serializable? {
+        return DataBuilding(id, team.id, type, health, enabled, pos.serialized())
     }
 
 }

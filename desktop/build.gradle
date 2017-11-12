@@ -15,6 +15,29 @@ task run(dependsOn: classes, type: JavaExec) {
     ignoreExitValue = true
 }
 
+task server(dependsOn: classes, type: JavaExec) {
+    main = project.mainClassName
+    args = ["-s"]
+    classpath = sourceSets.main.runtimeClasspath
+    standardInput = System.in
+    workingDir = project.assetsDir
+    ignoreExitValue = true
+}
+
+task client(dependsOn: classes, type: JavaExec) {
+    if (project.hasProperty("cname")) {
+        main = project.mainClassName
+        cname = project["cname"]
+        args = ["-c=$cname"]
+        classpath = sourceSets.main.runtimeClasspath
+        standardInput = System.in
+        workingDir = project.assetsDir
+        ignoreExitValue = true
+    } else {
+        println("Provide a client name!")
+    }
+}
+
 task dist(type: Jar) {
     from files(sourceSets.main.output.classesDir)
     from files(sourceSets.main.output.resourcesDir)

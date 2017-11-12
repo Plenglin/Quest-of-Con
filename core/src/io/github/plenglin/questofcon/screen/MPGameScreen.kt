@@ -12,8 +12,10 @@ import io.github.plenglin.questofcon.game.PlayerInterface
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.building.BuildingFactory
 import io.github.plenglin.questofcon.game.grid.*
+import io.github.plenglin.questofcon.interop.NetworkedPlayerInterface
 import io.github.plenglin.questofcon.interop.PassAndPlayInterface
 import io.github.plenglin.questofcon.interop.PassAndPlayManager
+import io.github.plenglin.questofcon.net.Client
 import io.github.plenglin.questofcon.render.WorldRenderer
 import io.github.plenglin.questofcon.ui.*
 import ktx.app.KtxScreen
@@ -22,57 +24,20 @@ import ktx.assets.disposeSafely
 /**
  *
  */
-object GameScreen : KtxScreen {
+class MPGameScreen(val client: Client) : KtxScreen {
 
     lateinit var batch: SpriteBatch
 
     lateinit var worldRenderer: WorldRenderer
 
-    lateinit var gameState: GameState
-
-    val teamA = Team("escargot", Color.BLUE)
-    val teamB = Team("parfait", Color.WHITE)
-    val teamC = Team("le baguette", Color.RED)
-
-    lateinit var ifMan: PassAndPlayManager
+    var currentPlayerInterface: PlayerInterface =  NetworkedPlayerInterface(client)
 
     override fun show() {
         batch = SpriteBatch()
-        gameState = GameState(listOf(teamA, teamB, teamC))
-        ifMan = PassAndPlayManager(gameState)
-        gameState.turnChange.addListener { newTeam ->
-            UI.targetPlayerInterface = ifMan.currentInterface()
-            UI.updateData()
-        }
 
-        println("Generating terrain...")
+        worldRenderer = WorldRenderer(currentPlayerInterface.world)
 
-        println("Generating height data...")
-        val heightData = HeightMap(DiamondSquareHeightGenerator(3, initialOffsets = 2.0, iterativeRescale = 0.8).generate().grid).normalized
-        val rainfallData = HeightMap(DiamondSquareHeightGenerator(3, initialOffsets = 2.0, iterativeRescale = 0.8).generate().grid).normalized
-
-        heightData.grid.forEach { col ->
-            col.forEach {
-                print("%.2f\t".format(it))
-            }
-            println()
-        }
-
-        println("Mapping height data to world...")
-        MapToHeight(gameState.world, heightData).doHeightMap()
-
-        println("Adding biomes...")
-        BiomeGenerator(gameState.world, heightData, rainfallData).applyBiomes()
-
-        /*GameData.scout.createPawnAt(teamA, WorldCoords(gameState.world, 5, 5))
-        BuildingFactory.createBuildingAt(teamA, WorldCoords(gameState.world, 5, 5))
-        BuildingFactory.createBuildingAt(teamB, WorldCoords(gameState.world, 7, 5))
-        println(WorldCoords(gameState.world, 7, 5).tile!!.passableBy(teamA))
-        println(WorldCoords(gameState.world, 7, 5).tile!!.passableBy(teamB))*/
-
-        worldRenderer = WorldRenderer(gameState.world)
-
-        UI.targetPlayerInterface = ifMan.currentInterface()
+        UI.targetPlayerInterface = currentPlayerInterface
         UI.gridCam.zoom = 1/48f
         UI.gridCam.position.set(0f, 0f, 0f)
 
