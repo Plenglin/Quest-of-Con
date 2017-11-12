@@ -11,16 +11,16 @@ import java.util.logging.Logger
  */
 object Matchmaker {
 
-    val port = Constants.SERVER_PORT
-
     var nextRoom = 0L
 
-    val serverSocket = ServerSocket(port)
 
     val pendingSockets = mutableListOf<Socket>()
     val rooms = mutableListOf<GameRoom>()
 
-    fun acceptSockets() {
+    fun acceptSockets(port: Int = Constants.SERVER_PORT) {
+
+        val serverSocket = ServerSocket(port)
+
         println("accepting sockets on port $port")
         while (true) {
             val sock = serverSocket.accept()
