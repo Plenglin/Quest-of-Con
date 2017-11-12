@@ -61,37 +61,51 @@ class ChatLog(skin: Skin) : Window("Chat Log", skin) {
 
     val playerInterface get() = UI.targetPlayerInterface
 
-    val chatLog: TextArea
+    val chatLog: Label
     val entryField: TextField
     var chatBuffer: String = ""
 
     init {
-        chatLog = TextArea(chatBuffer, skin)
         entryField = TextField("", skin)
+        /*entryField.setFocusTraversal(false);
+        entryField.setTextFieldListener { _, c ->
+            if (c == '\n') send()
+        }*/
 
-        chatLog.isDisabled = true
-        val scroll = ScrollPane(chatLog)
+        chatLog = Label("", skin)
 
-        add(scroll).colspan(2).size(200f, 150f)
+        val container = Container(chatLog).prefSize(200f, 150f).bottom()
+        val scroll = ScrollPane(container, skin)
+        scroll.setFadeScrollBars(false)
+        scroll.setFlickScroll(false)
+
+        add(scroll).colspan(2)
         row()
-        add(entryField)
+        add(entryField).bottom().left()
         add(TextButton("Send", skin).apply {
             addListener(object : ChangeListener() {
-                override fun changed(event: ChangeEvent?, actor: Actor?) {
-                    playerInterface.sendChat(entryField.text)
-                    entryField.text = ""
-                }
+                override fun changed(event: ChangeEvent?, actor: Actor?) = send()
             })
-        })
-        pack()
+        }).bottom()
+        //pack()
+        width = 250f
+        height = 200f
 
         playerInterface.chatUpdate.addListener {
             val team = playerInterface.teams[it.from]!!
             println("received msg ${it.text}")
             chatBuffer += "\n<${team.name}> ${it.text}"
             chatLog.setText(chatBuffer)
+            container.pack()
+            scroll.layout()
+            scroll.scrollTo(0f, 0f, 0f, 0f)
         }
 
+    }
+
+    fun send() {
+        playerInterface.sendChat(entryField.text)
+        entryField.text = ""
     }
 
 }
