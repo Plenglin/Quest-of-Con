@@ -16,7 +16,7 @@ object QuestOfCon : Game() {
         Assets.load()
         Assets.manager.finishLoading()
 
-        if (System.getenv("mp") == "1") {
+        if (Config.mode == Config.Mode.CLIENT) {
             println("asdf")
             setScreen(MPConnectionScreen)
         } else {

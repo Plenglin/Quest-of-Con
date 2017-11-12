@@ -2,6 +2,7 @@ package io.github.plenglin.questofcon.desktop;
 
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
+import io.github.plenglin.questofcon.Config;
 import io.github.plenglin.questofcon.Constants;
 import io.github.plenglin.questofcon.QuestOfCon;
 import io.github.plenglin.questofcon.net.Matchmaker;
@@ -11,9 +12,10 @@ public class DesktopLauncher {
 
 	public static void main(String[] args) {
 	    Options options = new Options();
-	    Option serverOpt = new Option("s", "start dedicated server");
-	    serverOpt.setOptionalArg(true);
-	    options.addOption(serverOpt);
+        Option server = new Option("s", "start dedicated server");
+        Option client = new Option("c", true,"start multiplayer client");
+        options.addOption(server);
+        options.addOption(client);
 
         CommandLineParser parser = new DefaultParser();
         try {
@@ -21,7 +23,12 @@ public class DesktopLauncher {
             CommandLine cmd = parser.parse(options, args);
             if (cmd.hasOption("s")) {
                 startServer(port);
+            } else if (cmd.hasOption("c")) {
+                Config.name = cmd.getOptionValue("c");
+                Config.mode = Config.Mode.CLIENT;
+                startClient();
             } else {
+                Config.mode = Config.Mode.PNP;
                 startClient();
             }
         } catch (ParseException e) {
@@ -36,7 +43,7 @@ public class DesktopLauncher {
     }
 
     private static void startClient() {
-        String title = System.getenv("title");
+        String title = Config.name;
         String x = System.getenv("windowx");
 
         LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
