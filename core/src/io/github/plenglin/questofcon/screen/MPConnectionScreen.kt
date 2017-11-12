@@ -8,10 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
 import com.badlogic.gdx.utils.viewport.ScreenViewport
 import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const
-import io.github.plenglin.questofcon.Assets
-import io.github.plenglin.questofcon.Constants
-import io.github.plenglin.questofcon.QuestOfCon
-import io.github.plenglin.questofcon.TerrainTextures
+import io.github.plenglin.questofcon.*
 import io.github.plenglin.questofcon.game.GameData
 import io.github.plenglin.questofcon.net.Client
 import io.github.plenglin.questofcon.ui.UI
@@ -43,7 +40,7 @@ object MPConnectionScreen : KtxScreen {
                 override fun changed(event: ChangeEvent?, actor: Actor?) {
                     println("starting client")
                     val sock = Socket(ip.text, Constants.SERVER_PORT)
-                    val client = Client(sock, System.getenv("title"))
+                    val client = Client(sock, Config.name)
                     client.initialization.addListener {
                         println("Changing screen!")
                         screenToSet = MPGameScreen(client)
