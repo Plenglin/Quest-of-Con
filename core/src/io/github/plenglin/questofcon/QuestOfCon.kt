@@ -1,6 +1,7 @@
 package io.github.plenglin.questofcon
 
 import com.badlogic.gdx.Game
+import io.github.plenglin.questofcon.game.GameData
 import io.github.plenglin.questofcon.screen.GameScreen
 import io.github.plenglin.questofcon.screen.MPConnectionScreen
 import io.github.plenglin.questofcon.screen.MPGameScreen
@@ -11,6 +12,8 @@ import io.github.plenglin.questofcon.screen.MPGameScreen
 object QuestOfCon : Game() {
 
     override fun create() {
+        GameData.register()
+
         Textures.values().forEach { it.load() }
         TerrainTextures.values().forEach { it.load() }
         Assets.load()

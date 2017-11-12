@@ -1,6 +1,7 @@
 package io.github.plenglin.questofcon.game.grid
 
 import io.github.plenglin.questofcon.Constants
+import io.github.plenglin.questofcon.game.GameData
 import io.github.plenglin.questofcon.linMap
 import io.github.plenglin.questofcon.logit
 import java.util.*
@@ -198,29 +199,29 @@ class BiomeGenerator(val world: World, val height: HeightMap, val rainfall: Heig
 
             tile.biome = {
                 if (tile.elevation == Constants.ELEVATION_LEVELS - 1) {
-                    Biomes.mountains
+                    GameData.mountains
                 }
                 if (tile.elevation == 0) {
-                    Biomes.water
+                    GameData.water
                 }
                 when {
-                    tile.elevation == Constants.ELEVATION_LEVELS - 1 -> Biomes.mountains
-                    h > 0.7 -> Biomes.highlands
-                    h > 0.25 -> if (water > 0.5) Biomes.grass else Biomes.desert
-                    else -> Biomes.water
+                    tile.elevation == Constants.ELEVATION_LEVELS - 1 -> GameData.mountains
+                    h > 0.7 -> GameData.highlands
+                    h > 0.25 -> if (water > 0.5) GameData.grass else GameData.desert
+                    else -> GameData.water
                 }
             }()
 
         }
 
-        val waterTiles = world.filter { it.tile!!.biome == Biomes.water }
-        val singleWaterTiles = waterTiles.filter { !it.surrounding().any { it.tile!!.biome == Biomes.water} }
+        val waterTiles = world.filter { it.tile!!.biome == GameData.water }
+        val singleWaterTiles = waterTiles.filter { !it.surrounding().any { it.tile!!.biome == GameData.water} }
         singleWaterTiles.forEach { waterTile ->
             waterTile.tile!!.biome = waterTile.surrounding()[0].tile!!.biome
         }
 
         val beachTiles = waterTiles.map { it.surrounding().toSet() }.reduce { acc, list -> acc + list } - waterTiles
-        beachTiles.forEach { it.tile!!.biome = Biomes.beach }
+        beachTiles.forEach { it.tile!!.biome = GameData.beach }
     }
 
 }

@@ -1,13 +1,11 @@
 package io.github.plenglin.questofcon.interop
 
 import com.badlogic.gdx.graphics.Color
-import io.github.plenglin.questofcon.ListenerManager
 import io.github.plenglin.questofcon.game.GameData
 import io.github.plenglin.questofcon.game.PlayerInterface
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.building.Building
 import io.github.plenglin.questofcon.game.building.BuildingCreator
-import io.github.plenglin.questofcon.game.grid.Biomes
 import io.github.plenglin.questofcon.game.grid.World
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 import io.github.plenglin.questofcon.game.pawn.Pawn
@@ -26,15 +24,17 @@ class NetworkedPlayerInterface(val client: Client) : PlayerInterface() {
     init {
         val resp = client.initialResponse
         val grid = resp.world.grid
+
+        println(resp.world.displayString.value)
         world = World(grid.size, grid[0].size)
 
-        world.forEach {
-            val i = it.i
-            val j = it.j
+        world.forEach { coord ->
+            val i = coord.i
+            val j = coord.j
             val data = grid[i][j]
-            it.tile!!.let {
+            coord.tile!!.let {
                 it.elevation = data.elevation
-                it.biome = Biomes.getById(data.biome)!!
+                it.biome = GameData.biomes[data.biome]
             }
         }
 
@@ -64,7 +64,7 @@ class NetworkedPlayerInterface(val client: Client) : PlayerInterface() {
                     val j = bldgData.pos.j
                     var building = getBuildingData(bldgData.id)
                     if (building == null) {
-                        building = GameData.buildingByType(bldgData.type).createBuildingAt(teams[bldgData.team]!!, WorldCoords(world, i, j), client.dummy)
+                        building = GameData.buildings[bldgData.type].createBuildingAt(teams[bldgData.team]!!, WorldCoords(world, i, j), client.dummy)
                         building.id = bldgData.id
                     }
                     building.team = teams[bldgData.team]!!
@@ -79,7 +79,7 @@ class NetworkedPlayerInterface(val client: Client) : PlayerInterface() {
                     val j = pawnData.pos.j
                     var pawn = getPawnData(data.id)
                     if (pawn == null) {
-                        pawn = GameData.pawnByType(pawnData.type).createPawnAt(teams[pawnData.team]!!, WorldCoords(world, i, j), client.dummy)
+                        pawn = GameData.pawns[pawnData.type].createPawnAt(teams[pawnData.team]!!, WorldCoords(world, i, j), client.dummy)
                         pawn.id = pawnData.id
                     }
                     pawn.ap = pawnData.ap

@@ -35,3 +35,46 @@ class ListenerManager<T> {
     }
 
 }
+
+class ObjectRegistry<T> : Iterable<T> where T : Registerable {
+
+    private val objects = mutableMapOf<Long, T>()
+    private val idToName = mutableMapOf<Long, String>()
+    private val nameToId = mutableMapOf<String, Long>()
+
+    private var nextLongId = 0L
+
+    fun register(obj: T): Long {
+        assert(!obj.name.contains(' '), { "Object name cannot contain spaces!" })
+        assert(obj.id !in objects, { "Object already registered!" })
+        obj.id = newId(obj.name)
+        objects.put(obj.id, obj)
+        return obj.id
+    }
+
+    private fun newId(name: String): Long {
+        val id = nextLongId++;
+        idToName.put(id, name)
+        nameToId.put(name, id)
+        return id
+    }
+
+    operator fun get(name: String): T {
+        val id = nameToId[name]!!
+        return objects[id]!!
+    }
+
+    operator fun get(id: Long): T {
+        return objects[id]!!
+    }
+
+    override fun iterator(): Iterator<T> {
+        return objects.values.iterator()
+    }
+
+}
+
+interface Registerable {
+    var id: Long
+    val name: String
+}

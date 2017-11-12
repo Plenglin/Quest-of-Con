@@ -25,7 +25,7 @@ class Team(val name: String, val color: Color, _id: Long = -1) {
     lateinit var world: World
 
     fun getBuildable(): List<BuildingCreator> {
-        return if (hasBuiltHQ) GameData.spawnableBuildings else listOf(BuildingHQ)
+        return if (hasBuiltHQ) GameData.buildings.toList().filter { it.name != "headquarters" } else listOf(BuildingHQ)
     }
 
     fun getOwnedTiles(): List<WorldCoords> = world.filter { it.tile!!.getTeam() == this }.toList()

@@ -37,7 +37,7 @@ class UnitSpawningDialog(val units: List<PawnCreator>, skin: Skin, val worldCoor
             add(Label("Cost", skin))
             row()
             units.forEach { pawn ->
-                add(Label(pawn.title.capitalize(), skin))
+                add(Label(pawn.displayName.capitalize(), skin))
                 add(Label("$${pawn.cost}", skin))
                 add(TextButton("Spawn", skin).apply {
 
@@ -73,7 +73,7 @@ class BuildingSpawningDialog(skin: Skin, val worldCoords: WorldCoords) : Dialog(
             add(Label("Cost", skin))
             row()
             buildings.forEach { bldg ->
-                add(Label(bldg.name.capitalize(), skin))
+                add(Label(bldg.displayName, skin))
                 add(Label("$${bldg.cost}", skin))
                 add(TextButton("Build", skin).apply {
                     isDisabled = bldg.cost > team.money

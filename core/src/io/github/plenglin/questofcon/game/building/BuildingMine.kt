@@ -13,7 +13,7 @@ class BuildingMine(team: Team, pos: WorldCoords, gameState: GameState, type: Lon
 
     override fun getMoneyPerTurn(): Int = 50
 
-    companion object : BuildingCreator("Mine", 250) {
+    companion object : BuildingCreator("bldg-mine","Mine", 250) {
 
         override fun createBuildingAt(team: Team, worldCoords: WorldCoords, gameState: GameState): Building {
             val building = BuildingMine(team, worldCoords, gameState, id)
