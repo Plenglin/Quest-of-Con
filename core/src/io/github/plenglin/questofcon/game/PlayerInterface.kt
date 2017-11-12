@@ -8,6 +8,7 @@ import io.github.plenglin.questofcon.game.grid.WorldCoords
 import io.github.plenglin.questofcon.game.pawn.Pawn
 import io.github.plenglin.questofcon.game.pawn.PawnCreator
 import io.github.plenglin.questofcon.net.DataBuilding
+import io.github.plenglin.questofcon.net.DataChat
 import io.github.plenglin.questofcon.net.DataPawn
 import io.github.plenglin.questofcon.net.DataTeam
 
@@ -23,6 +24,7 @@ abstract class PlayerInterface {
     val pawnUpdate: ListenerManager<Pawn> = ListenerManager()
     val buildingUpdate: ListenerManager<Building> = ListenerManager()
     val worldUpdate: ListenerManager<Unit> = ListenerManager()
+    val chatUpdate: ListenerManager<DataChat> = ListenerManager()
 
     // Actions
     abstract fun makePawn(at: WorldCoords, type: PawnCreator, onResult: (Pawn?) -> Unit = {})
@@ -33,6 +35,8 @@ abstract class PlayerInterface {
     abstract fun makeBuilding(at: WorldCoords, type: BuildingCreator, onResult: (Building?) -> Unit = {})
     abstract fun demolishBuilding(id: Long, onResult: (Boolean) -> Unit = {})
     abstract fun sendEndTurn(onResult: (Team) -> Unit = {})
+
+    abstract fun sendChat(text: String, onResult: (Boolean) -> Unit = {})
 
     // Data
     fun getPawnData(id: Long): Pawn? {

@@ -22,8 +22,6 @@ class NetworkedPlayerInterface(val client: Client) : PlayerInterface() {
     override val thisTeamId: Long
     override val thisTeam: Team
 
-    val onTalk = ListenerManager<DataChat>()
-
     init {
         val resp = client.initialResponse
         val grid = resp.world.grid
@@ -98,7 +96,7 @@ class NetworkedPlayerInterface(val client: Client) : PlayerInterface() {
                     val team = teams[id]!!
                     turnChange.fire(team)
                 }
-                ServerEventTypes.TALK -> onTalk.fire(it.data as DataChat)
+                ServerEventTypes.TALK -> chatUpdate.fire(it.data as DataChat)
             }
         }
     }
@@ -143,6 +141,10 @@ class NetworkedPlayerInterface(val client: Client) : PlayerInterface() {
 
     override fun getAllBuildings(): Sequence<Building> {
         return world.map { it.tile!!.building }.filterNotNull()
+    }
+
+    override fun sendChat(text: String, onResult: (Boolean) -> Unit) {
+        client.action(ClientActions.TALK, text)
     }
 
     fun respOk(onResult: (Boolean) -> Unit): (ServerResponse) -> Unit {

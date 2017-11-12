@@ -1,9 +1,11 @@
 package io.github.plenglin.questofcon.ui.elements
 
+import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.Group
-import com.badlogic.gdx.scenes.scene2d.ui.Label
-import com.badlogic.gdx.scenes.scene2d.ui.Skin
+import com.badlogic.gdx.scenes.scene2d.ui.*
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
 import io.github.plenglin.questofcon.game.grid.WorldCoords
+import io.github.plenglin.questofcon.ui.UI
 
 
 class RadialMenu(val skin: Skin, var radiusX: Float, var radiusY: Float) : Group() {
@@ -53,4 +55,40 @@ data class Selectable(val title: String, val onSelected: (WorldCoords) -> Unit) 
     override fun toString(): String {
         return "Selectable($title)"
     }
+}
+
+class ChatLog(skin: Skin) : Window("Chat Log", skin) {
+
+    val playerInterface get() = UI.targetPlayerInterface
+
+    val log: Label
+    val text: TextField
+    var chatBuffer: String = ""
+
+    init {
+        log = Label(chatBuffer, skin)
+        text = TextField("", skin)
+
+        add(ScrollPane(log)).colspan(2)
+        row()
+        add(text)
+        add(TextButton("Send", skin).apply {
+            addListener(object : ChangeListener() {
+                override fun changed(event: ChangeEvent?, actor: Actor?) {
+                    playerInterface.sendChat(this@ChatLog.text.text)
+                    this@ChatLog.text.text = ""
+                }
+            })
+        })
+        pack()
+
+        playerInterface.chatUpdate.addListener {
+            val team = playerInterface.teams[it.from]!!
+            chatBuffer += "\n<${team.name}> ${it.text}"
+            log.setText(chatBuffer)
+        }
+
+
+    }
+
 }

@@ -123,7 +123,11 @@ class SocketManager(val socket: Socket, val parent: GameRoom) : Thread("SocketMa
                     parent.gameState.getAllPawns().find { it.id == id }!!.health = 0
                     return ServerResponse(msgId, true)
                 }
-                ClientActions.TALK -> TODO()
+                ClientActions.TALK -> {
+                    val msg = data as String
+                    parent.broadcastEvent(ServerEventTypes.TALK, DataChat(this.team.id, msg))
+                    return ServerResponse(msgId, true)
+                }
             }
         } else {
             return ServerResponse(msgId, error = ServerResponseError.FORBIDDEN)

@@ -102,4 +102,8 @@ class PassAndPlayInterface(override val thisTeamId: Long, val parent: PassAndPla
         getPawnData(id)!!.health = 0
     }
 
+    override fun sendChat(text: String, onResult: (Boolean) -> Unit) {
+        onResult(false)
+    }
+
 }
