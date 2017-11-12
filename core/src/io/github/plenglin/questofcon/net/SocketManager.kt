@@ -124,9 +124,14 @@ class SocketManager(val socket: Socket, val parent: GameRoom) : Thread("SocketMa
                     return ServerResponse(msgId, true)
                 }
                 ClientActions.TALK -> {
-                    val msg = data as String
-                    parent.broadcastEvent(ServerEventTypes.TALK, DataChat(this.team.id, msg))
-                    return ServerResponse(msgId, true)
+                    var msg = data as String
+                    msg = msg.trim()
+                    if (msg.isNotEmpty()) {
+                        parent.broadcastEvent(ServerEventTypes.TALK, DataChat(this.team.id, msg))
+                        return ServerResponse(msgId, true)
+                    } else {
+                        return ServerResponse(msgId, false)
+                    }
                 }
             }
         } else {
