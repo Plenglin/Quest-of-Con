@@ -35,3 +35,40 @@ class ListenerManager<T> {
     }
 
 }
+
+class ObjectRegistry<T> where T : Registerable {
+
+    private val objects = mutableMapOf<Long, T>()
+    private val idToName = mutableMapOf<Long, String>()
+    private val nameToId = mutableMapOf<String, Long>()
+
+    private var nextLongId = 0L
+
+    fun register(name: String, obj: T): Long {
+        val id = newId(name)
+        objects.put(id, obj)
+        return id
+    }
+
+    private fun newId(name: String): Long {
+        val id = nextLongId++;
+        idToName.put(id, name)
+        nameToId.put(name, id)
+        return id
+    }
+
+    operator fun get(name: String): T {
+        val id = nameToId[name]!!
+        return objects[id]!!
+    }
+
+    operator fun get(id: Long): T {
+        return objects[id]!!
+    }
+
+}
+
+interface Registerable {
+    var id: Long
+    var name: String
+}
