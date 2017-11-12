@@ -24,13 +24,15 @@ class NetworkedPlayerInterface(val client: Client) : PlayerInterface() {
     init {
         val resp = client.initialResponse
         val grid = resp.world.grid
+
+        println(resp.world.displayString.value)
         world = World(grid.size, grid[0].size)
 
-        world.forEach {
-            val i = it.i
-            val j = it.j
+        world.forEach { coord ->
+            val i = coord.i
+            val j = coord.j
             val data = grid[i][j]
-            it.tile!!.let {
+            coord.tile!!.let {
                 it.elevation = data.elevation
                 it.biome = GameData.biomes[data.biome]
             }
