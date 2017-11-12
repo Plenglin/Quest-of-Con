@@ -73,11 +73,14 @@ class ChatLog(skin: Skin) : Window("Chat Log", skin) {
         }*/
 
         chatLog = Label("", skin)
+        chatLog.setWrap(true)
+        chatLog.width = 200f
 
-        val container = Container(chatLog).prefSize(200f, 150f).bottom()
+        val container = Container(chatLog).prefWidth(250f).minHeight(200f).bottom()//.size(225f, 200f)
         val scroll = ScrollPane(container, skin)
         scroll.setFadeScrollBars(false)
         scroll.setFlickScroll(false)
+        container.pack()
 
         add(scroll).colspan(2)
         row()
@@ -87,9 +90,9 @@ class ChatLog(skin: Skin) : Window("Chat Log", skin) {
                 override fun changed(event: ChangeEvent?, actor: Actor?) = send()
             })
         }).bottom()
-        //pack()
-        width = 250f
-        height = 200f
+
+        width = 300f
+        height = 250f
 
         playerInterface.chatUpdate.addListener {
             val team = playerInterface.teams[it.from]!!
