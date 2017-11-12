@@ -2,6 +2,7 @@ package io.github.plenglin.questofcon.ui
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
+import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
@@ -269,6 +270,27 @@ object RadialMenuInputManager : KtxInputAdapter {
                 }))
             else emptyList()
         }
+    }
+
+}
+
+object GridFocusManager : KtxInputAdapter {
+
+    override fun keyDown(keycode: Int): Boolean {
+        when (keycode) {
+            Input.Keys.ESCAPE -> focusGrid()
+        }
+        return false
+    }
+
+    override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+        focusGrid()
+        return false
+    }
+
+    fun focusGrid() {
+        UI.stage.keyboardFocus = null
+        UI.stage.scrollFocus = null
     }
 
 }

@@ -43,7 +43,7 @@ class MPGameScreen(val client: Client) : KtxScreen {
 
         UI.generateUI()
 
-        Gdx.input.inputProcessor = InputMultiplexer(UI.stage, MapControlInputManager, PawnActionInputProcessor, RadialMenuInputManager, GridSelectionInputManager)
+        Gdx.input.inputProcessor = InputMultiplexer(UI.stage, GridFocusManager, MapControlInputManager, PawnActionInputProcessor, RadialMenuInputManager, GridSelectionInputManager)
     }
 
     override fun render(delta: Float) {
