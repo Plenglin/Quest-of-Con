@@ -49,7 +49,7 @@ public class DesktopLauncher {
         String x = System.getenv("windowx");
 
         LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-        config.useGL30 = true;
+        config.useGL30 = false;
         config.foregroundFPS = 60;
         config.backgroundFPS = 30;
         config.width = 800;
