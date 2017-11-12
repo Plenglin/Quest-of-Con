@@ -1,13 +1,11 @@
 package io.github.plenglin.questofcon.interop
 
 import com.badlogic.gdx.graphics.Color
-import io.github.plenglin.questofcon.ListenerManager
 import io.github.plenglin.questofcon.game.GameData
 import io.github.plenglin.questofcon.game.PlayerInterface
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.building.Building
 import io.github.plenglin.questofcon.game.building.BuildingCreator
-import io.github.plenglin.questofcon.game.grid.Biomes
 import io.github.plenglin.questofcon.game.grid.World
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 import io.github.plenglin.questofcon.game.pawn.Pawn
@@ -34,7 +32,7 @@ class NetworkedPlayerInterface(val client: Client) : PlayerInterface() {
             val data = grid[i][j]
             it.tile!!.let {
                 it.elevation = data.elevation
-                it.biome = Biomes.getById(data.biome)!!
+                it.biome = GameData.biomes[data.biome]
             }
         }
 
