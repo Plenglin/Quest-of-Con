@@ -8,10 +8,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 import io.github.plenglin.questofcon.game.PlayerInterface
 import io.github.plenglin.questofcon.render.ShadeSet
-import io.github.plenglin.questofcon.ui.elements.ActionTooltip
-import io.github.plenglin.questofcon.ui.elements.GameStateInfoController
-import io.github.plenglin.questofcon.ui.elements.RadialMenu
-import io.github.plenglin.questofcon.ui.elements.TileInfoPanel
+import io.github.plenglin.questofcon.ui.elements.*
 import ktx.scene2d.Scene2DSkin
 
 
@@ -33,6 +30,7 @@ object UI {
     lateinit var tileInfo: TileInfoPanel
     lateinit var radialMenu: RadialMenu
     lateinit var pawnTooltip: ActionTooltip
+    lateinit var chatLog: ChatLog
 
     fun generateUI() {
         stage.clear()
@@ -52,6 +50,9 @@ object UI {
 
         pawnTooltip = ActionTooltip(skin)
         stage.addActor(pawnTooltip)
+
+        chatLog = ChatLog(skin)
+        stage.addActor(chatLog)
 
         infoPanel = GameStateInfoController(skin)
         stage.addActor(infoPanel)

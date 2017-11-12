@@ -61,22 +61,25 @@ class ChatLog(skin: Skin) : Window("Chat Log", skin) {
 
     val playerInterface get() = UI.targetPlayerInterface
 
-    val log: Label
-    val text: TextField
+    val chatLog: TextArea
+    val entryField: TextField
     var chatBuffer: String = ""
 
     init {
-        log = Label(chatBuffer, skin)
-        text = TextField("", skin)
+        chatLog = TextArea(chatBuffer, skin)
+        entryField = TextField("", skin)
 
-        add(ScrollPane(log)).colspan(2)
+        chatLog.isDisabled = true
+        val scroll = ScrollPane(chatLog)
+
+        add(scroll).colspan(2).size(200f, 150f)
         row()
-        add(text)
+        add(entryField)
         add(TextButton("Send", skin).apply {
             addListener(object : ChangeListener() {
                 override fun changed(event: ChangeEvent?, actor: Actor?) {
-                    playerInterface.sendChat(this@ChatLog.text.text)
-                    this@ChatLog.text.text = ""
+                    playerInterface.sendChat(entryField.text)
+                    entryField.text = ""
                 }
             })
         })
@@ -84,10 +87,10 @@ class ChatLog(skin: Skin) : Window("Chat Log", skin) {
 
         playerInterface.chatUpdate.addListener {
             val team = playerInterface.teams[it.from]!!
+            println("received msg ${it.text}")
             chatBuffer += "\n<${team.name}> ${it.text}"
-            log.setText(chatBuffer)
+            chatLog.setText(chatBuffer)
         }
-
 
     }
 

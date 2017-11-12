@@ -96,7 +96,7 @@ class NetworkedPlayerInterface(val client: Client) : PlayerInterface() {
                     val team = teams[id]!!
                     turnChange.fire(team)
                 }
-                ServerEventTypes.TALK -> chatUpdate.fire(it.data as DataChat)
+                ServerEventTypes.TALK -> chatUpdate.fire(data as DataChat)
             }
         }
     }
