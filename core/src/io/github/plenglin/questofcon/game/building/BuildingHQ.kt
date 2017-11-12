@@ -20,7 +20,7 @@ class BuildingHQ(team: Team, pos: WorldCoords, gameState: GameState, type: Long)
         return emptyList()  // No demolishing the HQ!
     }
 
-    companion object : BuildingCreator("HQ", 0) {
+    companion object : BuildingCreator("bldg-hq", "HQ", 0) {
 
         override fun createBuildingAt(team: Team, worldCoords: WorldCoords, gameState: GameState): Building {
             val building = BuildingHQ(team, worldCoords, gameState, id)

@@ -64,7 +64,7 @@ class NetworkedPlayerInterface(val client: Client) : PlayerInterface() {
                     val j = bldgData.pos.j
                     var building = getBuildingData(bldgData.id)
                     if (building == null) {
-                        building = GameData.buildingByType(bldgData.type).createBuildingAt(teams[bldgData.team]!!, WorldCoords(world, i, j), client.dummy)
+                        building = GameData.buildings[bldgData.type].createBuildingAt(teams[bldgData.team]!!, WorldCoords(world, i, j), client.dummy)
                         building.id = bldgData.id
                     }
                     building.team = teams[bldgData.team]!!
@@ -79,7 +79,7 @@ class NetworkedPlayerInterface(val client: Client) : PlayerInterface() {
                     val j = pawnData.pos.j
                     var pawn = getPawnData(data.id)
                     if (pawn == null) {
-                        pawn = GameData.pawnByType(pawnData.type).createPawnAt(teams[pawnData.team]!!, WorldCoords(world, i, j), client.dummy)
+                        pawn = GameData.pawns[pawnData.type].createPawnAt(teams[pawnData.team]!!, WorldCoords(world, i, j), client.dummy)
                         pawn.id = pawnData.id
                     }
                     pawn.ap = pawnData.ap

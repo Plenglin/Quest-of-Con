@@ -5,7 +5,7 @@ import io.github.plenglin.questofcon.game.GameData
 
 fun main(args: Array<String>) {
     println("Starting server...")
-    GameData.spawnableBuildings.forEach {
+    GameData.buildings.forEach {
         println("${it.id}: ${it.name}")
     }
     Matchmaker.acceptSockets()

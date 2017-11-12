@@ -80,7 +80,7 @@ class SocketManager(val socket: Socket, val parent: GameRoom) : Thread("SocketMa
                 ClientActions.MAKE_PAWN -> {
                     //if (parent.gameState)
                     data as DataPawnCreation
-                    val creator = GameData.pawnByType(data.type)
+                    val creator = GameData.pawns[data.type]
                     team.money -= creator.cost
                     val pawn = creator.createPawnAt(team, WorldCoords(parent.gameState.world, data.at), parent.gameState)
                     val ser = pawn.serialized()
@@ -89,7 +89,7 @@ class SocketManager(val socket: Socket, val parent: GameRoom) : Thread("SocketMa
                 }
                 ClientActions.MAKE_BUILDING -> {
                     data as DataBuildingCreation
-                    val creator = GameData.buildingByType(data.type)
+                    val creator = GameData.buildings[data.type]
                     team.money -= creator.cost
                     val building = creator.createBuildingAt(team, WorldCoords(parent.gameState.world, data.at), parent.gameState)
                     val ser = building.serialized()

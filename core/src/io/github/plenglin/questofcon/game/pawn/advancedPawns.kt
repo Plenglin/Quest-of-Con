@@ -25,7 +25,7 @@ class PawnArtillery(team: Team, pos: WorldCoords, state: GameState) : Pawn("Arti
         return true
     }
 
-    companion object : PawnCreator("Artillery", 500) {
+    companion object : PawnCreator("artillery", "Artillery", 500) {
 
         val damage = 100
         val dmgRadius = 1
@@ -80,7 +80,7 @@ class PawnKnight(team: Team, pos: WorldCoords, state: GameState) : Pawn("Kangaro
         return true
     }
 
-    companion object : PawnCreator("KangarooBot", 300) {
+    companion object : PawnCreator("kangaroo", "KangarooBot", 300) {
 
         val distA = 3
         val distB = 2

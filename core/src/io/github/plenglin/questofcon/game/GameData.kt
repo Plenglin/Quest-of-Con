@@ -1,6 +1,7 @@
 package io.github.plenglin.questofcon.game
 
 import io.github.plenglin.questofcon.Assets
+import io.github.plenglin.questofcon.ObjectRegistry
 import io.github.plenglin.questofcon.game.building.BuildingCreator
 import io.github.plenglin.questofcon.game.building.BuildingFactory
 import io.github.plenglin.questofcon.game.building.BuildingHQ
@@ -13,26 +14,30 @@ import io.github.plenglin.questofcon.game.pawn.SimplePawnCreator
 
 object GameData {
 
-    val grunt = SimplePawnCreator("grunt", 100).apply {
+    val pawns = ObjectRegistry<PawnCreator>()
+    val buildings = ObjectRegistry<BuildingCreator>()
+    val biomes = ObjectRegistry<PawnCreator>()
+
+    val grunt = SimplePawnCreator("inf-grunt", "grunt", 100).apply {
         maxHealth = 30
         attack = 20
         texture = { Assets[Assets.grunt] }
     }
 
-    val drill = SimplePawnCreator("drill mech", 150).apply {
+    val drill = SimplePawnCreator("mech-drill","drill mech", 150).apply {
         attack = 40
         maxHealth = 50
         texture = { Assets[Assets.drillmech] }
     }
 
-    val beam = SimplePawnCreator("laser mech", 150).apply {
+    val beam = SimplePawnCreator("mech-laser", "laser mech", 150).apply {
         attack = 30
         maxHealth = 40
         range = 2
         texture = { Assets[Assets.beammech] }
     }
 
-    val tankdes = SimplePawnCreator("tank destroyer", 300).apply {
+    val tankdes = SimplePawnCreator("veh-td", "tank destroyer", 300).apply {
         attack = 50
         maxHealth = 20
         range = 4
@@ -40,14 +45,14 @@ object GameData {
         texture = { Assets[Assets.tankdestroyer] }
     }
 
-    val defender = SimplePawnCreator("defender", 250).apply {
+    val defender = SimplePawnCreator("mech-defender", "defender", 250).apply {
         attack = 30
         maxHealth = 100
         actionPoints = 2
         texture = { Assets[Assets.defender] }
     }
 
-    val scout = SimplePawnCreator("scout", 200).apply {
+    val scout = SimplePawnCreator("veh-scout", "scout", 200).apply {
         attack = 20
         maxHealth = 30
         actionPoints = 5
@@ -55,20 +60,19 @@ object GameData {
         texture = { Assets[Assets.scout] }
     }
 
-    val spawnableUnits = listOf<PawnCreator>(
-            grunt, drill, beam, tankdes, defender, scout,
-            PawnArtillery, PawnKnight
-    ).sortedBy { it.cost }
+    init {
+        pawns.register(grunt)
+        pawns.register(drill)
+        pawns.register(beam)
+        pawns.register(tankdes)
+        pawns.register(defender)
+        pawns.register(scout)
+        pawns.register(PawnKnight)
+        pawns.register(PawnArtillery)
 
-    val spawnableBuildings = listOf<BuildingCreator>(
-            BuildingFactory, BuildingMine, BuildingHQ
-    ).sortedBy { it.name }
-
-    fun buildingByType(type: Long): BuildingCreator {
-        return spawnableBuildings.find { it.id == type }!!
+        buildings.register(BuildingHQ)
+        buildings.register(BuildingFactory)
+        buildings.register(BuildingMine)
     }
 
-    fun pawnByType(type: Long): PawnCreator {
-        return spawnableUnits.find { it.id == type }!!
-    }
 }

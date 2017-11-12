@@ -2,6 +2,7 @@ package io.github.plenglin.questofcon.game.pawn
 
 import com.badlogic.gdx.graphics.Texture
 import io.github.plenglin.questofcon.Assets
+import io.github.plenglin.questofcon.Registerable
 import io.github.plenglin.questofcon.game.GameState
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
@@ -10,12 +11,10 @@ import io.github.plenglin.questofcon.ui.*
 import io.github.plenglin.questofcon.ui.elements.ConfirmationDialog
 import io.github.plenglin.questofcon.ui.elements.Selectable
 
-private var nextCreatorId = 0L
 
-abstract class PawnCreator(val title: String, val cost: Int) {
+abstract class PawnCreator(override val name: String, val displayName: String, val cost: Int) : Registerable {
 
-    val id = nextCreatorId++
-
+    override var id: Long = -1
     abstract fun createPawnAt(team: Team, worldCoords: WorldCoords, state: GameState): Pawn
 
 }
@@ -173,7 +172,7 @@ abstract class Pawn(val name: String, var team: Team, _pos: WorldCoords, val max
 
 }
 
-class SimplePawnCreator(name: String, cost: Int) : PawnCreator(name, cost) {
+class SimplePawnCreator(name: String, displayName: String, cost: Int) : PawnCreator(name, displayName, cost) {
 
     var maxHealth: Int = 0
     var attack: Int = 0
@@ -193,7 +192,7 @@ class SimplePawnCreator(name: String, cost: Int) : PawnCreator(name, cost) {
     /**
      * A simple pawn that can be melee or ranged.
      */
-    inner class SimplePawn(team: Team, pos: WorldCoords, state: GameState) : Pawn(title, team, pos, maxHealth, actionPoints, texture, state) {
+    inner class SimplePawn(team: Team, pos: WorldCoords, state: GameState) : Pawn(displayName, team, pos, maxHealth, actionPoints, texture, state) {
 
         override fun damageTo(coords: WorldCoords): Int {
             val mult = Pawn.elevationDamageMultiplier(pos.tile!!.elevation, coords.tile!!.elevation)

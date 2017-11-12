@@ -1,6 +1,7 @@
 package io.github.plenglin.questofcon.game.building
 
 import com.badlogic.gdx.graphics.Texture
+import io.github.plenglin.questofcon.Registerable
 import io.github.plenglin.questofcon.game.GameState
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
@@ -11,11 +12,10 @@ import io.github.plenglin.questofcon.ui.elements.Selectable
 import io.github.plenglin.questofcon.ui.UI
 import java.io.Serializable
 
-var nextBuildingCreatorId = 0L
 
-abstract class BuildingCreator(val name: String, val cost: Int) {
+abstract class BuildingCreator(override val name: String, val displayName: String, val cost: Int) : Registerable {
 
-    val id = nextBuildingCreatorId++
+    override var id: Long = -1
 
     abstract fun createBuildingAt(team: Team, worldCoords: WorldCoords, gameState: GameState): Building
 

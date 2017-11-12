@@ -27,7 +27,7 @@ object MPConnectionScreen : KtxScreen {
     override fun show() {
         screenToSet = null
 
-        GameData.spawnableBuildings.forEach {
+        GameData.buildings.forEach {
             println("${it.id}: ${it.name}")
         }
         Scene2DSkin.defaultSkin = UI.skin

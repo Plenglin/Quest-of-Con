@@ -19,12 +19,16 @@ class BuildingFactory(team: Team, pos: WorldCoords, gameState: GameState, type: 
     override fun getRadialActions(): List<Selectable> {
         return super.getRadialActions() + if (pos.tile!!.pawn == null) listOf(
                 Selectable("Make", {
-                    UI.stage.addActor(UnitSpawningDialog(GameData.spawnableUnits, UI.skin, pos, team))
+                    UI.stage.addActor(UnitSpawningDialog(getSpawnable(), UI.skin, pos, team))
                 })
         ) else emptyList()
     }
 
-    companion object : BuildingCreator("factory", 200) {
+    fun getSpawnable(): List<PawnCreator> {
+        return GameData.pawns.toList()
+    }
+
+    companion object : BuildingCreator("bldg-factory", "factory", 200) {
 
         override fun createBuildingAt(team: Team, worldCoords: WorldCoords, gameState: GameState): Building {
             val building = BuildingFactory(team, worldCoords, gameState, id)
