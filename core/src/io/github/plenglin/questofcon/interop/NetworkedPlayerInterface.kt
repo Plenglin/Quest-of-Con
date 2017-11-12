@@ -21,6 +21,7 @@ class NetworkedPlayerInterface(val client: Client) : PlayerInterface() {
     override val teams: MutableMap<Long, Team>
     override val thisTeamId: Long
     override val thisTeam: Team
+    private var currentTeam: Long = 0
 
     init {
         val resp = client.initialResponse
@@ -44,6 +45,7 @@ class NetworkedPlayerInterface(val client: Client) : PlayerInterface() {
         thisTeamId = resp.yourId
         println(thisTeamId)
         thisTeam = teams[thisTeamId]!!
+        currentTeam = client.initialResponse.initialTeam
 
         client.onBalanceChanged.addListener {
             thisTeam.money = it
@@ -100,8 +102,6 @@ class NetworkedPlayerInterface(val client: Client) : PlayerInterface() {
             }
         }
     }
-
-    private var currentTeam: Long = 0
 
     override fun getCurrentTeam(): Team {
         return teams[currentTeam]!!

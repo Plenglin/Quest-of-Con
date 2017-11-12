@@ -82,6 +82,7 @@ class GameRoom(val sockets: List<Socket>, val roomId: Long) : Thread("GameRoom-$
         clientsById.forEach { _, sockMan ->
             sockMan.send(DataInitialResponse(
                     sockMan.team.id,
+                    gameState.getCurrentTeam().id,
                     clientsById.values.map { it.team.serialized() },
                     gameState.world.serialized()
             ))

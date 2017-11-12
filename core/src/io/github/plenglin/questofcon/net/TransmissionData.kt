@@ -32,7 +32,7 @@ data class ClientRequest(val type: ClientRequestType, val key: Long) : Serializa
 data class ServerResponse( val responseTo: Long, val data: Serializable? = null, val error: Int = ServerResponseError.OK) : Serializable
 
 data class DataInitialClientData(val name: String) : Serializable
-data class DataInitialResponse(val yourId: Long, val teams: List<DataTeam>, val world: DataWorldState) : Serializable
+data class DataInitialResponse(val yourId: Long, val initialTeam: Long, val teams: List<DataTeam>, val world: DataWorldState) : Serializable
 
 data class DataWorldState(val grid: Array<Array<DataTile>>) : Serializable {
     override fun equals(other: Any?): Boolean {
