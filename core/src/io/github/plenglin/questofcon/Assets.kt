@@ -23,6 +23,8 @@ object Assets {
     val tankdestroyer = AssetDescriptor<Texture>("sprites/pawn/tankdestr.png", Texture::class.java)
     val beammech = AssetDescriptor<Texture>("sprites/pawn/beammech.png", Texture::class.java)
 
+    val missingno = { this[missing] }
+
     fun load() {
         manager.load(artillery)
         manager.load(defender)

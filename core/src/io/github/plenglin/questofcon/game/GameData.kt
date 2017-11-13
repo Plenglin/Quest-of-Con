@@ -1,64 +1,112 @@
 package io.github.plenglin.questofcon.game
 
 import io.github.plenglin.questofcon.Assets
+import io.github.plenglin.questofcon.Constants
 import io.github.plenglin.questofcon.TerrainTextures
-import io.github.plenglin.questofcon.game.building.BuildingCreator
-import io.github.plenglin.questofcon.game.building.BuildingFactory
-import io.github.plenglin.questofcon.game.building.BuildingHQ
-import io.github.plenglin.questofcon.game.building.BuildingMine
+import io.github.plenglin.questofcon.game.building.*
 import io.github.plenglin.questofcon.game.grid.Biome
-import io.github.plenglin.questofcon.game.pawn.PawnArtillery
-import io.github.plenglin.questofcon.game.pawn.PawnCreator
-import io.github.plenglin.questofcon.game.pawn.SimplePawnCreator
+import io.github.plenglin.questofcon.game.pawn.*
 import io.github.plenglin.util.ObjectRegistry
 
 
 object GameData {
 
-    val pawns = ObjectRegistry<PawnCreator>()
-    val buildings = ObjectRegistry<BuildingCreator>()
+    val pawns = ObjectRegistry<PawnType>()
+    val buildings = ObjectRegistry<BuildingType>()
     val biomes = ObjectRegistry<Biome>()
 
-    val grunt = SimplePawnCreator("inf-grunt", "grunt", 100).apply {
-        maxHealth = 30
-        attack = 20
+    val grunt = PawnType("inf-grunt").apply {
+        displayName = "grunt"
+        cost = 75
+        baseHp = 30
+        baseAtk = 20
+        type = PawnClass.INFANTRY
         texture = { Assets[Assets.grunt] }
     }
 
-    val drill = SimplePawnCreator("mech-drill","drill mech", 150).apply {
-        attack = 40
-        maxHealth = 50
+    val drill = PawnType("mech-drill").apply {
+        displayName = "drill mech"
+        cost = 150
+        baseHp = 50
+        baseAtk = 40
+        type = PawnClass.MECH
         texture = { Assets[Assets.drillmech] }
     }
 
-    val beam = SimplePawnCreator("mech-laser", "laser mech", 150).apply {
-        attack = 30
-        maxHealth = 40
-        range = 2
-        texture = { Assets[Assets.beammech] }
+    val beam = PawnType("mech-beam").apply {
+        displayName = "beam mech"
+        cost = 150
+        baseHp = 40
+        baseAtk = 30
+        maxRange = 2
+        type = PawnClass.MECH
+        texture = { Assets[Assets.drillmech] }
     }
 
-    val tankdes = SimplePawnCreator("veh-td", "tank destroyer", 300).apply {
-        attack = 50
-        maxHealth = 20
-        range = 4
-        actionPoints = 20
+    val tankdes = PawnType("veh-td").apply {
+        displayName = "tank destroyer"
+        cost = 300
+        baseAtk = 50
+        baseHp = 20
+        maxRange = 4
+        maxAp = 2
+        type = PawnClass.VEHICLE
         texture = { Assets[Assets.tankdestroyer] }
     }
 
-    val defender = SimplePawnCreator("mech-defender", "defender", 250).apply {
-        attack = 30
-        maxHealth = 100
-        actionPoints = 2
+    val defender = PawnType("mech-defender").apply {
+        displayName = "defender"
+        cost = 250
+        baseAtk = 30
+        baseHp = 100
+        maxAp = 2
+        type = PawnClass.MECH
         texture = { Assets[Assets.defender] }
     }
 
-    val scout = SimplePawnCreator("veh-scout", "scout", 200).apply {
-        attack = 20
-        maxHealth = 30
-        actionPoints = 5
-        range = 2
+    val scout = PawnType("veh-scout").apply {
+        displayName = "scout"
+        cost = 200
+        baseAtk = 20
+        baseHp = 30
+        maxAp = 5
+        maxRange = 2
+        type = PawnClass.VEHICLE
         texture = { Assets[Assets.scout] }
+    }
+
+    val artillery = PawnType("mech-artillery").apply {
+        displayName = "artillery"
+        cost = 500
+        baseAtk = 50
+        baseHp = 20
+        maxAp = 1
+        maxRange = 5
+        minRange = 4
+        targetRadius = 1
+        type = PawnClass.MECH
+        texture = { Assets[Assets.artillery] }
+    }
+
+    val hq = BuildingType("bldg-hq").apply {
+        displayName = "headquarters"
+        upkeep = -Constants.BASE_ECO
+        power = -100
+    }
+
+    val factory = BuildingType("bldg-factory").apply {
+        displayName = "factory"
+        upkeep = 0
+        power = 10
+        /*buildable = listOf(
+
+        )*/
+    }
+
+    val mine = BuildingType("bldg-mine").apply {
+        displayName = "headquarters"
+        upkeep = -30
+        power = 10
     }
 
     val beach       = Biome("biome-beach", "beach", TerrainTextures.SAND, true, false)
@@ -75,11 +123,11 @@ object GameData {
         pawns.register(tankdes)
         pawns.register(defender)
         pawns.register(scout)
-        pawns.register(PawnArtillery)
+        pawns.register(artillery)
 
-        buildings.register(BuildingHQ)
-        buildings.register(BuildingFactory)
-        buildings.register(BuildingMine)
+        buildings.register(hq)
+        buildings.register(factory)
+        buildings.register(mine)
 
         biomes.register(beach)
         biomes.register(desert)

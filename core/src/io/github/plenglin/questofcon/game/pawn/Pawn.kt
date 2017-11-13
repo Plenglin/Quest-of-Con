@@ -14,13 +14,17 @@ import io.github.plenglin.questofcon.ui.elements.RadialMenuItem
 
 private var nextPawnId = 0L
 
-abstract class Pawn(val name: String, var team: Team, _pos: WorldCoords, val maxHealth: Int, val maxAp: Int, val texture: () -> Texture?, val state: GameState) {
+class Pawn(val type: PawnType, _pos: WorldCoords) {
 
-    var type = -1L
+    var gameState: GameState? = null
+
     var id = nextPawnId++
+
+    lateinit var team: Team
 
     open val maxAttacks = 1
     var attacksRemaining = 0
+    var level = 0
 
     var pos: WorldCoords = _pos
         set(value) {
@@ -29,13 +33,13 @@ abstract class Pawn(val name: String, var team: Team, _pos: WorldCoords, val max
             value.tile!!.pawn = this
         }
 
-    var health: Int = maxHealth
+    var health: Int = type.maxHp(level)
         set(value) {
             field = value
             if (health <= 0) {
                 pos.tile!!.pawn = null
             }
-            state.pawnChange.fire(this)
+            gameState?.pawnChange?.fire(this)
         }
     var ap: Int = 0
 
@@ -104,14 +108,14 @@ abstract class Pawn(val name: String, var team: Team, _pos: WorldCoords, val max
         if (ap - apCost >= 0) {
             ap -= apCost
             pos = coords
-            state.pawnChange.fire(this)
+            gameState?.pawnChange?.fire(this)
             return true
         }
         return false
     }
 
     open fun getProperties(): Map<String, Any> {
-        return mapOf("type" to name, "team" to team.name, "health" to "$health/$maxHealth", "actions" to "$ap/$maxAp", "attacks" to "$attacksRemaining/$maxAttacks")
+        return mapOf("type" to type.displayName, "team" to team.name, "health" to "$health/$maxHealth", "actions" to "$ap/$maxAp", "attacks" to "$attacksRemaining/$maxAttacks")
     }
 
     fun attemptAttack(coords: WorldCoords): Boolean {
@@ -119,27 +123,27 @@ abstract class Pawn(val name: String, var team: Team, _pos: WorldCoords, val max
         val result = onAttack(coords)
         if (result) {
             attacksRemaining -= 1
-            state.pawnChange.fire(this)
+            gameState?.pawnChange?.fire(this)
         }
         return result
     }
 
     open fun getRadialActions(): List<RadialMenuItem> {
 
-        val actions = mutableListOf<RadialMenuItem>(RadialMenuItem("Disband $name", {
-            ConfirmationDialog("Disband $name", UI.skin, {
+        val actions = mutableListOf<RadialMenuItem>(RadialMenuItem("Disband ${type.displayName}", {
+            ConfirmationDialog("Disband ${type.displayName}", UI.skin, {
                 UI.targetPlayerInterface.disbandPawn(this.id)
             }).show(UI.stage)
         }))
 
         if (ap > 0) {
 
-            actions.add(RadialMenuItem("Move $name", {
+            actions.add(RadialMenuItem("Move ${type.displayName}", {
                 PawnActionManager.beginMoving(this)
             }))
 
             if (attacksRemaining > 0) {
-                actions.add(RadialMenuItem("Attack with $name", {
+                actions.add(RadialMenuItem("Attack with ${type.displayName}", {
                     PawnActionManager.beginAttacking(this)
                 }))
             }
@@ -149,83 +153,11 @@ abstract class Pawn(val name: String, var team: Team, _pos: WorldCoords, val max
     }
 
     fun serialized(): DataPawn {
-        return DataPawn(id, team.id, type, health, ap, attacksRemaining, pos.serialized())
+        return DataPawn(id, team.id, type.id, health, ap, attacksRemaining, pos.serialized())
     }
 
     override fun toString(): String {
         return "Pawn($id, ${javaClass.simpleName})"
-    }
-
-    companion object {
-        fun elevationDamageMultiplier(from: Int, to: Int): Double {
-            val elevationChange = maxOf(to - from, 0)
-            return minOf(Math.pow(1.125, -elevationChange.toDouble()), 1.0)
-        }
-    }
-
-}
-
-class SimplePawnCreator(name: String, displayName: String, cost: Int) : PawnCreator(name, displayName, cost) {
-
-    var maxHealth: Int = 0
-    var attack: Int = 0
-    var texture: () -> Texture = { Assets.manager[Assets.missing] }
-    var actionPoints: Int = 3
-    var range: Int = 1
-    var maxAttacks: Int = 1
-
-    override fun createPawnAt(team: Team, worldCoords: WorldCoords, state: GameState): Pawn {
-        val pawn = SimplePawn(team, worldCoords, state)
-        worldCoords.tile!!.pawn = pawn
-        pawn.type = id
-        state.pawnChange.fire(pawn)
-        return pawn
-    }
-
-    /**
-     * A simple pawn that can be melee or ranged.
-     */
-    inner class SimplePawn(team: Team, pos: WorldCoords, state: GameState) : Pawn(displayName, team, pos, maxHealth, actionPoints, texture, state) {
-
-        override fun damageTo(coords: WorldCoords): Int {
-            val mult = Pawn.elevationDamageMultiplier(pos.tile!!.elevation, coords.tile!!.elevation)
-            println(mult)
-            return (attack * mult).toInt()
-        }
-
-        override val maxAttacks = this@SimplePawnCreator.maxAttacks
-
-        override fun getAttackableSquares(): Set<WorldCoords> {
-            return pos.floodfill(range).minus(this.pos)
-        }
-
-        override fun getTargetingRadius(coords: WorldCoords): Set<WorldCoords> {
-            return setOf(coords)
-        }
-
-        override fun onAttack(coords: WorldCoords): Boolean {
-            //val inRange = Math.abs(coords.i - this.pos.i) + Math.abs(coords.j - this.pos.j) <= range
-            val tile = coords.tile
-            if (tile != null && tile.getTeam() != this.team) {
-                return tile.doDamage(damageTo(coords))
-            } else {
-                return false
-            }
-        }
-
-        override fun getProperties(): Map<String, Any> {
-            val props = super.getProperties().toMutableMap()
-            props["attack"] = attack
-            if (range > 1) {
-                props["range"] = range
-            }
-            return props
-        }
-
-        override fun toString(): String {
-            return "SimplePawn($id, $name)"
-        }
-
     }
 
 }
