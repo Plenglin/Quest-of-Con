@@ -2,7 +2,7 @@ package io.github.plenglin.questofcon.game
 
 import com.badlogic.gdx.graphics.Color
 import io.github.plenglin.questofcon.Constants
-import io.github.plenglin.questofcon.ListenerManager
+import io.github.plenglin.util.ListenerManager
 import io.github.plenglin.questofcon.game.building.BuildingCreator
 import io.github.plenglin.questofcon.game.building.BuildingHQ
 import io.github.plenglin.questofcon.game.grid.World

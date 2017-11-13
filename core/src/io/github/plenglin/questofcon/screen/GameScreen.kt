@@ -6,16 +6,13 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import io.github.plenglin.questofcon.Assets
-import io.github.plenglin.questofcon.game.GameData
 import io.github.plenglin.questofcon.game.GameState
-import io.github.plenglin.questofcon.game.PlayerInterface
 import io.github.plenglin.questofcon.game.Team
-import io.github.plenglin.questofcon.game.building.BuildingFactory
 import io.github.plenglin.questofcon.game.grid.*
-import io.github.plenglin.questofcon.interop.PassAndPlayInterface
 import io.github.plenglin.questofcon.interop.PassAndPlayManager
 import io.github.plenglin.questofcon.render.WorldRenderer
 import io.github.plenglin.questofcon.ui.*
+import io.github.plenglin.util.HeightMap
 import ktx.app.KtxScreen
 import ktx.assets.disposeSafely
 

@@ -1,6 +1,6 @@
 package io.github.plenglin.questofcon.net
 
-import io.github.plenglin.questofcon.ListenerManager
+import io.github.plenglin.util.ListenerManager
 import io.github.plenglin.questofcon.game.DummyGameState
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream

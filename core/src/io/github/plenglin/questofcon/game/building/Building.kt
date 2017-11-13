@@ -1,25 +1,16 @@
 package io.github.plenglin.questofcon.game.building
 
 import com.badlogic.gdx.graphics.Texture
-import io.github.plenglin.questofcon.Registerable
 import io.github.plenglin.questofcon.game.GameState
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 import io.github.plenglin.questofcon.game.pawn.PawnCreator
 import io.github.plenglin.questofcon.net.DataBuilding
+import io.github.plenglin.questofcon.ui.UI
 import io.github.plenglin.questofcon.ui.elements.ConfirmationDialog
 import io.github.plenglin.questofcon.ui.elements.RadialMenuItem
-import io.github.plenglin.questofcon.ui.UI
 import java.io.Serializable
 
-
-abstract class BuildingCreator(override val name: String, val displayName: String, val cost: Int) : Registerable {
-
-    override var id: Long = -1
-
-    abstract fun createBuildingAt(team: Team, worldCoords: WorldCoords, gameState: GameState): Building
-
-}
 
 var nextBuildingId = 0L
 

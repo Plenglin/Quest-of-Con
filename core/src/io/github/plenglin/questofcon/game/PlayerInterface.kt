@@ -1,16 +1,13 @@
 package io.github.plenglin.questofcon.game
 
-import io.github.plenglin.questofcon.ListenerManager
+import io.github.plenglin.util.ListenerManager
 import io.github.plenglin.questofcon.game.building.Building
 import io.github.plenglin.questofcon.game.building.BuildingCreator
 import io.github.plenglin.questofcon.game.grid.World
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 import io.github.plenglin.questofcon.game.pawn.Pawn
 import io.github.plenglin.questofcon.game.pawn.PawnCreator
-import io.github.plenglin.questofcon.net.DataBuilding
 import io.github.plenglin.questofcon.net.DataChat
-import io.github.plenglin.questofcon.net.DataPawn
-import io.github.plenglin.questofcon.net.DataTeam
 
 
 abstract class PlayerInterface {

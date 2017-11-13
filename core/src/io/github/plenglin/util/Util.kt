@@ -1,4 +1,4 @@
-package io.github.plenglin.questofcon
+package io.github.plenglin.util
 
 
 fun linMap(x: Double, a1: Double, b1: Double, a2: Double, b2: Double): Double {
@@ -53,7 +53,7 @@ class ObjectRegistry<T> : Iterable<T> where T : Registerable {
     }
 
     private fun newId(name: String): Long {
-        val id = nextLongId++;
+        val id = nextLongId++
         idToName.put(id, name)
         nameToId.put(name, id)
         return id

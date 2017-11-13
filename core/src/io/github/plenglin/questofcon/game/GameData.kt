@@ -1,7 +1,6 @@
 package io.github.plenglin.questofcon.game
 
 import io.github.plenglin.questofcon.Assets
-import io.github.plenglin.questofcon.ObjectRegistry
 import io.github.plenglin.questofcon.TerrainTextures
 import io.github.plenglin.questofcon.game.building.BuildingCreator
 import io.github.plenglin.questofcon.game.building.BuildingFactory
@@ -10,8 +9,8 @@ import io.github.plenglin.questofcon.game.building.BuildingMine
 import io.github.plenglin.questofcon.game.grid.Biome
 import io.github.plenglin.questofcon.game.pawn.PawnArtillery
 import io.github.plenglin.questofcon.game.pawn.PawnCreator
-import io.github.plenglin.questofcon.game.pawn.PawnKnight
 import io.github.plenglin.questofcon.game.pawn.SimplePawnCreator
+import io.github.plenglin.util.ObjectRegistry
 
 
 object GameData {
@@ -76,7 +75,6 @@ object GameData {
         pawns.register(tankdes)
         pawns.register(defender)
         pawns.register(scout)
-        pawns.register(PawnKnight)
         pawns.register(PawnArtillery)
 
         buildings.register(BuildingHQ)
