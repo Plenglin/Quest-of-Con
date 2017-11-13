@@ -1,9 +1,15 @@
 package io.github.plenglin.questofcon.game.pawn
 
-import io.github.plenglin.questofcon.game.Buildable
+import io.github.plenglin.questofcon.game.BuildableType
+import io.github.plenglin.questofcon.game.grid.WorldCoords
 import io.github.plenglin.util.Registerable
 
-class PawnType(_name: String) : Registerable {
+class PawnType(_name: String) : Registerable, BuildableType<Pawn> {
+
+    override fun buildAt(coords: WorldCoords): Pawn {
+        val pawn = Pawn()
+        return pawn
+    }
 
     override var id: Long = 0L
     override val name: String = _name
@@ -30,7 +36,7 @@ class PawnType(_name: String) : Registerable {
     var aquatic = false
     var terrestrial = true
 
-    var canBuild: List<Buildable> = emptyList()
+    var canBuild: List<BuildableType<Any>> = emptyList()
 
 }
 

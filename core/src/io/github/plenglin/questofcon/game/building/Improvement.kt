@@ -1,15 +1,16 @@
 package io.github.plenglin.questofcon.game.building
 
-import io.github.plenglin.questofcon.game.Buildable
+import io.github.plenglin.questofcon.game.BuildableType
+import io.github.plenglin.questofcon.game.grid.Tile
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 
-enum class Improvement : Buildable {
+enum class Improvement : BuildableType<Tile> {
 
     FOREST, JUNGLE,
 
     ROAD, CANAL, BRIDGES, RAILS, LANDMINES;
 
-    override fun buildAt(coords: WorldCoords) {
-
+    override fun buildAt(coords: WorldCoords): Tile {
+        return coords.tile!!
     }
 }

@@ -47,6 +47,7 @@ class ObjectRegistry<T> : Iterable<T> where T : Registerable {
     fun register(obj: T): Long {
         assert(!obj.name.contains(' '), { "Object name cannot contain spaces!" })
         assert(obj.id !in objects, { "Object already registered!" })
+        assert(obj.id != -1L, { "Object ID was apparently initialized already!" })
         obj.id = newId(obj.name)
         objects.put(obj.id, obj)
         return obj.id
