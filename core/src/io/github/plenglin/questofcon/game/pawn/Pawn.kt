@@ -9,7 +9,7 @@ import io.github.plenglin.questofcon.game.grid.WorldCoords
 import io.github.plenglin.questofcon.net.DataPawn
 import io.github.plenglin.questofcon.ui.*
 import io.github.plenglin.questofcon.ui.elements.ConfirmationDialog
-import io.github.plenglin.questofcon.ui.elements.Selectable
+import io.github.plenglin.questofcon.ui.elements.RadialMenuItem
 
 
 abstract class PawnCreator(override val name: String, val displayName: String, val cost: Int) : Registerable {
@@ -131,9 +131,9 @@ abstract class Pawn(val name: String, var team: Team, _pos: WorldCoords, val max
         return result
     }
 
-    open fun getRadialActions(): List<Selectable> {
+    open fun getRadialActions(): List<RadialMenuItem> {
 
-        val actions = mutableListOf<Selectable>(Selectable("Disband $name", {
+        val actions = mutableListOf<RadialMenuItem>(RadialMenuItem("Disband $name", {
             ConfirmationDialog("Disband $name", UI.skin, {
                 UI.targetPlayerInterface.disbandPawn(this.id)
             }).show(UI.stage)
@@ -141,12 +141,12 @@ abstract class Pawn(val name: String, var team: Team, _pos: WorldCoords, val max
 
         if (ap > 0) {
 
-            actions.add(Selectable("Move $name", {
+            actions.add(RadialMenuItem("Move $name", {
                 PawnActionManager.beginMoving(this)
             }))
 
             if (attacksRemaining > 0) {
-                actions.add(Selectable("Attack with $name", {
+                actions.add(RadialMenuItem("Attack with $name", {
                     PawnActionManager.beginAttacking(this)
                 }))
             }

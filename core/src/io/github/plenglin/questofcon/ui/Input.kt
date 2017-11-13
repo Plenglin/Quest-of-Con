@@ -2,7 +2,6 @@ package io.github.plenglin.questofcon.ui
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
-import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
@@ -13,7 +12,7 @@ import io.github.plenglin.questofcon.game.grid.WorldCoords
 import io.github.plenglin.questofcon.render.CameraTransformBuffer
 import io.github.plenglin.questofcon.render.ShadeSet
 import io.github.plenglin.questofcon.ui.elements.BuildingSpawningDialog
-import io.github.plenglin.questofcon.ui.elements.Selectable
+import io.github.plenglin.questofcon.ui.elements.RadialMenuItem
 import ktx.app.KtxInputAdapter
 
 
@@ -231,13 +230,13 @@ object RadialMenuInputManager : KtxInputAdapter {
         return false
     }
 
-    private fun getSelectables(): List<Selectable> {
+    private fun getSelectables(): List<RadialMenuItem> {
         val currentTeam = UI.targetPlayerInterface.thisTeam
         val selection = GridSelectionInputManager.hovering ?: return emptyList()
 
         if (currentTeam.hasBuiltHQ) {
 
-            val actions = mutableListOf<Selectable>()
+            val actions = mutableListOf<RadialMenuItem>()
 
             // Pawn actions
             val pawn = selection.tile!!.pawn
@@ -253,7 +252,7 @@ object RadialMenuInputManager : KtxInputAdapter {
 
             // Construction actions
             if (selection.tile.canBuildOn(currentTeam)) {
-                actions.add(Selectable("Build", {
+                actions.add(RadialMenuItem("Build", {
                     BuildingSpawningDialog(
                             UI.skin,
                             it
@@ -265,7 +264,7 @@ object RadialMenuInputManager : KtxInputAdapter {
 
         } else {
             return if (selection.tile?.canBuildOn(currentTeam) == true)
-                listOf(Selectable("Build HQ", {
+                listOf(RadialMenuItem("Build HQ", {
                     UI.targetPlayerInterface.makeBuilding(selectedCoord, BuildingHQ)
                 }))
             else emptyList()

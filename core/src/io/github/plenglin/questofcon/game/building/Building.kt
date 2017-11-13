@@ -8,7 +8,7 @@ import io.github.plenglin.questofcon.game.grid.WorldCoords
 import io.github.plenglin.questofcon.game.pawn.PawnCreator
 import io.github.plenglin.questofcon.net.DataBuilding
 import io.github.plenglin.questofcon.ui.elements.ConfirmationDialog
-import io.github.plenglin.questofcon.ui.elements.Selectable
+import io.github.plenglin.questofcon.ui.elements.RadialMenuItem
 import io.github.plenglin.questofcon.ui.UI
 import java.io.Serializable
 
@@ -46,7 +46,7 @@ abstract class Building(val name: String, var team: Team, var pos: WorldCoords, 
 
     open fun onTurnEnd() = Unit
 
-    open fun getRadialActions() = listOf(Selectable("Demolish $name", {
+    open fun getRadialActions() = listOf(RadialMenuItem("Demolish $name", {
         ConfirmationDialog("Demolish $name", UI.skin, {
             UI.targetPlayerInterface.demolishBuilding(this.id)
         }).show(UI.stage)

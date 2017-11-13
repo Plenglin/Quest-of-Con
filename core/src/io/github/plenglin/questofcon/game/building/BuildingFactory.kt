@@ -8,7 +8,7 @@ import io.github.plenglin.questofcon.game.GameState
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 import io.github.plenglin.questofcon.game.pawn.PawnCreator
-import io.github.plenglin.questofcon.ui.elements.Selectable
+import io.github.plenglin.questofcon.ui.elements.RadialMenuItem
 import io.github.plenglin.questofcon.ui.UI
 import io.github.plenglin.questofcon.ui.elements.UnitSpawningDialog
 
@@ -16,9 +16,9 @@ class BuildingFactory(team: Team, pos: WorldCoords, gameState: GameState, type: 
 
     override val texture: Texture? = try { Textures.FACTORY() } catch (e: GdxRuntimeException) { null }
 
-    override fun getRadialActions(): List<Selectable> {
+    override fun getRadialActions(): List<RadialMenuItem> {
         return super.getRadialActions() + if (pos.tile!!.pawn == null) listOf(
-                Selectable("Make", {
+                RadialMenuItem("Make", {
                     UI.stage.addActor(UnitSpawningDialog(getSpawnable(), UI.skin, pos, team))
                 })
         ) else emptyList()

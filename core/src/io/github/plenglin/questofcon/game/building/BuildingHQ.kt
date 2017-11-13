@@ -7,7 +7,7 @@ import io.github.plenglin.questofcon.Textures
 import io.github.plenglin.questofcon.game.GameState
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
-import io.github.plenglin.questofcon.ui.elements.Selectable
+import io.github.plenglin.questofcon.ui.elements.RadialMenuItem
 
 
 class BuildingHQ(team: Team, pos: WorldCoords, gameState: GameState, type: Long) : Building("Headquarters", team, pos, Constants.HQ_HEALTH, gameState, type) {
@@ -16,7 +16,7 @@ class BuildingHQ(team: Team, pos: WorldCoords, gameState: GameState, type: Long)
 
     override fun getMoneyPerTurn(): Int = Constants.BASE_ECO
 
-    override fun getRadialActions(): List<Selectable> {
+    override fun getRadialActions(): List<RadialMenuItem> {
         return emptyList()  // No demolishing the HQ!
     }
 
