@@ -114,7 +114,7 @@ class Pawn(val type: PawnType, var team: Team, _pos: WorldCoords, var level: Int
     }
 
     fun attemptMoveTo(coords: WorldCoords, apCost: Int): Boolean {
-        if (ap - apCost >= 0) {
+        if (ap > 0) {
             ap -= apCost
             pos = coords
             gameState?.pawnChange?.fire(this)
