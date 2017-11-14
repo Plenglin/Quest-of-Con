@@ -3,13 +3,14 @@ package io.github.plenglin.questofcon.game.pawn
 import com.badlogic.gdx.graphics.Texture
 import io.github.plenglin.questofcon.Assets
 import io.github.plenglin.questofcon.game.BuildableType
+import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 import io.github.plenglin.util.Registerable
 
 class PawnType(_name: String) : Registerable, BuildableType<Pawn> {
 
-    override fun buildAt(coords: WorldCoords): Pawn {
-        val pawn = Pawn(this, coords)
+    override fun buildAt(coords: WorldCoords, team: Team): Pawn {
+        val pawn = Pawn(this, team, coords)
         return pawn
     }
 

@@ -117,7 +117,7 @@ class WorldRenderer(val world: World) {
 
                     if (pawn != null) {
 
-                        val tex = pawn.texture() ?: Assets[Assets.missing]
+                        val tex = pawn.texture ?: Assets[Assets.missing]
                         val y = j.toFloat()
 
                         // Team outline
@@ -126,7 +126,7 @@ class WorldRenderer(val world: World) {
                         val color = pawn.team.color.cpy()
                         color.a = 0.5f
                         batch.color = color
-                        batch.draw(pawn.texture(), x, y, 1f, 1f)
+                        batch.draw(pawn.texture, x, y, 1f, 1f)
                     }
                 }
 

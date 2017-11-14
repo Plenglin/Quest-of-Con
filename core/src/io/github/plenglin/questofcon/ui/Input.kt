@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
 import io.github.plenglin.questofcon.Constants
-import io.github.plenglin.questofcon.game.building.BuildingHQ
+import io.github.plenglin.questofcon.game.GameData
 import io.github.plenglin.questofcon.game.grid.World
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 import io.github.plenglin.questofcon.render.CameraTransformBuffer
@@ -265,7 +265,7 @@ object RadialMenuInputManager : KtxInputAdapter {
         } else {
             return if (selection.tile?.canBuildOn(currentTeam) == true)
                 listOf(RadialMenuItem("Build HQ", {
-                    UI.targetPlayerInterface.makeBuilding(selectedCoord, BuildingHQ)
+                    UI.targetPlayerInterface.makeBuilding(selectedCoord, GameData.hq)
                 }))
             else emptyList()
         }

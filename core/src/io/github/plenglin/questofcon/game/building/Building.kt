@@ -1,10 +1,8 @@
 package io.github.plenglin.questofcon.game.building
 
-import com.badlogic.gdx.graphics.Texture
 import io.github.plenglin.questofcon.game.GameState
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
-import io.github.plenglin.questofcon.game.pawn.PawnCreator
 import io.github.plenglin.questofcon.game.pawn.PawnType
 import io.github.plenglin.questofcon.net.DataBuilding
 import io.github.plenglin.questofcon.ui.UI
@@ -15,12 +13,10 @@ import java.io.Serializable
 
 var nextBuildingId = 0L
 
-class Building(val type: BuildingType) {
+class Building(val type: BuildingType, var team: Team, var pos: WorldCoords) {
 
     var id = nextBuildingId++
-    lateinit var team: Team
     var gameState: GameState? = null
-    lateinit var pos: WorldCoords
 
     var enabled = true
 
@@ -32,6 +28,11 @@ class Building(val type: BuildingType) {
             }
             gameState?.buildingChange?.fire(this)
         }
+
+    fun applyToPosition(): Building {
+        pos.tile!!.building = this
+        return this
+    }
 
     fun getMoneyPerTurn() = 0
 
@@ -54,10 +55,12 @@ class Building(val type: BuildingType) {
         return map
     }
 
-    open fun canCreate(type: PawnCreator): Boolean = false
-
     fun serialized(): Serializable? {
         return DataBuilding(id, team.id, type.id, health, enabled, pos.serialized())
     }
+
+    val buildable get(): List<PawnType> = type.buildable(team)
+    val texture get() = type.texture()
+    val displayName = type.displayName
 
 }

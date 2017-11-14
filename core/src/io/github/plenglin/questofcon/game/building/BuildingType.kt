@@ -6,11 +6,12 @@ import io.github.plenglin.questofcon.game.BuildableType
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 import io.github.plenglin.questofcon.game.pawn.Pawn
+import io.github.plenglin.questofcon.game.pawn.PawnType
 import io.github.plenglin.util.Registerable
 
 class BuildingType(_name: String) : Registerable, BuildableType<Building> {
-    override fun buildAt(coords: WorldCoords): Building {
-        val building = Building(this)
+    override fun buildAt(coords: WorldCoords, team: Team): Building {
+        val building = Building(this, team, coords).applyToPosition()
         return building
     }
 
@@ -26,7 +27,7 @@ class BuildingType(_name: String) : Registerable, BuildableType<Building> {
 
     var power = 0
 
-    var buildable: (Team) -> List<Pawn> = { emptyList() }
+    var buildable: (Team) -> List<PawnType> = { emptyList() }
 
     var texture: () -> Texture = Assets.missingno
 

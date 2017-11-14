@@ -4,11 +4,11 @@ import io.github.plenglin.questofcon.game.GameState
 import io.github.plenglin.questofcon.game.PlayerInterface
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.building.Building
-import io.github.plenglin.questofcon.game.building.BuildingCreator
+import io.github.plenglin.questofcon.game.building.BuildingType
 import io.github.plenglin.questofcon.game.grid.World
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 import io.github.plenglin.questofcon.game.pawn.Pawn
-import io.github.plenglin.questofcon.game.pawn.PawnCreator
+import io.github.plenglin.questofcon.game.pawn.PawnType
 
 class PassAndPlayManager(val state: GameState) {
     val interfaces = state.teams.map { PassAndPlayInterface(it.id, this) }
@@ -34,11 +34,11 @@ class PassAndPlayInterface(override val thisTeamId: Long, val parent: PassAndPla
     override val teams: MutableMap<Long, Team> = mutableMapOf(*gameState.teams.map { it.id to it }.toTypedArray())
     override val thisTeam: Team = teams[thisTeamId]!!
 
-    override fun makePawn(at: WorldCoords, type: PawnCreator, onResult: (Pawn?) -> Unit) {
+    override fun makePawn(at: WorldCoords, type: PawnType, onResult: (Pawn?) -> Unit) {
         val building = at.tile!!.building
-        if (thisTeam.money >= type.cost && building?.canCreate(type) == true && building.team == thisTeam) {
+        if (thisTeam.money >= type.cost && building?.team == thisTeam && building.buildable.contains(type)) {
             thisTeam.money -= type.cost
-            val newPawn = type.createPawnAt(thisTeam, at, gameState)
+            val newPawn = Pawn(type, thisTeam, at).applyToPosition()
             newPawn.ap = 0
             onResult(newPawn)
         } else {
@@ -60,13 +60,13 @@ class PassAndPlayInterface(override val thisTeamId: Long, val parent: PassAndPla
         }
     }
 
-    override fun makeBuilding(at: WorldCoords, type: BuildingCreator, onResult: (Building?) -> Unit) {
+    override fun makeBuilding(at: WorldCoords, type: BuildingType, onResult: (Building?) -> Unit) {
         if (thisTeam.money < type.cost) {
             onResult(null)
             return
         }
         thisTeam.money -= type.cost
-        val building = type.createBuildingAt(thisTeam, at, gameState)
+        val building = Building(type, thisTeam, at).applyToPosition()
         //building.enabled = false
         gameState.buildingChange.fire(building)
         onResult(building)

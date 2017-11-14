@@ -8,7 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
-import io.github.plenglin.questofcon.game.pawn.PawnCreator
+import io.github.plenglin.questofcon.game.pawn.PawnType
 import io.github.plenglin.questofcon.ui.UI
 
 class ConfirmationDialog(title: String, skin: Skin, val onConfirm: () -> Unit) : Dialog(title, skin) {
@@ -29,7 +29,7 @@ class ConfirmationDialog(title: String, skin: Skin, val onConfirm: () -> Unit) :
 
 }
 
-class UnitSpawningDialog(val units: List<PawnCreator>, skin: Skin, val worldCoords: WorldCoords, val team: Team) : Dialog("Spawn", skin) {
+class UnitSpawningDialog(val units: List<PawnType>, skin: Skin, val worldCoords: WorldCoords, val team: Team) : Dialog("Spawn", skin) {
 
     init {
         contentTable.apply {

@@ -2,7 +2,9 @@ package io.github.plenglin.questofcon.net
 
 import io.github.plenglin.questofcon.game.GameData
 import io.github.plenglin.questofcon.game.Team
+import io.github.plenglin.questofcon.game.building.Building
 import io.github.plenglin.questofcon.game.grid.WorldCoords
+import io.github.plenglin.questofcon.game.pawn.Pawn
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.io.Serializable
@@ -80,18 +82,20 @@ class SocketManager(val socket: Socket, val parent: GameRoom) : Thread("SocketMa
                 ClientActions.MAKE_PAWN -> {
                     //if (parent.gameState)
                     data as DataPawnCreation
-                    val creator = GameData.pawns[data.type]
-                    team.money -= creator.cost
-                    val pawn = creator.createPawnAt(team, WorldCoords(parent.gameState.world, data.at), parent.gameState)
+                    val type = GameData.pawns[data.type]
+                    team.money -= type.cost
+                    //val pawn = creator.createPawnAt(team, WorldCoords(parent.gameState.world, data.at), parent.gameState)
+                    val pawn = Pawn(type, team, WorldCoords(parent.gameState.world, data.at)).applyToPosition()
                     val ser = pawn.serialized()
                     //parent.broadcastEvent(ServerEventTypes.PAWN_CHANGE, ser)
                     return ServerResponse(msgId, ser)
                 }
                 ClientActions.MAKE_BUILDING -> {
                     data as DataBuildingCreation
-                    val creator = GameData.buildings[data.type]
-                    team.money -= creator.cost
-                    val building = creator.createBuildingAt(team, WorldCoords(parent.gameState.world, data.at), parent.gameState)
+                    val type = GameData.buildings[data.type]
+                    team.money -= type.cost
+                    //val building = creator.createBuildingAt(team, WorldCoords(parent.gameState.world, data.at), parent.gameState)
+                    val building = Building(type, team, WorldCoords(parent.gameState.world, data.at)).applyToPosition()
                     val ser = building.serialized()
                     //parent.broadcastEvent(ServerEventTypes.BUILDING_CHANGE, ser)
                     return ServerResponse(msgId, ser)

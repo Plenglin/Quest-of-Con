@@ -1,7 +1,5 @@
 package io.github.plenglin.questofcon.game.pawn
 
-import com.badlogic.gdx.graphics.Texture
-import io.github.plenglin.questofcon.Assets
 import io.github.plenglin.questofcon.game.GameState
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
@@ -14,25 +12,19 @@ import io.github.plenglin.questofcon.ui.elements.RadialMenuItem
 
 private var nextPawnId = 0L
 
-class Pawn(val type: PawnType, _pos: WorldCoords) {
+class Pawn(val type: PawnType, var team: Team, _pos: WorldCoords, var level: Int = 1) {
+
+    val displayName: String = type.displayName
+    val maxAp = type.maxAp
+    val maxHealth get() = type.maxHp(level)
+    val maxAttacks = type.maxAtks
 
     var gameState: GameState? = null
 
     var id = nextPawnId++
 
-    lateinit var team: Team
-
-    open val maxAttacks = 1
     var attacksRemaining = 0
-    var level = 0
-
-    var pos: WorldCoords = _pos
-        set(value) {
-            field.tile!!.pawn = null
-            field = value
-            value.tile!!.pawn = this
-        }
-
+    var ap: Int = 0
     var health: Int = type.maxHp(level)
         set(value) {
             field = value
@@ -41,7 +33,18 @@ class Pawn(val type: PawnType, _pos: WorldCoords) {
             }
             gameState?.pawnChange?.fire(this)
         }
-    var ap: Int = 0
+
+    var pos: WorldCoords = _pos
+        set(value) {
+            field.tile!!.pawn = null
+            field = value
+            value.tile!!.pawn = this
+        }
+
+    fun applyToPosition(): Pawn {
+        pos.tile!!.pawn = this
+        return this
+    }
 
     fun getMovableSquares(): Map<WorldCoords, Int> {
         // Dijkstra
@@ -82,18 +85,29 @@ class Pawn(val type: PawnType, _pos: WorldCoords) {
         return dist.filter { true }
     }
 
-    abstract fun getAttackableSquares(): Set<WorldCoords>
+    fun getAttackableSquares(): Set<WorldCoords> {
+        return pos.floodfill(type.maxRange) - pos.floodfill(type.minRange)
+    }
 
-    open fun getTargetingRadius(coords: WorldCoords): Set<WorldCoords> = setOf(coords)
+    fun getTargetingRadius(coords: WorldCoords): Set<WorldCoords> {
+        return coords.floodfill(type.targetRadius)
+    }
 
-    abstract fun damageTo(coords: WorldCoords): Int
+    fun damageTo(coords: WorldCoords): Int {
+        return coords.tile!!.elevation - pos.tile!!.elevation
+    }
 
     /**
      * Try to attemptAttack a square.
      * @param coords the square to attemptAttack
      * @return whether it was successful or not.
      */
-    abstract fun onAttack(coords: WorldCoords): Boolean
+    fun onAttack(coords: WorldCoords): Boolean {
+        coords.floodfill(type.targetRadius).forEach {
+
+        }
+        return false
+    }
 
     fun attemptMoveTo(coords: WorldCoords, movementData: Map<WorldCoords, Int>): Boolean {
         val cost = movementData[coords]
@@ -114,7 +128,7 @@ class Pawn(val type: PawnType, _pos: WorldCoords) {
         return false
     }
 
-    open fun getProperties(): Map<String, Any> {
+    fun getProperties(): Map<String, Any> {
         return mapOf("type" to type.displayName, "team" to team.name, "health" to "$health/$maxHealth", "actions" to "$ap/$maxAp", "attacks" to "$attacksRemaining/$maxAttacks")
     }
 
@@ -130,20 +144,20 @@ class Pawn(val type: PawnType, _pos: WorldCoords) {
 
     open fun getRadialActions(): List<RadialMenuItem> {
 
-        val actions = mutableListOf<RadialMenuItem>(RadialMenuItem("Disband ${type.displayName}", {
-            ConfirmationDialog("Disband ${type.displayName}", UI.skin, {
+        val actions = mutableListOf<RadialMenuItem>(RadialMenuItem("Disband $displayName", {
+            ConfirmationDialog("Disband $displayName", UI.skin, {
                 UI.targetPlayerInterface.disbandPawn(this.id)
             }).show(UI.stage)
         }))
 
         if (ap > 0) {
 
-            actions.add(RadialMenuItem("Move ${type.displayName}", {
+            actions.add(RadialMenuItem("Move $displayName", {
                 PawnActionManager.beginMoving(this)
             }))
 
             if (attacksRemaining > 0) {
-                actions.add(RadialMenuItem("Attack with ${type.displayName}", {
+                actions.add(RadialMenuItem("Attack with $displayName", {
                     PawnActionManager.beginAttacking(this)
                 }))
             }
@@ -159,5 +173,7 @@ class Pawn(val type: PawnType, _pos: WorldCoords) {
     override fun toString(): String {
         return "Pawn($id, ${javaClass.simpleName})"
     }
+
+    val texture get() = type.texture()
 
 }

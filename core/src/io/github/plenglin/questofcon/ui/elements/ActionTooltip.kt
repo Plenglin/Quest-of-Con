@@ -48,9 +48,9 @@ class ActionTooltip(skin: Skin) : Table(skin) {
                     val ptarget = target.tile!!.pawn
                     val building = target.tile.building
                     val damage = thePawn.damageTo(target)
-                    a.setText(ptarget?.name ?: "")
+                    a.setText(ptarget?.displayName ?: "")
                     b.setText(if (ptarget != null) "${ptarget.health} -> ${ptarget.health - damage}" else "")
-                    c.setText(building?.name ?: "")
+                    c.setText(building?.displayName ?: "")
                     d.setText(if (building != null) "${building.health} -> ${building.health - damage}" else "")
                 } else {
                     isVisible = false
