@@ -5,7 +5,6 @@ import io.github.plenglin.questofcon.Assets
 import io.github.plenglin.questofcon.game.BuildableType
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
-import io.github.plenglin.questofcon.game.pawn.Pawn
 import io.github.plenglin.questofcon.game.pawn.PawnType
 import io.github.plenglin.util.Registerable
 

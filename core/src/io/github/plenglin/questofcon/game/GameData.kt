@@ -2,10 +2,10 @@ package io.github.plenglin.questofcon.game
 
 import io.github.plenglin.questofcon.Assets
 import io.github.plenglin.questofcon.Constants
-import io.github.plenglin.questofcon.TerrainTextures
-import io.github.plenglin.questofcon.game.building.*
+import io.github.plenglin.questofcon.game.building.BuildingType
 import io.github.plenglin.questofcon.game.grid.Biome
-import io.github.plenglin.questofcon.game.pawn.*
+import io.github.plenglin.questofcon.game.pawn.PawnClass
+import io.github.plenglin.questofcon.game.pawn.PawnType
 import io.github.plenglin.util.ObjectRegistry
 
 
@@ -92,12 +92,14 @@ object GameData {
         displayName = "headquarters"
         upkeep = -Constants.BASE_ECO
         power = -100
+        texture = { Assets[Assets.headquarters] }
     }
 
     val factory = BuildingType("bldg-factory").apply {
         displayName = "factory"
         upkeep = 0
         power = 10
+        texture = { Assets[Assets.factory] }
         /*buildable = listOf(
 
         )*/
@@ -107,14 +109,15 @@ object GameData {
         displayName = "headquarters"
         upkeep = -30
         power = 10
+        texture = { Assets[Assets.mine] }
     }
 
-    val beach       = Biome("biome-beach", "beach", TerrainTextures.SAND, true, false)
-    val desert      = Biome("biome-desert", "desert", TerrainTextures.SAND, true, false)
-    val grass       = Biome("biome-grassland", "grassland", TerrainTextures.GRASS, true, true)
-    val highlands   = Biome("biome-highlands", "highlands", TerrainTextures.BIGHILL, true, false, movementCost = 2)
-    val water       = Biome("biome-water", "water", TerrainTextures.WATER, false, false)
-    val mountains   = Biome("biome-mountains", "mountains", TerrainTextures.MOUNTAIN, false, false)
+    val beach       = Biome("biome-beach", "beach", true, false, { Assets[Assets.sand] })
+    val desert      = Biome("biome-desert", "desert", true, false, { Assets[Assets.sand] })
+    val grass       = Biome("biome-grassland", "grassland", true, true, { Assets[Assets.grass] })
+    val highlands   = Biome("biome-highlands", "highlands", true, false, { Assets[Assets.bighill] }, movementCost = 2)
+    val water       = Biome("biome-water", "water", false, false, { Assets[Assets.water] })
+    val mountains   = Biome("biome-mountains", "mountains", false, false, { Assets[Assets.mountain] })
 
     fun register() {
         pawns.register(grunt)

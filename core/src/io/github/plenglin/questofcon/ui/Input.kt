@@ -266,6 +266,7 @@ object RadialMenuInputManager : KtxInputAdapter {
             return if (selection.tile?.canBuildOn(currentTeam) == true)
                 listOf(RadialMenuItem("Build HQ", {
                     UI.targetPlayerInterface.makeBuilding(selectedCoord, GameData.hq)
+                    currentTeam.hasBuiltHQ = true
                 }))
             else emptyList()
         }

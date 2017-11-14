@@ -18,8 +18,6 @@ object QuestOfCon : Game() {
         GameData.register()
 
         println("loading assets")
-        Textures.values().forEach { it.load() }
-        TerrainTextures.values().forEach { it.load() }
         Assets.load()
         Assets.manager.finishLoading()
 
