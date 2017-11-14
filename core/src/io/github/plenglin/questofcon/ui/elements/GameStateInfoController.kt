@@ -41,7 +41,7 @@ class GameStateInfoController(skin: Skin) : Window("Status", skin) {
 
     fun updateData() {
         val team = playerInterface.getCurrentTeam()
-        val isCurrentTeam = (team == playerInterface.thisTeam)
+        val isCurrentTeam = playerInterface.isCurrentTurn()
 
         currentTeamLabel.setText("${team.name}'s turn")
         moneyLabel.setText("$${team.money}")

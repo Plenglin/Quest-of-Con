@@ -48,4 +48,8 @@ abstract class PlayerInterface {
     abstract fun getAllBuildings(): Sequence<Building>
     abstract fun getCurrentTeam(): Team
 
+    fun isCurrentTurn(): Boolean {
+        return getCurrentTeam() == thisTeam
+    }
+
 }

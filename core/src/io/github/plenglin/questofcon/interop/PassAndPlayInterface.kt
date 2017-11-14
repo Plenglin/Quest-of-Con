@@ -12,7 +12,7 @@ import io.github.plenglin.questofcon.game.pawn.PawnType
 
 class PassAndPlayManager(val state: GameState) {
     val interfaces = state.teams.map { PassAndPlayInterface(it.id, this) }
-    fun currentInterface() = interfaces.find { it.thisTeam == state.getCurrentTeam() }!!
+    fun currentInterface() = interfaces.find { it.isCurrentTurn() }!!
 
     init {
         state.pawnChange.addListener { p ->

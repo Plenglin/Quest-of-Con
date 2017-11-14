@@ -199,7 +199,7 @@ object RadialMenuInputManager : KtxInputAdapter {
         when (button) {
             Input.Buttons.RIGHT -> {
                 val hov = GridSelectionInputManager.hovering
-                if (hov != null) {
+                if (hov != null && UI.targetPlayerInterface.isCurrentTurn()) {
                     selectedCoord = hov
                     radialMenu.items = getSelectables()
                     radialMenu.setPosition(screenX.toFloat(), UI.viewport.screenHeight - screenY.toFloat())
