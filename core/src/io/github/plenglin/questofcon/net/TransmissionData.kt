@@ -49,6 +49,17 @@ data class DataWorldState(val grid: Array<Array<DataTile>>) : Serializable {
     override fun hashCode(): Int {
         return Arrays.hashCode(grid)
     }
+
+    val displayString = lazy {
+        var out = ""
+        grid.forEach { col ->
+            col.forEach { cell ->
+                out += "(${cell.biome}, ${cell.elevation})\t"
+            }
+            out += "\n"
+        }
+        out
+    }
 }
 data class DataTile(val biome: Long, val elevation: Int) : Serializable
 

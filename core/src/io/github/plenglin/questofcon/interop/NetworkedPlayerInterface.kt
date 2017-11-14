@@ -1,17 +1,15 @@
 package io.github.plenglin.questofcon.interop
 
 import com.badlogic.gdx.graphics.Color
-import io.github.plenglin.questofcon.ListenerManager
 import io.github.plenglin.questofcon.game.GameData
 import io.github.plenglin.questofcon.game.PlayerInterface
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.building.Building
-import io.github.plenglin.questofcon.game.building.BuildingCreator
-import io.github.plenglin.questofcon.game.grid.Biomes
+import io.github.plenglin.questofcon.game.building.BuildingType
 import io.github.plenglin.questofcon.game.grid.World
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 import io.github.plenglin.questofcon.game.pawn.Pawn
-import io.github.plenglin.questofcon.game.pawn.PawnCreator
+import io.github.plenglin.questofcon.game.pawn.PawnType
 import io.github.plenglin.questofcon.net.*
 
 
@@ -26,15 +24,17 @@ class NetworkedPlayerInterface(val client: Client) : PlayerInterface() {
     init {
         val resp = client.initialResponse
         val grid = resp.world.grid
+
+        println(resp.world.displayString.value)
         world = World(grid.size, grid[0].size)
 
-        world.forEach {
-            val i = it.i
-            val j = it.j
+        world.forEach { coord ->
+            val i = coord.i
+            val j = coord.j
             val data = grid[i][j]
-            it.tile!!.let {
+            coord.tile!!.let {
                 it.elevation = data.elevation
-                it.biome = Biomes.getById(data.biome)!!
+                it.biome = GameData.biomes[data.biome]
             }
         }
 
@@ -64,7 +64,8 @@ class NetworkedPlayerInterface(val client: Client) : PlayerInterface() {
                     val j = bldgData.pos.j
                     var building = getBuildingData(bldgData.id)
                     if (building == null) {
-                        building = GameData.buildingByType(bldgData.type).createBuildingAt(teams[bldgData.team]!!, WorldCoords(world, i, j), client.dummy)
+                        //building = GameData.buildings[bldgData.type].createBuildingAt(teams[bldgData.team]!!, WorldCoords(world, i, j), client.dummy)
+                        building = Building(GameData.buildings[bldgData.type], teams[bldgData.team]!!, WorldCoords(world, i, j)).applyToPosition()
                         building.id = bldgData.id
                     }
                     building.team = teams[bldgData.team]!!
@@ -79,7 +80,8 @@ class NetworkedPlayerInterface(val client: Client) : PlayerInterface() {
                     val j = pawnData.pos.j
                     var pawn = getPawnData(data.id)
                     if (pawn == null) {
-                        pawn = GameData.pawnByType(pawnData.type).createPawnAt(teams[pawnData.team]!!, WorldCoords(world, i, j), client.dummy)
+                        //pawn = GameData.pawns[pawnData.type].createPawnAt(teams[pawnData.team]!!, WorldCoords(world, i, j), client.dummy)
+                        pawn = Pawn(GameData.pawns[pawnData.type], teams[pawnData.team]!!, WorldCoords(world, i, j)).applyToPosition()
                         pawn.id = pawnData.id
                     }
                     pawn.ap = pawnData.ap
@@ -107,7 +109,7 @@ class NetworkedPlayerInterface(val client: Client) : PlayerInterface() {
         return teams[currentTeam]!!
     }
 
-    override fun makePawn(at: WorldCoords, type: PawnCreator, onResult: (Pawn?) -> Unit) {
+    override fun makePawn(at: WorldCoords, type: PawnType, onResult: (Pawn?) -> Unit) {
         client.action(ClientActions.MAKE_PAWN, DataPawnCreation(type.id, at.serialized()))
     }
 
@@ -119,7 +121,7 @@ class NetworkedPlayerInterface(val client: Client) : PlayerInterface() {
         client.action(ClientActions.ATTACK_PAWN, DataPawnAttack(id, target.serialized()), respOk(onResult))
     }
 
-    override fun makeBuilding(at: WorldCoords, type: BuildingCreator, onResult: (Building?) -> Unit) {
+    override fun makeBuilding(at: WorldCoords, type: BuildingType, onResult: (Building?) -> Unit) {
         client.action(ClientActions.MAKE_BUILDING, DataBuildingCreation(type.id, at.serialized()))
     }
 

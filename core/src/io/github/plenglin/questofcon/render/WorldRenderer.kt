@@ -45,7 +45,7 @@ class WorldRenderer(val world: World) {
                 val x = i.toFloat()
                 col.forEachIndexed { j, tile ->
                     val y = j.toFloat()
-                    batch.draw(tile.biome.texture.bg(), x, y, 1f, 1f)
+                    batch.draw(tile.biome.texture(), x, y, 1f, 1f)
                 }
             }
 
@@ -74,12 +74,12 @@ class WorldRenderer(val world: World) {
             shape.end()
 
             // Draw in the selection sets
-            Gdx.gl20.glEnable(GL20.GL_BLEND);
-            Gdx.gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+            Gdx.gl.glEnable(GL20.GL_BLEND)
+            Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
             shape.begin()
             paints.forEach { it.draw(shape) }
             shape.end()
-            Gdx.gl20.glDisable(GL20.GL_BLEND);
+            Gdx.gl.glDisable(GL20.GL_BLEND)
 
             // Draw buildings
             batch.enableBlending()
@@ -117,7 +117,7 @@ class WorldRenderer(val world: World) {
 
                     if (pawn != null) {
 
-                        val tex = pawn.texture() ?: Assets[Assets.missing]
+                        val tex = pawn.texture
                         val y = j.toFloat()
 
                         // Team outline
@@ -126,7 +126,7 @@ class WorldRenderer(val world: World) {
                         val color = pawn.team.color.cpy()
                         color.a = 0.5f
                         batch.color = color
-                        batch.draw(pawn.texture(), x, y, 1f, 1f)
+                        batch.draw(pawn.texture, x, y, 1f, 1f)
                     }
                 }
 

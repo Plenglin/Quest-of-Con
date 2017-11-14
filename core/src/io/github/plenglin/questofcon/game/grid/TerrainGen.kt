@@ -1,8 +1,9 @@
 package io.github.plenglin.questofcon.game.grid
 
 import io.github.plenglin.questofcon.Constants
-import io.github.plenglin.questofcon.linMap
-import io.github.plenglin.questofcon.logit
+import io.github.plenglin.questofcon.game.GameData
+import io.github.plenglin.util.HeightMap
+import io.github.plenglin.util.logit
 import java.util.*
 
 
@@ -100,73 +101,6 @@ class DiamondSquareHeightGenerator(scale: Int, val initialOffsets: Double = 0.5,
 
 }
 
-class HeightMap(val grid: Array<Array<Double>>) {
-
-    constructor(grid: Collection<Collection<Double>>): this(grid.map { it.toTypedArray() }.toTypedArray())
-
-    val width = grid.size
-
-    val normalized get(): HeightMap {
-        val max = grid.flatten().max()!!
-        val min = grid.flatten().min()!!
-        println("max: $max, min: $min")
-        return HeightMap(grid.map { col ->
-            col.map { linMap(it, min, max, 0.0, 1.0) }.toTypedArray()
-        }.toTypedArray())
-    }
-
-    operator fun times(other: HeightMap): HeightMap {
-        return HeightMap((0 until width).map { i ->
-            (0 until width).map { j ->
-                this[i][j] * other[i][j]
-            }
-        })
-    }
-
-    operator fun times(other: Double): HeightMap {
-        return HeightMap((0 until width).map { i ->
-            (0 until width).map { j ->
-                this[i][j] * other
-            }
-        })
-    }
-
-    operator fun plus(other: Double): HeightMap {
-        return HeightMap((0 until width).map { i ->
-            (0 until width).map { j ->
-                this[i][j] + other
-            }
-        })
-    }
-
-    operator fun get(i: Int): Array<Double> {
-        return grid[i]
-    }
-
-    /**
-     * Interpolate the data.
-     * @param x A number in [0, 1]
-     * @param y A number in [0, 1]
-     */
-    operator fun get(x: Double, y: Double): Double {
-        // Numbers and the cells
-        val i = x * (width - 1)
-        val j = y * (width - 1)
-        val i1 = i.toInt()
-        val j1 = j.toInt()
-        val i2 = i1 + 1
-        val j2 = j1 + 1
-
-        // Get the sides
-        val s1 = linMap(i, i1.toDouble(), i2.toDouble(), grid[i1][j1], grid[i2][j1])
-        val s2 = linMap(i, i1.toDouble(), i2.toDouble(), grid[i1][j2], grid[i2][j1])
-
-        // Interpolate the values at the sides
-        return linMap(j, j1.toDouble(), j2.toDouble(), s1, s2)
-    }
-
-}
-
 /**
  * Takes a biome height map and turns it into a [World].
  */
@@ -198,29 +132,29 @@ class BiomeGenerator(val world: World, val height: HeightMap, val rainfall: Heig
 
             tile.biome = {
                 if (tile.elevation == Constants.ELEVATION_LEVELS - 1) {
-                    Biomes.mountains
+                    GameData.mountains
                 }
                 if (tile.elevation == 0) {
-                    Biomes.water
+                    GameData.water
                 }
                 when {
-                    tile.elevation == Constants.ELEVATION_LEVELS - 1 -> Biomes.mountains
-                    h > 0.7 -> Biomes.highlands
-                    h > 0.25 -> if (water > 0.5) Biomes.grass else Biomes.desert
-                    else -> Biomes.water
+                    tile.elevation == Constants.ELEVATION_LEVELS - 1 -> GameData.mountains
+                    h > 0.7 -> GameData.highlands
+                    h > 0.25 -> if (water > 0.5) GameData.grass else GameData.desert
+                    else -> GameData.water
                 }
             }()
 
         }
 
-        val waterTiles = world.filter { it.tile!!.biome == Biomes.water }
-        val singleWaterTiles = waterTiles.filter { !it.surrounding().any { it.tile!!.biome == Biomes.water} }
+        val waterTiles = world.filter { it.tile!!.biome == GameData.water }
+        val singleWaterTiles = waterTiles.filter { !it.surrounding().any { it.tile!!.biome == GameData.water} }
         singleWaterTiles.forEach { waterTile ->
             waterTile.tile!!.biome = waterTile.surrounding()[0].tile!!.biome
         }
 
         val beachTiles = waterTiles.map { it.surrounding().toSet() }.reduce { acc, list -> acc + list } - waterTiles
-        beachTiles.forEach { it.tile!!.biome = Biomes.beach }
+        beachTiles.forEach { it.tile!!.biome = GameData.beach }
     }
 
 }

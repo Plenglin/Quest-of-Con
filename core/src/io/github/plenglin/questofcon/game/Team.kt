@@ -2,9 +2,8 @@ package io.github.plenglin.questofcon.game
 
 import com.badlogic.gdx.graphics.Color
 import io.github.plenglin.questofcon.Constants
-import io.github.plenglin.questofcon.ListenerManager
-import io.github.plenglin.questofcon.game.building.BuildingCreator
-import io.github.plenglin.questofcon.game.building.BuildingHQ
+import io.github.plenglin.util.ListenerManager
+import io.github.plenglin.questofcon.game.building.BuildingType
 import io.github.plenglin.questofcon.game.grid.World
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 import io.github.plenglin.questofcon.net.DataTeam
@@ -24,8 +23,8 @@ class Team(val name: String, val color: Color, _id: Long = -1) {
     var hasBuiltHQ = false
     lateinit var world: World
 
-    fun getBuildable(): List<BuildingCreator> {
-        return if (hasBuiltHQ) GameData.spawnableBuildings else listOf(BuildingHQ)
+    fun getBuildable(): List<BuildingType> {
+        return if (hasBuiltHQ) GameData.buildings.toList().filter { it != GameData.hq } else listOf(GameData.hq)
     }
 
     fun getOwnedTiles(): List<WorldCoords> = world.filter { it.tile!!.getTeam() == this }.toList()

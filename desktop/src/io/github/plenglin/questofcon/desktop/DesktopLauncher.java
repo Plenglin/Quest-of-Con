@@ -5,6 +5,7 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import io.github.plenglin.questofcon.Config;
 import io.github.plenglin.questofcon.Constants;
 import io.github.plenglin.questofcon.QuestOfCon;
+import io.github.plenglin.questofcon.game.GameData;
 import io.github.plenglin.questofcon.net.Matchmaker;
 import org.apache.commons.cli.*;
 
@@ -38,6 +39,7 @@ public class DesktopLauncher {
 	}
 
     private static void startServer(int port) {
+        GameData.INSTANCE.register();
         Matchmaker.INSTANCE.acceptSockets(port);
         System.exit(0);
     }
@@ -47,7 +49,7 @@ public class DesktopLauncher {
         String x = System.getenv("windowx");
 
         LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-        config.useGL30 = true;
+        config.useGL30 = false;
         config.foregroundFPS = 60;
         config.backgroundFPS = 30;
         config.width = 800;

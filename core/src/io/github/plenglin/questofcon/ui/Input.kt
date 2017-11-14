@@ -2,18 +2,17 @@ package io.github.plenglin.questofcon.ui
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
-import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.math.Vector3
 import io.github.plenglin.questofcon.Constants
-import io.github.plenglin.questofcon.game.building.BuildingHQ
+import io.github.plenglin.questofcon.game.GameData
 import io.github.plenglin.questofcon.game.grid.World
 import io.github.plenglin.questofcon.game.grid.WorldCoords
 import io.github.plenglin.questofcon.render.CameraTransformBuffer
 import io.github.plenglin.questofcon.render.ShadeSet
 import io.github.plenglin.questofcon.ui.elements.BuildingSpawningDialog
-import io.github.plenglin.questofcon.ui.elements.Selectable
+import io.github.plenglin.questofcon.ui.elements.RadialMenuItem
 import ktx.app.KtxInputAdapter
 
 
@@ -200,7 +199,7 @@ object RadialMenuInputManager : KtxInputAdapter {
         when (button) {
             Input.Buttons.RIGHT -> {
                 val hov = GridSelectionInputManager.hovering
-                if (hov != null) {
+                if (hov != null && UI.targetPlayerInterface.isCurrentTurn()) {
                     selectedCoord = hov
                     radialMenu.items = getSelectables()
                     radialMenu.setPosition(screenX.toFloat(), UI.viewport.screenHeight - screenY.toFloat())
@@ -231,13 +230,13 @@ object RadialMenuInputManager : KtxInputAdapter {
         return false
     }
 
-    private fun getSelectables(): List<Selectable> {
+    private fun getSelectables(): List<RadialMenuItem> {
         val currentTeam = UI.targetPlayerInterface.thisTeam
         val selection = GridSelectionInputManager.hovering ?: return emptyList()
 
         if (currentTeam.hasBuiltHQ) {
 
-            val actions = mutableListOf<Selectable>()
+            val actions = mutableListOf<RadialMenuItem>()
 
             // Pawn actions
             val pawn = selection.tile!!.pawn
@@ -253,10 +252,9 @@ object RadialMenuInputManager : KtxInputAdapter {
 
             // Construction actions
             if (selection.tile.canBuildOn(currentTeam)) {
-                actions.add(Selectable("Build", {
+                actions.add(RadialMenuItem("Build", {
                     BuildingSpawningDialog(
-                            UI.skin,
-                            it
+                            UI.skin, it
                     ).show(UI.stage)
                 }))
             }
@@ -265,8 +263,9 @@ object RadialMenuInputManager : KtxInputAdapter {
 
         } else {
             return if (selection.tile?.canBuildOn(currentTeam) == true)
-                listOf(Selectable("Build HQ", {
-                    UI.targetPlayerInterface.makeBuilding(selectedCoord, BuildingHQ)
+                listOf(RadialMenuItem("Build HQ", {
+                    UI.targetPlayerInterface.makeBuilding(selectedCoord, GameData.hq)
+                    currentTeam.hasBuiltHQ = true
                 }))
             else emptyList()
         }

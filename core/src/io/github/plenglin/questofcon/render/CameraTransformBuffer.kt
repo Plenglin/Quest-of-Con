@@ -5,7 +5,7 @@ import com.badlogic.gdx.math.Vector3
 import ktx.math.*
 
 
-class CameraTransformBuffer(val camera: OrthographicCamera, val maxPositionSize: Int = 15, val maxZoomSize: Int = 20) {
+class CameraTransformBuffer(val camera: OrthographicCamera, val maxPositionSize: Int = 10, val maxZoomSize: Int = 20) {
 
     private val positions = mutableListOf<Vector3>()
     private val zooms = mutableListOf<Float>()

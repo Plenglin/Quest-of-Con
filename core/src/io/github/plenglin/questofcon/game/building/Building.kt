@@ -1,59 +1,68 @@
 package io.github.plenglin.questofcon.game.building
 
-import com.badlogic.gdx.graphics.Texture
+import io.github.plenglin.questofcon.game.GameData
 import io.github.plenglin.questofcon.game.GameState
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
-import io.github.plenglin.questofcon.game.pawn.PawnCreator
+import io.github.plenglin.questofcon.game.pawn.PawnType
 import io.github.plenglin.questofcon.net.DataBuilding
-import io.github.plenglin.questofcon.ui.elements.ConfirmationDialog
-import io.github.plenglin.questofcon.ui.elements.Selectable
 import io.github.plenglin.questofcon.ui.UI
+import io.github.plenglin.questofcon.ui.elements.ConfirmationDialog
+import io.github.plenglin.questofcon.ui.elements.RadialMenuItem
+import io.github.plenglin.questofcon.ui.elements.UnitSpawningDialog
 import java.io.Serializable
 
-var nextBuildingCreatorId = 0L
-
-abstract class BuildingCreator(val name: String, val cost: Int) {
-
-    val id = nextBuildingCreatorId++
-
-    abstract fun createBuildingAt(team: Team, worldCoords: WorldCoords, gameState: GameState): Building
-
-}
 
 var nextBuildingId = 0L
 
-abstract class Building(val name: String, var team: Team, var pos: WorldCoords, val maxHealth: Int, val gameState: GameState, val type: Long) {
+class Building(val type: BuildingType, var team: Team, var pos: WorldCoords) {
 
     var id = nextBuildingId++
-
-    abstract val texture: Texture?
+    var gameState: GameState? = null
 
     var enabled = true
 
-    var health = maxHealth
+    var health = type.maxHp
         set(value) {
             field = value
             if (health <= 0) {
                 pos.tile!!.building = null
             }
-            gameState.buildingChange.fire(this)
+            gameState?.buildingChange?.fire(this)
         }
 
-    open fun getMoneyPerTurn() = 0
+    fun applyToPosition(gameState: GameState? = null): Building {
+        pos.tile!!.building = this
+        this.gameState = gameState
+        return this
+    }
 
-    open fun onTurnBegin() = Unit
+    fun getMoneyPerTurn() = 0
 
-    open fun onTurnEnd() = Unit
+    fun onTurnBegin() = Unit
 
-    open fun getRadialActions() = listOf(Selectable("Demolish $name", {
-        ConfirmationDialog("Demolish $name", UI.skin, {
-            UI.targetPlayerInterface.demolishBuilding(this.id)
-        }).show(UI.stage)
-    }))
+    fun onTurnEnd() = Unit
 
-    open fun getProperties(): Map<String, Any> {
-        val map = mutableMapOf("type" to name, "hp" to "$health/$maxHealth", "team" to team.name)
+    fun getRadialActions(): List<RadialMenuItem> {
+        val out = mutableListOf<RadialMenuItem>()
+        if (this.type != GameData.hq) {
+            out.add(RadialMenuItem("Demolish $displayName", {
+                ConfirmationDialog("Demolish $displayName", UI.skin, {
+                    UI.targetPlayerInterface.demolishBuilding(this.id)
+                }).show(UI.stage)
+            }))
+        }
+        val buildables = this.buildable
+        if (buildables.isNotEmpty()) {
+            out.add(RadialMenuItem("Make", {
+                UnitSpawningDialog(buildables, UI.skin, pos, team).show(UI.stage)
+            }))
+        }
+        return out
+    }
+
+    fun getProperties(): Map<String, Any> {
+        val map = mutableMapOf("type" to type.displayName, "hp" to "$health/${type.maxHp}", "team" to team.name)
         val money = getMoneyPerTurn()
         if (money > 0) {
             map.put("Income", "$$money")
@@ -61,10 +70,12 @@ abstract class Building(val name: String, var team: Team, var pos: WorldCoords, 
         return map
     }
 
-    open fun canCreate(type: PawnCreator): Boolean = false
-
     fun serialized(): Serializable? {
-        return DataBuilding(id, team.id, type, health, enabled, pos.serialized())
+        return DataBuilding(id, team.id, type.id, health, enabled, pos.serialized())
     }
+
+    val buildable get(): List<PawnType> = type.buildable(team)
+    val texture get() = type.texture()
+    val displayName = type.displayName
 
 }

@@ -1,7 +1,9 @@
 package io.github.plenglin.questofcon.game.grid
 
+import io.github.plenglin.questofcon.game.GameData
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.building.Building
+import io.github.plenglin.questofcon.game.building.Improvement
 import io.github.plenglin.questofcon.game.pawn.Pawn
 import io.github.plenglin.questofcon.net.DataTile
 
@@ -10,10 +12,11 @@ import io.github.plenglin.questofcon.net.DataTile
  */
 class Tile {
 
-    var biome: Biome = Biomes.grass
+    var biome: Biome = GameData.grass
     var elevation: Int = 0
     var pawn: Pawn? = null
     var building: Building? = null
+    var improvement: Improvement? = null
 
     fun getTeam(): Team? {
         return pawn?.team ?: building?.team

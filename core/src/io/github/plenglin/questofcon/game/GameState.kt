@@ -1,7 +1,7 @@
 package io.github.plenglin.questofcon.game
 
 import com.badlogic.gdx.graphics.Color
-import io.github.plenglin.questofcon.ListenerManager
+import io.github.plenglin.util.ListenerManager
 import io.github.plenglin.questofcon.game.building.Building
 import io.github.plenglin.questofcon.game.grid.World
 import io.github.plenglin.questofcon.game.pawn.Pawn
@@ -13,7 +13,6 @@ open class GameState(val teams: List<Team>) {
 
     val world = World(32, 32)
     private var teamIndex = 0
-    private var events = mutableListOf<Event>()
 
     val turnChange = ListenerManager<Team>()
     val pawnChange = ListenerManager<Pawn>()
@@ -38,21 +37,6 @@ open class GameState(val teams: List<Team>) {
         getAllPawns().forEach { pawnChange.fire(it) }
         getAllBuildings().forEach { buildingChange.fire(it) }
         turnChange.fire(getCurrentTeam())
-    }
-
-    fun queueEvent(event: Event) {
-        events.add(event)
-    }
-
-    fun processEvents() {
-        while (!events.isEmpty()) {
-            val e = events.removeAt(0)
-            when (e) {
-                is PawnChangeEvent -> pawnChange.fire(getAllPawns().find { it.id == e.id }!!)
-                is BuildingChangeEvent -> buildingChange.fire(getAllBuildings().find { it.id == e.id }!!)
-                is WorldChangeEvent -> worldChange.fire(world)
-            }
-        }
     }
 
     fun getAllPawns(): Sequence<Pawn> {

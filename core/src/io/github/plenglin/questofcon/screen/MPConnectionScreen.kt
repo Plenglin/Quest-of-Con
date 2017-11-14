@@ -20,14 +20,12 @@ import java.net.Socket
 object MPConnectionScreen : KtxScreen {
 
     val viewport = ScreenViewport()
-    val stage = Stage()
-
-    var screenToSet: Screen? = null
+    lateinit var stage: Stage
 
     override fun show() {
-        screenToSet = null
-
-        GameData.spawnableBuildings.forEach {
+        println("mpconn: thread ${Thread.currentThread()}")
+        stage = Stage(viewport)
+        GameData.buildings.forEach {
             println("${it.id}: ${it.name}")
         }
         Scene2DSkin.defaultSkin = UI.skin
@@ -43,7 +41,7 @@ object MPConnectionScreen : KtxScreen {
                     val client = Client(sock, Config.name)
                     client.initialization.addListener {
                         println("Changing screen!")
-                        screenToSet = MPGameScreen(client)
+                        Gdx.app.postRunnable { QuestOfCon.screen = MPGameScreen(client) }
                     }
                     client.start()
                 }
@@ -57,9 +55,6 @@ object MPConnectionScreen : KtxScreen {
     }
 
     override fun render(delta: Float) {
-        if (screenToSet != null) {
-            QuestOfCon.screen = screenToSet
-        }
         Gdx.gl20.glClearColor(0f, 0.5f, 0.5f, 1f)
         Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT or GL20.GL_DEPTH_BUFFER_BIT)
         stage.draw()
