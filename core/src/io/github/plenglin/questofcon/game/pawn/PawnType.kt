@@ -27,7 +27,7 @@ class PawnType(_name: String) : Registerable, BuildableType<Pawn> {
     var targetRadius: Int = 0
 
     var baseHp = 1
-    var maxAtks = 0
+    var maxAtks = 1
     var maxAp = 3
 
     var cost = 0

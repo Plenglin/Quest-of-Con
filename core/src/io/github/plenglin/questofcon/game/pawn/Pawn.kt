@@ -1,5 +1,6 @@
 package io.github.plenglin.questofcon.game.pawn
 
+import io.github.plenglin.questofcon.Constants
 import io.github.plenglin.questofcon.game.GameState
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
@@ -18,6 +19,8 @@ class Pawn(val type: PawnType, var team: Team, _pos: WorldCoords, var level: Int
     val maxAp = type.maxAp
     val maxHealth get() = type.maxHp(level)
     val maxAttacks = type.maxAtks
+
+    val isHealer = type.baseAtk < 0
 
     var gameState: GameState? = null
 
@@ -41,8 +44,9 @@ class Pawn(val type: PawnType, var team: Team, _pos: WorldCoords, var level: Int
             value.tile!!.pawn = this
         }
 
-    fun applyToPosition(): Pawn {
+    fun applyToPosition(gameState: GameState? = null): Pawn {
         pos.tile!!.pawn = this
+        this.gameState = gameState
         return this
     }
 
@@ -94,19 +98,10 @@ class Pawn(val type: PawnType, var team: Team, _pos: WorldCoords, var level: Int
     }
 
     fun damageTo(coords: WorldCoords): Int {
-        return coords.tile!!.elevation - pos.tile!!.elevation
-    }
-
-    /**
-     * Try to attemptAttack a square.
-     * @param coords the square to attemptAttack
-     * @return whether it was successful or not.
-     */
-    fun onAttack(coords: WorldCoords): Boolean {
-        coords.floodfill(type.targetRadius).forEach {
-
-        }
-        return false
+        val difference = maxOf(coords.tile!!.elevation - pos.tile!!.elevation, 0)
+        val coeff = 1 - Constants.ELEVATION_DEF_BONUS_PER_DELTA * difference
+        //println("$difference, $coeff")
+        return maxOf(Math.round(type.baseAtk * coeff).toInt(), 5)
     }
 
     fun attemptMoveTo(coords: WorldCoords, movementData: Map<WorldCoords, Int>): Boolean {
@@ -134,15 +129,31 @@ class Pawn(val type: PawnType, var team: Team, _pos: WorldCoords, var level: Int
 
     fun attemptAttack(coords: WorldCoords): Boolean {
         ap -= 1
-        val result = onAttack(coords)
-        if (result) {
-            attacksRemaining -= 1
-            gameState?.pawnChange?.fire(this)
+        val dist = coords.manhattanDist(pos)
+        var success = false
+        if (dist in type.minRange..type.maxRange) {
+            if (type.targetRadius == 0) {
+                if (coords.tile!!.getTeam() == this.team && isHealer) {
+                    success = coords.tile.doDamage(type.baseAtk)
+                } else if (coords.tile.getTeam() != null) {
+                    success = coords.tile.doDamage(damageTo(coords))
+                }
+            } else {
+                (coords.floodfill(type.maxRange) - coords.floodfill(type.minRange)).filter { it.tile!!.getTeam() != team }.forEach {
+                    it.tile!!.doDamage(damageTo(it))
+                }
+                attacksRemaining--
+                success = true
+            }
         }
-        return result
+
+        if (success) {
+            attacksRemaining--
+        }
+        return success
     }
 
-    open fun getRadialActions(): List<RadialMenuItem> {
+    fun getRadialActions(): List<RadialMenuItem> {
 
         val actions = mutableListOf<RadialMenuItem>(RadialMenuItem("Disband $displayName", {
             ConfirmationDialog("Disband $displayName", UI.skin, {
@@ -151,15 +162,21 @@ class Pawn(val type: PawnType, var team: Team, _pos: WorldCoords, var level: Int
         }))
 
         if (ap > 0) {
-
             actions.add(RadialMenuItem("Move $displayName", {
                 PawnActionManager.beginMoving(this)
             }))
-
             if (attacksRemaining > 0) {
-                actions.add(RadialMenuItem("Attack with $displayName", {
-                    PawnActionManager.beginAttacking(this)
-                }))
+
+                if (isHealer) {
+                    RadialMenuItem("Heal with $displayName", {
+                        PawnActionManager.beginAttacking(this)
+                    })
+                } else {
+                    actions.add(RadialMenuItem("Attack with $displayName", {
+                        PawnActionManager.beginAttacking(this)
+                    }))
+                }
+
             }
 
         }

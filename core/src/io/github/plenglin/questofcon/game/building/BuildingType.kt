@@ -24,7 +24,7 @@ class BuildingType(_name: String) : Registerable, BuildableType<Building> {
     var cost = 0
     var upkeep = 0
 
-    var power = 0
+    var powerConsumption = 0
 
     var buildable: (Team) -> List<PawnType> = { emptyList() }
 

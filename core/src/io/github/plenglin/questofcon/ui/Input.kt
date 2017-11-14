@@ -254,8 +254,7 @@ object RadialMenuInputManager : KtxInputAdapter {
             if (selection.tile.canBuildOn(currentTeam)) {
                 actions.add(RadialMenuItem("Build", {
                     BuildingSpawningDialog(
-                            UI.skin,
-                            it
+                            UI.skin, it
                     ).show(UI.stage)
                 }))
             }

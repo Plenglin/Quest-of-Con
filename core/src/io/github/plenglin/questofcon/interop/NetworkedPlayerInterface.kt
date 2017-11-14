@@ -65,7 +65,7 @@ class NetworkedPlayerInterface(val client: Client) : PlayerInterface() {
                     var building = getBuildingData(bldgData.id)
                     if (building == null) {
                         //building = GameData.buildings[bldgData.type].createBuildingAt(teams[bldgData.team]!!, WorldCoords(world, i, j), client.dummy)
-                        building = Building(GameData.buildings[bldgData.type], teams[bldgData.team]!!, WorldCoords(world, i, j))
+                        building = Building(GameData.buildings[bldgData.type], teams[bldgData.team]!!, WorldCoords(world, i, j)).applyToPosition()
                         building.id = bldgData.id
                     }
                     building.team = teams[bldgData.team]!!

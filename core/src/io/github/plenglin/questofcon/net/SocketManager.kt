@@ -85,9 +85,9 @@ class SocketManager(val socket: Socket, val parent: GameRoom) : Thread("SocketMa
                     val type = GameData.pawns[data.type]
                     team.money -= type.cost
                     //val pawn = creator.createPawnAt(team, WorldCoords(parent.gameState.world, data.at), parent.gameState)
-                    val pawn = Pawn(type, team, WorldCoords(parent.gameState.world, data.at)).applyToPosition()
+                    val pawn = Pawn(type, team, WorldCoords(parent.gameState.world, data.at)).applyToPosition(parent.gameState)
                     val ser = pawn.serialized()
-                    //parent.broadcastEvent(ServerEventTypes.PAWN_CHANGE, ser)
+                    parent.broadcastEvent(ServerEventTypes.PAWN_CHANGE, ser)
                     return ServerResponse(msgId, ser)
                 }
                 ClientActions.MAKE_BUILDING -> {
@@ -95,9 +95,9 @@ class SocketManager(val socket: Socket, val parent: GameRoom) : Thread("SocketMa
                     val type = GameData.buildings[data.type]
                     team.money -= type.cost
                     //val building = creator.createBuildingAt(team, WorldCoords(parent.gameState.world, data.at), parent.gameState)
-                    val building = Building(type, team, WorldCoords(parent.gameState.world, data.at)).applyToPosition()
+                    val building = Building(type, team, WorldCoords(parent.gameState.world, data.at)).applyToPosition(parent.gameState)
                     val ser = building.serialized()
-                    //parent.broadcastEvent(ServerEventTypes.BUILDING_CHANGE, ser)
+                    parent.broadcastEvent(ServerEventTypes.BUILDING_CHANGE, ser)
                     return ServerResponse(msgId, ser)
                 }
                 ClientActions.DEMOLISH_BUILDING -> {

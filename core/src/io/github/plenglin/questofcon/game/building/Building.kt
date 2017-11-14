@@ -1,5 +1,6 @@
 package io.github.plenglin.questofcon.game.building
 
+import io.github.plenglin.questofcon.game.GameData
 import io.github.plenglin.questofcon.game.GameState
 import io.github.plenglin.questofcon.game.Team
 import io.github.plenglin.questofcon.game.grid.WorldCoords
@@ -8,6 +9,7 @@ import io.github.plenglin.questofcon.net.DataBuilding
 import io.github.plenglin.questofcon.ui.UI
 import io.github.plenglin.questofcon.ui.elements.ConfirmationDialog
 import io.github.plenglin.questofcon.ui.elements.RadialMenuItem
+import io.github.plenglin.questofcon.ui.elements.UnitSpawningDialog
 import java.io.Serializable
 
 
@@ -29,8 +31,9 @@ class Building(val type: BuildingType, var team: Team, var pos: WorldCoords) {
             gameState?.buildingChange?.fire(this)
         }
 
-    fun applyToPosition(): Building {
+    fun applyToPosition(gameState: GameState? = null): Building {
         pos.tile!!.building = this
+        this.gameState = gameState
         return this
     }
 
@@ -40,11 +43,23 @@ class Building(val type: BuildingType, var team: Team, var pos: WorldCoords) {
 
     fun onTurnEnd() = Unit
 
-    fun getRadialActions() = listOf(RadialMenuItem("Demolish ${type.displayName}", {
-        ConfirmationDialog("Demolish ${type.displayName}", UI.skin, {
-            UI.targetPlayerInterface.demolishBuilding(this.id)
-        }).show(UI.stage)
-    }))
+    fun getRadialActions(): List<RadialMenuItem> {
+        val out = mutableListOf<RadialMenuItem>()
+        if (this.type != GameData.hq) {
+            out.add(RadialMenuItem("Demolish $displayName", {
+                ConfirmationDialog("Demolish $displayName", UI.skin, {
+                    UI.targetPlayerInterface.demolishBuilding(this.id)
+                }).show(UI.stage)
+            }))
+        }
+        val buildables = this.buildable
+        if (buildables.isNotEmpty()) {
+            out.add(RadialMenuItem("Make", {
+                UnitSpawningDialog(buildables, UI.skin, pos, team).show(UI.stage)
+            }))
+        }
+        return out
+    }
 
     fun getProperties(): Map<String, Any> {
         val map = mutableMapOf("type" to type.displayName, "hp" to "$health/${type.maxHp}", "team" to team.name)

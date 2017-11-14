@@ -46,7 +46,7 @@ object GameData {
     val tankdes = PawnType("veh-td").apply {
         displayName = "tank destroyer"
         cost = 300
-        baseAtk = 50
+        baseAtk = 30
         baseHp = 20
         maxRange = 4
         maxAp = 2
@@ -90,25 +90,28 @@ object GameData {
 
     val hq = BuildingType("bldg-hq").apply {
         displayName = "headquarters"
+        maxHp = 1000
         upkeep = -Constants.BASE_ECO
-        power = -100
+        powerConsumption = -100
         texture = { Assets[Assets.headquarters] }
     }
 
     val factory = BuildingType("bldg-factory").apply {
         displayName = "factory"
+        maxHp = 100
+        cost = 150
         upkeep = 0
-        power = 10
+        powerConsumption = 10
         texture = { Assets[Assets.factory] }
-        /*buildable = listOf(
-
-        )*/
+        buildable = { pawns.toList() }
     }
 
     val mine = BuildingType("bldg-mine").apply {
-        displayName = "headquarters"
+        displayName = "mine"
+        maxHp = 75
+        cost = 200
         upkeep = -30
-        power = 10
+        powerConsumption = 10
         texture = { Assets[Assets.mine] }
     }
 
@@ -118,6 +121,7 @@ object GameData {
     val highlands   = Biome("biome-highlands", "highlands", true, false, { Assets[Assets.bighill] }, movementCost = 2)
     val water       = Biome("biome-water", "water", false, false, { Assets[Assets.water] })
     val mountains   = Biome("biome-mountains", "mountains", false, false, { Assets[Assets.mountain] })
+    val flattened   = Biome("biome-flattened", "flattened", true, true, { Assets[Assets.smallhill] })
 
     fun register() {
         pawns.register(grunt)

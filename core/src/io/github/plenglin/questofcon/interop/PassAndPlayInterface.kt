@@ -38,7 +38,7 @@ class PassAndPlayInterface(override val thisTeamId: Long, val parent: PassAndPla
         val building = at.tile!!.building
         if (thisTeam.money >= type.cost && building?.team == thisTeam && building.buildable.contains(type)) {
             thisTeam.money -= type.cost
-            val newPawn = Pawn(type, thisTeam, at).applyToPosition()
+            val newPawn = Pawn(type, thisTeam, at).applyToPosition(gameState)
             newPawn.ap = 0
             onResult(newPawn)
         } else {

@@ -47,6 +47,10 @@ data class WorldCoords(val world: World, val i: Int, val j: Int) {
 
     fun serialized(): DataPosition = DataPosition(i, j)
 
+    fun manhattanDist(other: WorldCoords): Int {
+        return Math.abs(this.i - other.i) + Math.abs(this.j - other.j)
+    }
+
     constructor(world: World, pos: DataPosition) : this(world, pos.i, pos.j)
 
 }

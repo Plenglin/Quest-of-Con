@@ -20,6 +20,7 @@ object Constants {
     val BASE_ECO: Int = 100
     val HQ_HEALTH = 500
     val ELEVATION_LEVELS = 6
+    val ELEVATION_DEF_BONUS_PER_DELTA = 0.1
 
     val SERVER_PORT = 51337
 
